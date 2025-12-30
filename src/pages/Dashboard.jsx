@@ -162,7 +162,7 @@ const Dashboard = () => {
                         </Typography>
 
                         {/* Stats & Recommendations Section */}
-                        <Box sx={{ maxWidth: '1000px', mx: 'auto', mt: 4 }}>
+                        <Box sx={{ mx: 'auto', mt: 4 }}>
                             {/* Dashboard Hero Section */}
                             <DashboardHeader user={user} />
 
