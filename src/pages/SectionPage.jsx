@@ -424,7 +424,7 @@ Explain clearly why approach #3 is superior to the others.`;
                 <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Button
                         startIcon={<ArrowBack />}
-                        onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}`)}
+                        onClick={() => navigate(-1)}
                         sx={{
                             borderRadius: '9999px',
                             px: 3,

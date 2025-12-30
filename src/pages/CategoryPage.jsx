@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { categoryAPI, progressAPI, curriculumAPI } from '../services/api';
-import { useBookmarks } from '../context/BookmarkContext';
+import { curriculumAPI, progressAPI } from '../services/api';
+import { isBookmarked, toggleBookmark } from '../utils/bookmarks';
 import SafeImage from '../components/SafeImage';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import toast from 'react-hot-toast';
@@ -35,7 +35,7 @@ const CategoryPage = () => {
     const navigate = useNavigate();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
-    const { isBookmarked, toggleBookmark } = useBookmarks();
+    const [, setBookmarkUpdate] = useState(0); // Forcing re-render on bookmark toggle
 
     const [category, setCategory] = useState(null);
     const [sections, setSections] = useState([]);
@@ -103,6 +103,7 @@ const CategoryPage = () => {
         });
         if (result.success) {
             toast.success(result.message);
+            setBookmarkUpdate(prev => prev + 1);
         } else {
             toast.error(result.message);
         }
@@ -331,7 +332,7 @@ const CategoryPage = () => {
                                                             topicSlug: topicSlug,
                                                             difficulty: section.difficulty
                                                         });
-                                                        navigate(0);
+                                                        setBookmarkUpdate(prev => prev + 1);
                                                     }}
                                                     sx={{
                                                         color: sectionBookmarked ? topicColor : 'text.disabled',

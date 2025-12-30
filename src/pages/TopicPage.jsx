@@ -228,8 +228,7 @@ const TopicPage = () => {
                     >
                         {/* Back Button */}
                         <Button
-                            component={Link}
-                            to="/dashboard"
+                            onClick={() => navigate(-1)}
                             startIcon={<ArrowBack />}
                             sx={{
                                 mb: 4,
@@ -613,7 +612,7 @@ const TopicPage = () => {
                                                             <Box
                                                                 key={section._id}
                                                                 component={Link}
-                                                                to={`/topic/${topic.slug}/section/${section.slug}`}
+                                                                to={`/topic/${topic.slug}/category/${category.slug}/section/${section.slug}`}
                                                                 sx={{
                                                                     display: 'flex',
                                                                     alignItems: 'center',
