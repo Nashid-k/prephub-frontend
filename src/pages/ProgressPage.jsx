@@ -132,46 +132,60 @@ const ProgressPage = () => {
     }
 
     return (
-        <Box sx={{ minHeight: 'calc(100vh - 100px)', py: 6 }}>
-            <Container maxWidth="xl">
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5 }}
-                >
-                    <Box sx={{ mb: 6, textAlign: 'center' }}>
-                        <Box
-                            sx={{
-                                display: 'inline-flex',
-                                p: 2,
-                                borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
-                                mb: 3,
-                                boxShadow: '0 8px 24px rgba(94, 92, 230, 0.3)',
-                            }}
-                        >
-                            <TrendingUp sx={{ fontSize: 40, color: 'white' }} />
+        <Box sx={{ minHeight: 'calc(100vh - 100px)', pb: 8 }}>
+            {/* Hero Section */}
+            <Box
+                sx={{
+                    background: (theme) =>
+                        theme.palette.mode === 'dark'
+                            ? 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.15) 0%, transparent 60%)'
+                            : 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.08) 0%, transparent 60%)',
+                    py: 8,
+                    mb: 6,
+                }}
+            >
+                <Container maxWidth="xl">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <Box sx={{ textAlign: 'center' }}>
+                            <Box
+                                sx={{
+                                    display: 'inline-flex',
+                                    p: 2,
+                                    borderRadius: '50%',
+                                    background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
+                                    mb: 3,
+                                    boxShadow: '0 8px 32px rgba(94, 92, 230, 0.3)',
+                                }}
+                            >
+                                <TrendingUp sx={{ fontSize: 48, color: 'white' }} />
+                            </Box>
+                            <Typography
+                                variant="h2"
+                                component="h1"
+                                sx={{
+                                    fontWeight: 700,
+                                    mb: 2,
+                                    background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
+                                    WebkitBackgroundClip: 'text',
+                                    WebkitTextFillColor: 'transparent',
+                                    fontSize: { xs: '2.5rem', md: '3.5rem' },
+                                }}
+                            >
+                                Your Progress
+                            </Typography>
+                            <Typography variant="h6" color="text.secondary" sx={{ opacity: 0.8, fontWeight: 400, maxWidth: 600, mx: 'auto' }}>
+                                Track your learning journey across all topics and visualize your achievements.
+                            </Typography>
                         </Box>
-                        <Typography
-                            variant="h3"
-                            sx={{
-                                fontWeight: 700,
-                                mb: 2,
-                                background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
-                                backgroundClip: 'text',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                            }}
-                        >
-                            Your Progress
-                        </Typography>
-                        <Typography variant="h6" sx={{ opacity: 0.7, fontWeight: 400 }}>
-                            Track your learning journey
-                        </Typography>
-                    </Box>
-                </motion.div>
+                    </motion.div>
+                </Container>
+            </Box>
 
+            <Container maxWidth="xl">
                 {/* Stats Grid */}
                 <Grid container spacing={3} sx={{ mb: 6 }}>
                     {stats.map((stat, index) => (
@@ -184,32 +198,45 @@ const ProgressPage = () => {
                                 <Card
                                     sx={{
                                         background: isDark
-                                            ? 'linear-gradient(135deg, #1c1c1e 0%, #2c2c2e 100%)'
-                                            : 'linear-gradient(135deg, #ffffff 0%, #f5f5f7 100%)',
-                                        borderRadius: 3,
-                                        boxShadow: isDark ? '0 4px 20px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.1)',
+                                            ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%)'
+                                            : 'rgba(255, 255, 255, 0.8)',
+                                        borderRadius: '24px',
+                                        backdropFilter: 'blur(20px)',
+                                        border: '1px solid',
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                                        boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
+                                        height: '100%',
+                                        transition: 'transform 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-5px)',
+                                        }
                                     }}
                                 >
-                                    <CardContent>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                    <CardContent sx={{ p: 4 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                                             <Box
                                                 sx={{
                                                     p: 1.5,
-                                                    borderRadius: 2,
+                                                    borderRadius: '16px',
                                                     background: `${stat.color}20`,
                                                     color: stat.color,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    width: 56,
+                                                    height: 56,
                                                 }}
                                             >
                                                 {stat.icon}
                                             </Box>
                                         </Box>
-                                        <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+                                        <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, letterSpacing: '-0.02em' }}>
                                             {stat.value}
                                         </Typography>
-                                        <Typography variant="body2" color="text.secondary">
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary', mb: 0.5 }}>
                                             {stat.label}
                                         </Typography>
-                                        <Typography variant="caption" color="text.secondary">
+                                        <Typography variant="body2" color="text.secondary">
                                             {stat.description}
                                         </Typography>
                                     </CardContent>
@@ -220,97 +247,232 @@ const ProgressPage = () => {
                 </Grid>
 
                 {/* Analytics Section */}
-                <Grid container spacing={3} sx={{ mb: 6 }}>
-                    {/* Study Heatmap */}
-                    <Grid item xs={12} md={8}>
-                        <Paper sx={{ p: 3, borderRadius: 3 }}>
-                            <StudyHeatmap studyDates={studyDates} />
-                        </Paper>
-                    </Grid>
+                <Box sx={{ mb: 8 }}>
+                    <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>Analytics</Typography>
+                    <Grid container spacing={3}>
+                        {/* Study Heatmap */}
+                        <Grid item xs={12} md={8}>
+                            <Paper sx={{
+                                p: 4,
+                                borderRadius: '24px',
+                                background: isDark ? 'rgba(30, 30, 30, 0.4)' : '#fff',
+                                backdropFilter: 'blur(20px)',
+                                border: '1px solid',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                            }}>
+                                <StudyHeatmap studyDates={studyDates} />
+                            </Paper>
+                        </Grid>
 
-                    {/* Weak Areas */}
-                    <Grid item xs={12} md={4}>
-                        <WeakAreasCard topics={topics} />
-                    </Grid>
+                        {/* Weak Areas */}
+                        <Grid item xs={12} md={4}>
+                            <WeakAreasCard topics={topics} />
+                        </Grid>
 
-                    {/* Time Spent Chart */}
-                    <Grid item xs={12}>
-                        <Paper sx={{ p: 3, borderRadius: 3 }}>
-                            <TimeSpentChart topics={topicsForChart} />
-                        </Paper>
+                        {/* Time Spent Chart */}
+                        <Grid item xs={12}>
+                            <Paper sx={{
+                                p: 4,
+                                borderRadius: '24px',
+                                background: isDark ? 'rgba(30, 30, 30, 0.4)' : '#fff',
+                                backdropFilter: 'blur(20px)',
+                                border: '1px solid',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                            }}>
+                                <TimeSpentChart topics={topicsForChart} />
+                            </Paper>
+                        </Grid>
                     </Grid>
-                </Grid>
+                </Box>
 
-                <Divider sx={{ my: 6 }} />
+                <Divider sx={{ my: 6, opacity: 0.1 }} />
 
                 {/* Topics Progress List */}
-                <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-                    Topic Progress
+                <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>
+                    Detailed Progress
                 </Typography>
 
                 <Grid container spacing={3}>
-                    {topics.map((topic, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={topic.topicSlug}>
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 + index * 0.05 }}
-                            >
-                                <Card
-                                    component={Link}
-                                    to={topic.continueLink || `/topic/${topic.topicSlug}`}
-                                    sx={{
-                                        textDecoration: 'none',
-                                        height: '100%',
-                                        transition: 'all 0.3s',
-                                        borderRadius: 3,
-                                        '&:hover': {
-                                            transform: 'translateY(-4px)',
-                                            boxShadow: 4,
-                                        },
-                                    }}
+                    {topics.map((topic, index) => {
+                        const topicColor = getTopicColor(topic.topicSlug, isDark);
+                        const progress = topic.percentage || 0;
+                        return (
+                            <Grid item xs={12} sm={6} md={4} key={topic.topicSlug}>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.3 + index * 0.05 }}
+                                    style={{ height: '100%' }}
                                 >
-                                    <CardContent>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                            <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                                                {topic.topicName}
-                                            </Typography>
-                                            <Chip
-                                                label={`${topic.percentage}%`}
-                                                size="small"
-                                                color={topic.percentage === 100 ? 'success' : topic.percentage > 0 ? 'primary' : 'default'}
+                                    <Card
+                                        component={Link}
+                                        to={topic.continueLink || `/topic/${topic.topicSlug}`}
+                                        sx={{
+                                            textDecoration: 'none',
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            borderRadius: '32px',
+                                            background: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
+                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
+                                            backdropFilter: 'blur(20px)',
+                                            border: '1px solid',
+                                            borderColor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.08)'
+                                                    : 'rgba(0, 0, 0, 0.06)',
+                                            boxShadow: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? '0 8px 32px rgba(0, 0, 0, 0.4)'
+                                                    : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                                            transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                                            '&:hover': {
+                                                transform: 'translateY(-8px)',
+                                                boxShadow: `0 24px 64px ${topicColor}40`,
+                                                borderColor: topicColor,
+                                                '& .progress-bg-image': {
+                                                    transform: 'scale(1.1) rotate(5deg)',
+                                                    opacity: 0.15,
+                                                }
+                                            },
+                                        }}
+                                    >
+                                        {/* Background Image */}
+                                        <Box
+                                            className="progress-bg-image"
+                                            sx={{
+                                                position: 'absolute',
+                                                top: -20,
+                                                right: -20,
+                                                width: '200px',
+                                                height: '200px',
+                                                opacity: 0.05,
+                                                transition: 'all 0.6s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                                                pointerEvents: 'none',
+                                                zIndex: 0,
+                                            }}
+                                        >
+                                            <img
+                                                src={getTopicImage(topic.topicSlug)}
+                                                alt=""
+                                                style={{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    objectFit: 'contain',
+                                                    filter: isDark ? 'brightness(0.7)' : 'grayscale(100%)',
+                                                }}
+                                                onError={(e) => { e.target.style.display = 'none'; }}
                                             />
                                         </Box>
 
-                                        <LinearProgress
-                                            variant="determinate"
-                                            value={topic.percentage}
+                                        {/* Gradient Accent */}
+                                        <Box
                                             sx={{
-                                                height: 8,
-                                                borderRadius: 1,
-                                                mb: 2,
-                                                bgcolor: 'action.hover',
-                                                '& .MuiLinearProgress-bar': {
-                                                    background: getTopicColor(topic.topicSlug),
-                                                },
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                right: 0,
+                                                height: '120px',
+                                                background: `linear-gradient(135deg, ${topicColor}10 0%, transparent 100%)`,
+                                                opacity: 0.6,
+                                                pointerEvents: 'none',
                                             }}
                                         />
 
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Typography variant="body2" color="text.secondary">
-                                                {topic.completedSections}/{topic.totalSections} sections
-                                            </Typography>
-                                            {topic.percentage < 100 && (
-                                                <Typography variant="caption" sx={{ color: 'primary.main' }}>
-                                                    Continue →
+                                        <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2, height: '100%', position: 'relative', zIndex: 1 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <Box
+                                                    sx={{
+                                                        width: 56,
+                                                        height: 56,
+                                                        borderRadius: '16px',
+                                                        background: `linear-gradient(135deg, ${topicColor}20 0%, ${topicColor}10 100%)`,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        border: '1px solid',
+                                                        borderColor: `${topicColor}30`,
+                                                    }}
+                                                >
+                                                    <img
+                                                        src={getTopicImage(topic.topicSlug)}
+                                                        alt={topic.topicName}
+                                                        style={{ width: '60%', height: '60%', objectFit: 'contain' }}
+                                                        onError={(e) => { e.target.style.display = 'none'; }}
+                                                    />
+                                                </Box>
+                                                <Chip
+                                                    label={progress === 100 ? 'Completed' : 'In Progress'}
+                                                    size="small"
+                                                    sx={{
+                                                        bgcolor: progress === 100 ? 'success.light' : `${topicColor}20`,
+                                                        color: progress === 100 ? 'success.dark' : topicColor,
+                                                        fontWeight: 700,
+                                                        borderRadius: '8px',
+                                                        height: 28,
+                                                    }}
+                                                />
+                                            </Box>
+
+                                            <Box>
+                                                <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
+                                                    {topic.topicName}
                                                 </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {topic.completedSections} of {topic.totalSections} sections completed
+                                                </Typography>
+                                            </Box>
+
+                                            <Box sx={{ mt: 2 }}>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>Progress</Typography>
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: topicColor }}>{progress}%</Typography>
+                                                </Box>
+                                                <LinearProgress
+                                                    variant="determinate"
+                                                    value={progress}
+                                                    sx={{
+                                                        height: 10,
+                                                        borderRadius: '9999px',
+                                                        bgcolor: (theme) => isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                                        '& .MuiLinearProgress-bar': {
+                                                            borderRadius: '9999px',
+                                                            background: `linear-gradient(90deg, ${topicColor} 0%, ${topicColor}cc 100%)`,
+                                                        },
+                                                    }}
+                                                />
+                                            </Box>
+
+                                            {progress < 100 ? (
+                                                <Button
+                                                    variant="text"
+                                                    endIcon={<CheckCircle />}
+                                                    sx={{
+                                                        mt: 'auto',
+                                                        justifyContent: 'flex-start',
+                                                        p: 0,
+                                                        color: topicColor,
+                                                        '&:hover': { bgcolor: 'transparent', textDecoration: 'underline' }
+                                                    }}
+                                                >
+                                                    Continue Learning
+                                                </Button>
+                                            ) : (
+                                                <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', gap: 1, color: 'success.main' }}>
+                                                    <CheckCircle fontSize="small" />
+                                                    <Typography variant="body2" fontWeight={600}>Topic Mastered</Typography>
+                                                </Box>
                                             )}
-                                        </Box>
-                                    </CardContent>
-                                </Card>
-                            </motion.div>
-                        </Grid>
-                    ))}
+                                        </CardContent>
+                                    </Card>
+                                </motion.div>
+                            </Grid>
+                        );
+                    })}
                 </Grid>
             </Container>
         </Box>

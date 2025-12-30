@@ -6,13 +6,130 @@ import { TrendingUp, CheckCircle, PlayArrow, MenuBook, ArrowForward } from '@mui
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import './TopicCard.css';
 
-const TopicCard = ({ topic }) => {
+const TopicCard = (props) => {
+    const { topic } = props;
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
     const progress = topic.progress || 0;
     const topicColor = getTopicColor(topic.slug, isDark);
 
+    if (props.variant === 'list') {
+        return (
+            <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                whileHover={{ x: 10 }}
+                transition={{ duration: 0.3 }}
+            >
+                <Card
+                    component={Link}
+                    to={props.customLink || `/topic/${topic.slug}`}
+                    sx={{
+                        textDecoration: 'none',
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        p: 2,
+                        gap: 3,
+                        borderRadius: '24px',
+                        background: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.03)'
+                                : '#fff',
+                        border: '1px solid',
+                        borderColor: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(0, 0, 0, 0.05)',
+                        transition: 'all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                        '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: `0 8px 16px ${topicColor}10`,
+                            borderColor: `${topicColor}40`,
+                        },
+                    }}
+                >
+                    {/* Icon */}
+                    <Box
+                        sx={{
+                            width: 64,
+                            height: 64,
+                            borderRadius: '20px',
+                            background: `linear-gradient(135deg, ${topicColor}20 0%, ${topicColor}10 100%)`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                        }}
+                    >
+                        <img
+                            src={getTopicImage(topic.slug)}
+                            alt={topic.name}
+                            style={{ width: '32px', height: '32px', objectFit: 'contain' }}
+                            onError={(e) => { e.target.style.display = 'none'; }}
+                        />
+                    </Box>
+
+                    {/* Content */}
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: 'text.primary' }}>
+                            {topic.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary" sx={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 1,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden'
+                        }}>
+                            {topic.description}
+                        </Typography>
+                    </Box>
+
+                    {/* Stats & Action */}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                        {progress > 0 && (
+                            <Box sx={{ width: 100, display: { xs: 'none', md: 'block' } }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                    <Typography variant="caption" color="text.secondary" fontWeight={600}>Progress</Typography>
+                                    <Typography variant="caption" color={topicColor} fontWeight={700}>{progress}%</Typography>
+                                </Box>
+                                <LinearProgress
+                                    variant="determinate"
+                                    value={progress}
+                                    sx={{
+                                        height: 6,
+                                        borderRadius: '9999px',
+                                        bgcolor: 'action.hover',
+                                        '& .MuiLinearProgress-bar': {
+                                            borderRadius: '9999px',
+                                            bgcolor: topicColor
+                                        }
+                                    }}
+                                />
+                            </Box>
+                        )}
+                        <Box
+                            sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: '50%',
+                                bgcolor: 'action.hover',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                color: topicColor
+                            }}
+                        >
+                            <ArrowForward />
+                        </Box>
+                    </Box>
+                </Card>
+            </motion.div>
+        );
+    }
+
+    // Default Grid Variant
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -23,10 +140,11 @@ const TopicCard = ({ topic }) => {
         >
             <Card
                 component={Link}
-                to={`/topic/${topic.slug}`}
+                to={props.customLink || `/topic/${topic.slug}`}
                 sx={{
                     textDecoration: 'none',
-                    height: '100%',
+                    height: '380px', // Fixed height instead of minHeight for uniform cards
+                    width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
@@ -73,7 +191,7 @@ const TopicCard = ({ topic }) => {
                     }}
                 />
 
-                <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 3, position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2, height: '100%', position: 'relative', zIndex: 1 }}>
                     {/* Icon */}
                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                         <Box
@@ -81,6 +199,7 @@ const TopicCard = ({ topic }) => {
                             sx={{
                                 width: 96,
                                 height: 96,
+                                flexShrink: 0,
                                 borderRadius: '28px',
                                 background: `linear-gradient(135deg, ${topicColor}20 0%, ${topicColor}10 100%)`,
                                 display: 'flex',
@@ -116,6 +235,11 @@ const TopicCard = ({ topic }) => {
                                 fontWeight: 700,
                                 mb: 1,
                                 color: 'text.primary',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 1,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                height: '32px', // Fixed height for title line
                             }}
                         >
                             {topic.name}
@@ -126,10 +250,11 @@ const TopicCard = ({ topic }) => {
                             sx={{
                                 lineHeight: 1.6,
                                 display: '-webkit-box',
-                                WebkitLineClamp: 2,
+                                WebkitLineClamp: 3,
                                 WebkitBoxOrient: 'vertical',
                                 overflow: 'hidden',
-                                minHeight: '40px',
+                                height: '72px', // Fixed height: 1.6em * 3 lines roughly 72px? 1.6 * 14px * 3 = 67px. Let's make it safe.
+                                minHeight: '72px',
                             }}
                         >
                             {topic.description}

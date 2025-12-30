@@ -318,6 +318,7 @@ const Navbar = () => {
                                 {user ? (
                                     <>
                                         <IconButton
+                                            id="navbar-profile"
                                             onClick={handleUserMenuOpen}
                                             sx={{ p: 0 }}
                                         >

@@ -20,6 +20,16 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'typescript': '#3178C6',
         'postgresql': '#336791',
         'postgres': '#336791',
+        'operating-systems': '#4361EE', // Bright Blue
+        'operating systems': '#4361EE',
+        'os': '#4361EE',
+        'system-design': '#F72585', // Pink/Magenta
+        'system design': '#F72585',
+        'networking': '#4CC9F0', // Cyan
+        'computer-networking': '#4CC9F0',
+        'devops': '#7209B7', // Purple
+        'devops-basics': '#7209B7',
+        'engineering-practices': '#7209B7',
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -47,6 +57,16 @@ export const getTopicImage = (topicSlug) => {
         'typescript': '/images/topics/typescript.png',
         'postgresql': '/images/topics/postgresql.svg',
         'postgres': '/images/topics/postgresql.svg',
+        'operating-systems': '/images/topics/operating-systems.png',
+        'operating systems': '/images/topics/operating-systems.png',
+        'os': '/images/topics/operating-systems.png',
+        'system-design': '/images/topics/system-design.png',
+        'system design': '/images/topics/system-design.png',
+        'networking': '/images/topics/networking.png',
+        'computer-networking': '/images/topics/networking.png',
+        'devops': '/images/topics/devops.png',
+        'devops-basics': '/images/topics/devops.png',
+        'engineering-practices': '/images/topics/devops.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';

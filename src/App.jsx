@@ -16,6 +16,10 @@ const BookmarksPage = React.lazy(() => import('./pages/BookmarksPage'));
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
 const ShareCodePage = React.lazy(() => import('./pages/ShareCodePage'));
 const ReviewQueuePage = React.lazy(() => import('./pages/ReviewQueuePage'));
+const DSAPage = React.lazy(() => import('./pages/DSAPage'));
+const CSFundamentalsPage = React.lazy(() => import('./pages/CSFundamentalsPage'));
+const SystemDesignPage = React.lazy(() => import('./pages/SystemDesignPage'));
+const EngineeringPracticesPage = React.lazy(() => import('./pages/EngineeringPracticesPage'));
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
@@ -63,6 +67,38 @@ function AppContent() {
                                         element={
                                             <ProtectedRoute>
                                                 <Dashboard />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route
+                                        path="/dsa"
+                                        element={
+                                            <ProtectedRoute>
+                                                <DSAPage />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route
+                                        path="/cs-fundamentals"
+                                        element={
+                                            <ProtectedRoute>
+                                                <CSFundamentalsPage />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route
+                                        path="/system-design"
+                                        element={
+                                            <ProtectedRoute>
+                                                <SystemDesignPage />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route
+                                        path="/engineering-practices"
+                                        element={
+                                            <ProtectedRoute>
+                                                <EngineeringPracticesPage />
                                             </ProtectedRoute>
                                         }
                                     />

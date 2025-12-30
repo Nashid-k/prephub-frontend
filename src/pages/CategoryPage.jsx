@@ -145,6 +145,49 @@ const CategoryPage = () => {
         }
     };
 
+    const handleToggleCategoryProgress = async () => {
+        const newStatus = !allStudied; // Toggle based on current aggregate state
+
+        // Optimistic update for ALL sections
+        const newProgressMap = { ...progressMap };
+        sections.forEach(s => {
+            newProgressMap[s.slug] = newStatus;
+        });
+        setProgressMap(newProgressMap);
+
+        try {
+            await progressAPI.toggleCategory(topicSlug, categorySlug, newStatus);
+            toast.success(newStatus ? 'Category marked as completed' : 'Category marked as incomplete');
+
+            // Update the cache
+            const cacheKey = `prephub_category_agg_${topicSlug}_${categorySlug}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            if (cachedData) {
+                try {
+                    const data = JSON.parse(cachedData);
+                    // Update all sections in cache
+                    if (!data.progress) data.progress = {};
+                    sections.forEach(s => {
+                        data.progress[s.slug] = newStatus;
+                    });
+                    localStorage.setItem(cacheKey, JSON.stringify(data));
+                } catch (e) {
+                    console.error('Failed to update cache');
+                }
+            }
+
+            // Invalidate parent caches
+            localStorage.removeItem(`prephub_topic_agg_${topicSlug}`);
+            localStorage.removeItem('prephub_global_progress');
+        } catch (err) {
+            console.error('Failed to toggle category progress:', err);
+            toast.error('Failed to update category progress');
+            // Revert is complex here, simpler to utilize fetchAggregateData or just revert the map if we stored previous
+            // For now, let's just re-fetch in case of error to stay consistent
+            fetchAggregateData();
+        }
+    };
+
     // Memoize expensive calculation to prevent recalculation on every render
     const allStudied = React.useMemo(() => {
         return sections.length > 0 && sections.every(s => progressMap[s.slug]);
@@ -242,13 +285,22 @@ const CategoryPage = () => {
                                     label={`${sections.length} Sections`}
                                     sx={{ bgcolor: `${topicColor}15`, color: topicColor, fontWeight: 600 }}
                                 />
-                                {allStudied && (
-                                    <Chip
-                                        icon={<CheckCircle sx={{ fontSize: 16 }} />}
-                                        label="Completed"
-                                        sx={{ bgcolor: '#30d15820', color: '#30d158', fontWeight: 600 }}
-                                    />
-                                )}
+                                <Chip
+                                    icon={allStudied ? <CheckCircle sx={{ fontSize: 16 }} /> : <Box sx={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid currentColor' }} />}
+                                    label={allStudied ? "Completed" : "Mark Complete"}
+                                    onClick={handleToggleCategoryProgress}
+                                    sx={{
+                                        bgcolor: allStudied ? '#30d15820' : 'transparent',
+                                        color: allStudied ? '#30d158' : 'text.secondary',
+                                        fontWeight: 600,
+                                        border: allStudied ? 'none' : '1px solid',
+                                        borderColor: 'text.disabled',
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            bgcolor: allStudied ? '#30d15830' : 'action.hover'
+                                        }
+                                    }}
+                                />
                             </Box>
                         </Box>
 

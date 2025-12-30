@@ -120,23 +120,40 @@ const SectionPage = () => {
     const topicColor = getTopicColor(topicSlug, isDark);
 
     useEffect(() => {
-        // 1. Load from cache first for instant UI
-        const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
-        const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
-            try {
-                const data = JSON.parse(cachedData);
-                applyAggregateData(data);
-                setLoading(false);
-            } catch (e) {
-                console.error('Failed to parse cached section data');
-            }
-        }
+        const loadData = async () => {
+            // 1. Load from cache first for instant UI
+            const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            let cachedLoaded = false;
 
-        fetchAggregateData();
+            if (cachedData) {
+                try {
+                    const data = JSON.parse(cachedData);
+                    await applyAggregateData(data);
+                    setLoading(false);
+                    cachedLoaded = true;
+                } catch (e) {
+                    console.error('Failed to parse cached section data');
+                }
+            }
+
+            if (!cachedLoaded) {
+                fetchAggregateData();
+            } else {
+                // Still fetch fresh data in background, but don't show loading spinner if we have cache
+                // Actually, if we want to update content, we should fetch. 
+                // But applyAggregateData handles generation if missing. 
+                // Let's just fetch to be safe, but silent update? 
+                // The user wants 'loading state until content fetches'. 
+                // If cache loaded content, we are good. If cache only had metadata, we awaited generation above.
+                // So we can trigger a background refresh if needed, but for now let's just stick to the requested flow.
+                fetchAggregateData(true); // silent refresh
+            }
+        };
+        loadData();
     }, [topicSlug, categorySlug, sectionSlug]);
 
-    const applyAggregateData = (data) => {
+    const applyAggregateData = async (data) => {
         const { section: sectionData, topic: topicData, category: categoryData, siblingSections, questions: questionsData, userProgress } = data;
 
         setSection(sectionData);
@@ -173,13 +190,16 @@ const SectionPage = () => {
             }
         }
 
+        const promises = [];
         if (isBlind75) {
             setActiveTab('practice');
-            if (!testCases) generateTestCases(sectionData);
-            if (!problemContent) generateProblemContent(sectionData);
+            if (!testCases) promises.push(generateTestCases(sectionData));
+            if (!problemContent) promises.push(generateProblemContent(sectionData));
         } else {
-            if (!aiContent) generateAIContent(sectionData, categoryData);
+            if (!aiContent) promises.push(generateAIContent(sectionData, categoryData));
         }
+
+        await Promise.all(promises);
 
         const idx = (siblingSections || []).findIndex(s => s.slug === sectionSlug);
         setCurrentIndex(idx);
@@ -195,17 +215,17 @@ const SectionPage = () => {
         }
     }, [aiContent, questions, activeTab]);
 
-    const fetchAggregateData = async () => {
+    const fetchAggregateData = async (silent = false) => {
         try {
             const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
-            if (!localStorage.getItem(cacheKey)) {
+            if (!silent) {
                 setLoading(true);
             }
 
             const response = await curriculumAPI.getSectionAggregate(topicSlug, sectionSlug);
             const data = response.data;
 
-            applyAggregateData(data);
+            await applyAggregateData(data);
 
             // 2. Save to cache
             localStorage.setItem(cacheKey, JSON.stringify(data));
@@ -214,7 +234,9 @@ const SectionPage = () => {
         } catch (err) {
             console.error('Error fetching section aggregate:', err);
         } finally {
-            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
         }
     };
 
@@ -392,7 +414,7 @@ Explain clearly why approach #3 is superior to the others.`;
         boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
     };
 
-    if (loading) return <LoadingSpinner message="Loading section..." />;
+    if (loading) return <LoadingSpinner message="Loading Topic..." />;
     if (!section) return <Typography>Section not found</Typography>;
 
     const prevSection = currentIndex > 0 ? allSections[currentIndex - 1] : null;

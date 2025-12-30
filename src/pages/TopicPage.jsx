@@ -41,7 +41,7 @@ const TopicPage = () => {
     const [topic, setTopic] = useState(null);
     const [categories, setCategories] = useState([]);
     const [sections, setSections] = useState([]);
-    const [activeTab, setActiveTab] = useState('All');
+
     const [expandedCategory, setExpandedCategory] = useState(null);
     const [progressMap, setProgressMap] = useState({});
     const [progressStats, setProgressStats] = useState({ totalSections: 0, completedSections: 0, percentage: 0 });
@@ -97,38 +97,7 @@ const TopicPage = () => {
 
     const topicColor = getTopicColor(topic?.slug, isDark);
 
-    // Calculate super chapters (groups) for tabs
-    const superChapters = React.useMemo(() => {
-        const groups = new Set();
-        categories.forEach(c => {
-            if (c.group && c.group.includes(':')) {
-                groups.add(c.group.split(':')[0].trim());
-            } else if (c.group && c.group !== 'general') {
-                groups.add(c.group);
-            }
-        });
-        const sorted = Array.from(groups).sort();
-        if (sorted.length > 0) return sorted;
-        return [];
-    }, [categories]);
 
-    // Filter categories based on active tab
-    const filteredCategories = React.useMemo(() => {
-        if (activeTab === 'All' || superChapters.length === 0) return categories;
-        return categories.filter(c => {
-            if (c.group && c.group.includes(':')) {
-                return c.group.split(':')[0].trim() === activeTab;
-            }
-            return c.group === activeTab;
-        });
-    }, [categories, activeTab, superChapters]);
-
-    // Set default tab to first super chapter if available
-    useEffect(() => {
-        if (superChapters.length > 0 && (activeTab === 'All' || !superChapters.includes(activeTab))) {
-            setActiveTab(superChapters[0]);
-        }
-    }, [superChapters, activeTab]);
 
     // Calculate progress based on sections, not categories
     const { totalSections, completedSections, percentage: overallProgress } = progressStats;
@@ -153,6 +122,33 @@ const TopicPage = () => {
         );
     }
 
+
+
+    const handleToggleTopic = async () => {
+        const isComplete = overallProgress === 100;
+        const newStatus = !isComplete;
+
+        // Optimistic UI update requires complex state management here as everything is derived.
+        // It's easier to just call the API then force a refresh/fetch.
+        // But for better UX, let's assume success and update stats.
+
+        try {
+            await progressAPI.toggleTopic(slug, newStatus);
+            toast.success(newStatus ? 'Topic marked as completed' : 'Topic marked as incomplete');
+
+            // Invalidate caches
+            localStorage.removeItem(`prephub_topic_agg_${slug}`);
+            localStorage.removeItem('prephub_global_progress');
+            localStorage.removeItem('prephub_topics');
+
+            // Reload data
+            setLoading(true);
+            fetchAggregateData();
+        } catch (error) {
+            console.error('Failed to toggle topic:', error);
+            toast.error('Failed to update topic progress');
+        }
+    };
 
     return (
         <Box sx={{ minHeight: 'calc(100vh - 100px)', pb: 6 }}>
@@ -289,14 +285,20 @@ const TopicPage = () => {
                                         }}
                                     />
                                     <Chip
-                                        icon={<CheckCircle />}
-                                        label={`${completedCategories} Completed`}
+                                        icon={overallProgress === 100 ? <CheckCircle /> : <Box sx={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid currentColor' }} />}
+                                        label={overallProgress === 100 ? "Topic Completed" : "Mark Topic Complete"}
+                                        onClick={handleToggleTopic}
                                         sx={{
                                             borderRadius: '9999px',
                                             fontWeight: 700,
-                                            bgcolor: `${topicColor}20`,
-                                            color: topicColor,
-                                            border: `2px solid ${topicColor}40`,
+                                            bgcolor: overallProgress === 100 ? `${topicColor}20` : 'transparent',
+                                            color: overallProgress === 100 ? topicColor : 'text.secondary',
+                                            border: `2px solid`,
+                                            borderColor: overallProgress === 100 ? `${topicColor}40` : 'rgba(128,128,128,0.3)',
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                                bgcolor: overallProgress === 100 ? `${topicColor}30` : 'action.hover'
+                                            }
                                         }}
                                     />
                                 </Box>
@@ -351,39 +353,35 @@ const TopicPage = () => {
                 </Typography>
 
                 {/* Tabs for Super Chapters */}
-                {superChapters.length > 0 && (
-                    <Box sx={{ display: 'flex', gap: 1, mb: 4, flexWrap: 'wrap' }}>
-                        {superChapters.map((chapter) => (
-                            <Chip
-                                key={chapter}
-                                label={chapter}
-                                onClick={() => setActiveTab(chapter)}
-                                sx={{
-                                    borderRadius: '9999px',
-                                    fontWeight: 600,
-                                    height: 36,
-                                    px: 1,
-                                    bgcolor: activeTab === chapter ? `${topicColor}20` : 'transparent',
-                                    color: activeTab === chapter ? topicColor : 'text.secondary',
-                                    border: '1px solid',
-                                    borderColor: activeTab === chapter ? topicColor : 'divider',
-                                    cursor: 'pointer',
-                                    '&:hover': {
-                                        bgcolor: activeTab === chapter ? `${topicColor}30` : 'action.hover',
-                                    },
-                                    transition: 'all 0.2s ease',
-                                }}
-                            />
-                        ))}
-                    </Box>
-                )}
-
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {filteredCategories.map((category, index) => {
+                    {categories.map((category, index) => {
                         const isCompleted = progressMap[category.slug] || false;
                         const isCategoryBookmarked = isBookmarked(category._id);
                         const isExpanded = expandedCategory === category._id;
                         const categorySections = sections.filter(s => s.categoryId === category._id || (s.topicId === topic._id && !s.categoryId)).sort((a, b) => a.order - b.order);
+
+                        const handleToggleCategory = async (e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            const newStatus = !isCompleted;
+
+                            try {
+                                await progressAPI.toggleCategory(topic.slug, category.slug, newStatus);
+                                // Optimistic/Local update for immediate feedback
+                                // Ideally we recall fetchAggregateData, but we can also tweak progressMap
+                                setProgressMap(prev => ({
+                                    ...prev,
+                                    [category.slug]: newStatus
+                                }));
+                                toast.success(newStatus ? 'Category marked completed' : 'Category incomplete');
+
+                                // Invalidate cache
+                                localStorage.removeItem(`prephub_topic_agg_${slug}`);
+                            } catch (err) {
+                                console.error(err);
+                                toast.error('Failed to update category');
+                            }
+                        };
 
                         const handleCategoryBookmark = (e) => {
                             e.preventDefault();
@@ -448,7 +446,13 @@ const TopicPage = () => {
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: 3,
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            '&:hover': {
+                                                bgcolor: (theme) =>
+                                                    theme.palette.mode === 'dark'
+                                                        ? 'rgba(255, 255, 255, 0.02)'
+                                                        : 'rgba(0, 0, 0, 0.01)'
+                                            }
                                         }}
                                     >
                                         {/* Index Number */}
@@ -504,10 +508,8 @@ const TopicPage = () => {
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             {/* Checkbox (Status) */}
                                             <IconButton
-                                                onClick={(e) => { e.stopPropagation(); /* Logic for toggle status if needed, but TopicPage usually implies status is derived */ }}
+                                                onClick={handleToggleCategory}
                                                 sx={{
-                                                    // Preserving visual style but TopicPage status is usually read-only or derived?
-                                                    // Actual code checked `isCompleted`. The user said "same check box". Focus on style.
                                                     color: isCompleted ? '#30d158' : 'text.disabled',
                                                     bgcolor: isCompleted ? '#30d15815' : 'transparent',
                                                     border: '1px solid',
@@ -542,9 +544,9 @@ const TopicPage = () => {
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
-                                                    cursor: 'pointer',
                                                     transition: 'all 0.2s',
-                                                    '&:hover': { bgcolor: `${topicColor}30` }
+                                                    cursor: 'pointer',
+                                                    '&:hover': { bgcolor: isExpanded ? `${topicColor}30` : 'action.selected' }
                                                 }}
                                             >
                                                 <ExpandMore sx={{
@@ -568,13 +570,7 @@ const TopicPage = () => {
                                             }}>
                                                 {categorySections.length > 0 ? (
                                                     categorySections.map((section, sIndex) => {
-                                                        const isSectionCompleted = section.isCompleted; // Need to verify if section object has this? Usually progressMap handles it?
-                                                        // Actually TopicPage does not check section completion individually in progressMap?
-                                                        // progressMap on TopicPage is { categorySlug: bool }?
-                                                        // Let's assume section object returned by getTopicBySlug doesn't have isCompleted populated.
-                                                        // We might need to fetch section progress or assume false for now?
-                                                        // The user didn't ask for section progress here, just listing.
-
+                                                        // Fallback logic for checks, just list item here
                                                         return (
                                                             <Box
                                                                 key={section._id}

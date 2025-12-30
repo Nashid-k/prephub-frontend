@@ -99,7 +99,11 @@ export const progressAPI = {
   getTopicProgress: (topicSlug) =>
     api.get(`/progress/topic/${topicSlug}`),
   getAllProgress: () =>
-    api.get('/progress/all')
+    api.get('/progress/all'),
+  toggleCategory: (topicSlug, categorySlug, completed) =>
+    api.post('/progress/toggle/category', { topicSlug, categorySlug, completed }),
+  toggleTopic: (topicSlug, completed) =>
+    api.post('/progress/toggle/topic', { topicSlug, completed })
 };
 
 // Add time tracking method
