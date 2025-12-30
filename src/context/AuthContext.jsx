@@ -13,7 +13,12 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const getApiUrl = () => {
+        const url = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+        return url.endsWith('/api') ? url : `${url}/api`;
+    };
+
+    const API_URL = getApiUrl();
 
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
