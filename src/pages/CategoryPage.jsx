@@ -16,7 +16,11 @@ import {
     Button,
     LinearProgress,
     useTheme,
-    Grid
+    Grid,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel
 } from '@mui/material';
 import {
     ArrowBack,
@@ -26,7 +30,9 @@ import {
     BookmarkBorder,
     EmojiEvents,
     MenuBook,
-    School
+    School,
+    AccessTime,
+    FilterList
 } from '@mui/icons-material';
 import LoadingSpinner from '../components/LoadingSpinner';
 
@@ -42,6 +48,7 @@ const CategoryPage = () => {
     const [progressMap, setProgressMap] = useState({});
     const [loading, setLoading] = useState(true);
     const [topic, setTopic] = useState(null);
+    const [difficultyFilter, setDifficultyFilter] = useState('all');
 
     const topicColor = getTopicColor(topicSlug);
 
@@ -346,106 +353,126 @@ const CategoryPage = () => {
 
                 {/* Sections List */}
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 3, px: 1 }}>
-                        Modules
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, px: 1 }}>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                            Modules
+                        </Typography>
+
+                        {/* Difficulty Filter */}
+                        <FormControl variant="outlined" size="small" sx={{ minWidth: 160 }}>
+                            <InputLabel>Filter Level</InputLabel>
+                            <Select
+                                value={difficultyFilter}
+                                onChange={(e) => setDifficultyFilter(e.target.value)}
+                                label="Filter Level"
+                                sx={{ borderRadius: '9999px' }}
+                            >
+                                <MenuItem value="all">All Levels</MenuItem>
+                                <MenuItem value="beginner">Beginner</MenuItem>
+                                <MenuItem value="intermediate">Intermediate</MenuItem>
+                                <MenuItem value="advanced">Advanced</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Box>
 
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {sections.map((section, index) => {
-                            const isCompleted = progressMap[section.slug];
-                            const sectionBookmarked = isBookmarked(section._id);
+                        {sections
+                            .filter(section => difficultyFilter === 'all' || section.difficulty === difficultyFilter)
+                            .map((section, index) => {
+                                const isCompleted = progressMap[section.slug];
+                                const sectionBookmarked = isBookmarked(section._id);
 
-                            return (
-                                <Box key={section._id}>
-                                    <Card
-                                        onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${section.slug}`)}
-                                        sx={{
-                                            borderRadius: '20px',
-                                            background: isDark ? 'rgba(255,255,255,0.03)' : '#fff',
-                                            border: '1px solid',
-                                            borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                                transform: 'translateY(-2px)',
-                                                boxShadow: `0 8px 24px ${topicColor}15`,
-                                                borderColor: `${topicColor}40`
-                                            }
-                                        }}
-                                    >
-                                        <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
-                                            {/* Index Number */}
-                                            <Typography variant="h4" sx={{
-                                                fontWeight: 800,
-                                                color: isCompleted ? '#30d158' : 'text.disabled',
-                                                opacity: 0.3,
-                                                minWidth: '40px'
-                                            }}>
-                                                {String(index + 1).padStart(2, '0')}
-                                            </Typography>
-
-                                            {/* Content */}
-                                            <Box sx={{ flex: 1 }}>
-                                                <Typography variant="h6" sx={{
-                                                    fontWeight: 700,
-                                                    mb: 0.5,
-                                                    textDecoration: isCompleted ? 'line-through' : 'none',
-                                                    opacity: isCompleted ? 0.6 : 1
+                                return (
+                                    <Box key={section._id}>
+                                        <Card
+                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${section.slug}`)}
+                                            sx={{
+                                                borderRadius: '20px',
+                                                background: isDark ? 'rgba(255,255,255,0.03)' : '#fff',
+                                                border: '1px solid',
+                                                borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                                transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                                                cursor: 'pointer',
+                                                '&:hover': {
+                                                    transform: 'translateY(-2px)',
+                                                    boxShadow: `0 8px 24px ${topicColor}15`,
+                                                    borderColor: `${topicColor}40`
+                                                }
+                                            }}
+                                        >
+                                            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
+                                                {/* Index Number */}
+                                                <Typography variant="h4" sx={{
+                                                    fontWeight: 800,
+                                                    color: isCompleted ? '#30d158' : 'text.disabled',
+                                                    opacity: 0.3,
+                                                    minWidth: '40px'
                                                 }}>
-                                                    {section.title}
+                                                    {String(index + 1).padStart(2, '0')}
                                                 </Typography>
-                                                <Typography variant="body2" sx={{ color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                    {section.description}
-                                                </Typography>
-                                            </Box>
 
-                                            {/* Actions */}
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <IconButton
-                                                    onClick={(e) => handleToggleProgress(e, section.slug)}
-                                                    sx={{
-                                                        color: isCompleted ? '#30d158' : 'text.disabled',
-                                                        bgcolor: isCompleted ? '#30d15815' : 'transparent',
-                                                        border: '1px solid',
-                                                        borderColor: isCompleted ? '#30d15840' : 'rgba(128,128,128,0.2)',
-                                                        '&:hover': { bgcolor: '#30d15825', color: '#30d158' }
-                                                    }}
-                                                >
-                                                    <CheckCircle />
-                                                </IconButton>
+                                                {/* Content */}
+                                                <Box sx={{ flex: 1 }}>
+                                                    <Typography variant="h6" sx={{
+                                                        fontWeight: 700,
+                                                        mb: 0.5,
+                                                        textDecoration: isCompleted ? 'line-through' : 'none',
+                                                        opacity: isCompleted ? 0.6 : 1
+                                                    }}>
+                                                        {section.title}
+                                                    </Typography>
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                        {section.description}
+                                                    </Typography>
+                                                </Box>
 
-                                                <IconButton
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        toggleBookmark({
-                                                            id: section._id,
-                                                            type: 'section',
-                                                            title: section.title,
-                                                            description: section.description,
-                                                            slug: section.slug,
-                                                            categorySlug: categorySlug,
-                                                            topicSlug: topicSlug,
-                                                            difficulty: section.difficulty
-                                                        });
-                                                        setBookmarkUpdate(prev => prev + 1);
-                                                    }}
-                                                    sx={{
-                                                        color: sectionBookmarked ? topicColor : 'text.disabled',
-                                                        '&:hover': { color: topicColor }
-                                                    }}
-                                                >
-                                                    {sectionBookmarked ? <Bookmark /> : <BookmarkBorder />}
-                                                </IconButton>
+                                                {/* Actions */}
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <IconButton
+                                                        onClick={(e) => handleToggleProgress(e, section.slug)}
+                                                        sx={{
+                                                            color: isCompleted ? '#30d158' : 'text.disabled',
+                                                            bgcolor: isCompleted ? '#30d15815' : 'transparent',
+                                                            border: '1px solid',
+                                                            borderColor: isCompleted ? '#30d15840' : 'rgba(128,128,128,0.2)',
+                                                            '&:hover': { bgcolor: '#30d15825', color: '#30d158' }
+                                                        }}
+                                                    >
+                                                        <CheckCircle />
+                                                    </IconButton>
 
-                                                <Box sx={{ p: 1, bgcolor: 'action.hover', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                    <PlayArrow sx={{ color: topicColor }} />
+                                                    <IconButton
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            toggleBookmark({
+                                                                id: section._id,
+                                                                type: 'section',
+                                                                title: section.title,
+                                                                description: section.description,
+                                                                slug: section.slug,
+                                                                categorySlug: categorySlug,
+                                                                topicSlug: topicSlug,
+                                                                difficulty: section.difficulty
+                                                            });
+                                                            setBookmarkUpdate(prev => prev + 1);
+                                                        }}
+                                                        sx={{
+                                                            color: sectionBookmarked ? topicColor : 'text.disabled',
+                                                            '&:hover': { color: topicColor }
+                                                        }}
+                                                    >
+                                                        {sectionBookmarked ? <Bookmark /> : <BookmarkBorder />}
+                                                    </IconButton>
+
+                                                    <Box sx={{ p: 1, bgcolor: 'action.hover', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <PlayArrow sx={{ color: topicColor }} />
+                                                    </Box>
                                                 </Box>
                                             </Box>
-                                        </Box>
-                                    </Card>
-                                </Box>
-                            );
-                        })}
+                                        </Card>
+                                    </Box>
+                                );
+                            })}
                     </Box>
                 </Box>
             </Container>
