@@ -59,6 +59,7 @@ import './SectionPage.css';
 const SectionPage = () => {
     const { topicSlug, categorySlug, sectionSlug } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
@@ -724,8 +725,8 @@ Explain clearly why approach #3 is superior to the others.`;
                             position: 'fixed',
                             bottom: 100,
                             right: 32,
-                            width: 400,
-                            height: 500,
+                            width: 500,
+                            height: 650,
                             zIndex: 1200,
                             ...glassSx,
                             overflow: 'hidden'
@@ -734,6 +735,7 @@ Explain clearly why approach #3 is superior to the others.`;
                                 ref={chatRef}
                                 topic={topicSlug}
                                 section={section.title}
+                                user={user}
                                 context={{
                                     description: section.description,
                                     activeTab,
