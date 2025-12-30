@@ -157,7 +157,7 @@ const SectionPage = () => {
     }, [topicSlug, categorySlug, sectionSlug]);
 
     const applyAggregateData = async (data) => {
-        const { section: sectionData, topic: topicData, category: categoryData, siblingSections, questions: questionsData, userProgress } = data;
+        const { section: sectionData, topic: topicData, category: categoryData, siblingSections, userProgress } = data;
 
         setSection(sectionData);
         setTopic(topicData);
@@ -215,7 +215,7 @@ const SectionPage = () => {
                 }
             });
         }
-    }, [aiContent, questions, activeTab]);
+    }, [aiContent, activeTab]);
 
     const fetchAggregateData = async (silent = false) => {
         try {
