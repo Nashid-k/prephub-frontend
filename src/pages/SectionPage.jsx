@@ -8,6 +8,7 @@ import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
+import VoiceWidget from '../components/VoiceWidget';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -722,6 +723,15 @@ Explain clearly why approach #3 is superior to the others.`;
                 </Box>
 
                 {/* Floating AI Chat Button */}
+                <VoiceWidget
+                    context={{
+                        topic: topicSlug,
+                        section: section?.title,
+                        module: category?.name,
+                        code: editorCode
+                    }}
+                />
+
                 <IconButton
                     aria-label="chat-toggle"
                     onClick={() => setIsChatOpen(!isChatOpen)}
