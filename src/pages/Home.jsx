@@ -551,173 +551,140 @@ const Home = () => {
                                                     Recent Bookmarks
                                                 </Typography>
                                             </Box>
-                                            {/* Activity Section - Continue Learning & Bookmarks */}
-                                            {loading ? (
-                                                <Container maxWidth="lg" sx={{ mt: 10 }}>
-                                                    <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center' }}>
-                                                        Loading your activity...
-                                                    </Typography>
-                                                    <Grid container spacing={4}>
-                                                        <Grid item xs={12} md={6}>
-                                                            <Box sx={{
-                                                                height: 300,
-                                                                background: 'linear-gradient(135deg, rgba(94, 92, 230, 0.1) 0%, transparent 100%)',
-                                                                borderRadius: '32px',
-                                                                animation: 'pulse 1.5s ease-in-out infinite'
-                                                            }} />
-                                                        </Grid>
-                                                        <Grid item xs={12} md={6}>
-                                                            <Box sx={{
-                                                                height: 300,
-                                                                background: 'linear-gradient(135deg, rgba(90, 200, 250, 0.1) 0%, transparent 100%)',
-                                                                borderRadius: '32px',
-                                                                animation: 'pulse 1.5s ease-in-out 0.3s infinite'
-                                                            }} />
-                                                        </Grid>
-                                                    </Grid>
-                                                </Container>
-                                            ) : hasActivity && (
-                                                <Container maxWidth="lg" sx={{ mt: 10 }}>
-                                                    <Typography variant="h4" sx={{ mb: 4, fontWeight: 700, textAlign: 'center' }}>
-                                                        Pick up where you left off
-                                                    </Typography>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                {recentBookmarks.map((b) => {
+                                                    const bookmarkTopicColor = getTopicColor(b.topicSlug, isDark);
 
-                                                    <Grid container spacing={4}>
-                                                        {/* Continue Learning Card */}
-                                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                            {recentBookmarks.map((b) => {
-                                                                const bookmarkTopicColor = getTopicColor(b.topicSlug, isDark);
-
-                                                                return (
-                                                                    <Box
-                                                                        key={b.id}
-                                                                        component={Link}
-                                                                        to={b.type === 'topic' ? `/topic/${b.slug}` : `/topic/${b.topicSlug}/category/${b.categorySlug}${b.type === 'section' ? `/section/${b.slug}` : ''}`}
-                                                                        sx={{
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            gap: 2,
-                                                                            p: 2,
-                                                                            borderRadius: '16px',
-                                                                            bgcolor: 'action.hover',
-                                                                            textDecoration: 'none',
-                                                                            border: '2px solid',
-                                                                            borderColor: 'transparent',
-                                                                            transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                                                            '&:hover': {
-                                                                                bgcolor: `${bookmarkTopicColor}10`,
-                                                                                borderColor: bookmarkTopicColor,
-                                                                                transform: 'translateY(-4px)',
-                                                                                boxShadow: `0 8px 24px ${bookmarkTopicColor}40`,
-                                                                                '& .bookmark-icon': {
-                                                                                    transform: 'scale(1.1) rotate(5deg)',
-                                                                                },
-                                                                                '& .bookmark-arrow': {
-                                                                                    transform: 'translateX(8px)',
-                                                                                },
-                                                                            },
-                                                                        }}
-                                                                    >
-                                                                        {/* Topic Icon */}
-                                                                        <Box
-                                                                            className="bookmark-icon"
-                                                                            sx={{
-                                                                                width: 48,
-                                                                                height: 48,
-                                                                                borderRadius: '12px',
-                                                                                background: `linear-gradient(135deg, ${bookmarkTopicColor}20 0%, ${bookmarkTopicColor}10 100%)`,
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                justifyContent: 'center',
-                                                                                border: '2px solid',
-                                                                                borderColor: `${bookmarkTopicColor}40`,
-                                                                                flexShrink: 0,
-                                                                                transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                                                            }}
-                                                                        >
-                                                                            <img
-                                                                                src={getTopicImage(b.topicSlug)}
-                                                                                alt={b.topicSlug}
-                                                                                style={{
-                                                                                    width: '60%',
-                                                                                    height: '60%',
-                                                                                    objectFit: 'contain',
-                                                                                }}
-                                                                                onError={(e) => {
-                                                                                    e.target.style.display = 'none';
-                                                                                }}
-                                                                            />
-                                                                        </Box>
-
-                                                                        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                                                            <Typography
-                                                                                variant="body1"
-                                                                                sx={{
-                                                                                    fontWeight: 600,
-                                                                                    color: bookmarkTopicColor,
-                                                                                    overflow: 'hidden',
-                                                                                    textOverflow: 'ellipsis',
-                                                                                    whiteSpace: 'nowrap',
-                                                                                }}
-                                                                            >
-                                                                                {b.title}
-                                                                            </Typography>
-                                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                                                <Chip
-                                                                                    label={b.type}
-                                                                                    size="small"
-                                                                                    sx={{
-                                                                                        height: '20px',
-                                                                                        fontSize: '0.7rem',
-                                                                                        fontWeight: 600,
-                                                                                        textTransform: 'capitalize',
-                                                                                        bgcolor: `${bookmarkTopicColor}20`,
-                                                                                        color: bookmarkTopicColor,
-                                                                                        border: `1px solid ${bookmarkTopicColor}40`,
-                                                                                    }}
-                                                                                />
-                                                                            </Box>
-                                                                        </Box>
-
-                                                                        <ArrowForward
-                                                                            className="bookmark-arrow"
-                                                                            sx={{
-                                                                                color: bookmarkTopicColor,
-                                                                                fontSize: 20,
-                                                                                flexShrink: 0,
-                                                                                transition: 'transform 0.3s ease',
-                                                                            }}
-                                                                        />
-                                                                    </Box>
-                                                                );
-                                                            })}
-                                                            <Button
-                                                                component={Link}
-                                                                to="/bookmarks"
-                                                                variant="outlined"
-                                                                fullWidth
-                                                                sx={{
-                                                                    borderRadius: '9999px',
-                                                                    mt: 1,
-                                                                    borderColor: '#5e5ce6',
-                                                                    color: '#5e5ce6',
-                                                                    borderWidth: '2px',
-                                                                    '&:hover': {
-                                                                        borderWidth: '2px',
-                                                                        borderColor: '#5e5ce6',
-                                                                        background: 'rgba(94, 92, 230, 0.1)',
+                                                    return (
+                                                        <Box
+                                                            key={b.id}
+                                                            component={Link}
+                                                            to={b.type === 'topic' ? `/topic/${b.slug}` : `/topic/${b.topicSlug}/category/${b.categorySlug}${b.type === 'section' ? `/section/${b.slug}` : ''}`}
+                                                            sx={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: 2,
+                                                                p: 2,
+                                                                borderRadius: '16px',
+                                                                bgcolor: 'action.hover',
+                                                                textDecoration: 'none',
+                                                                border: '2px solid',
+                                                                borderColor: 'transparent',
+                                                                transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                                                                '&:hover': {
+                                                                    bgcolor: `${bookmarkTopicColor}10`,
+                                                                    borderColor: bookmarkTopicColor,
+                                                                    transform: 'translateY(-4px)',
+                                                                    boxShadow: `0 8px 24px ${bookmarkTopicColor}40`,
+                                                                    '& .bookmark-icon': {
+                                                                        transform: 'scale(1.1) rotate(5deg)',
                                                                     },
+                                                                    '& .bookmark-arrow': {
+                                                                        transform: 'translateX(8px)',
+                                                                    },
+                                                                },
+                                                            }}
+                                                        >
+                                                            {/* Topic Icon */}
+                                                            <Box
+                                                                className="bookmark-icon"
+                                                                sx={{
+                                                                    width: 48,
+                                                                    height: 48,
+                                                                    borderRadius: '12px',
+                                                                    background: `linear-gradient(135deg, ${bookmarkTopicColor}20 0%, ${bookmarkTopicColor}10 100%)`,
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center',
+                                                                    border: '2px solid',
+                                                                    borderColor: `${bookmarkTopicColor}40`,
+                                                                    flexShrink: 0,
+                                                                    transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                                                 }}
                                                             >
-                                                                View All Bookmarks
-                                                            </Button>
+                                                                <img
+                                                                    src={getTopicImage(b.topicSlug)}
+                                                                    alt={b.topicSlug}
+                                                                    style={{
+                                                                        width: '60%',
+                                                                        height: '60%',
+                                                                        objectFit: 'contain',
+                                                                    }}
+                                                                    onError={(e) => {
+                                                                        e.target.style.display = 'none';
+                                                                    }}
+                                                                />
+                                                            </Box>
+
+                                                            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+                                                                <Typography
+                                                                    variant="body1"
+                                                                    sx={{
+                                                                        fontWeight: 600,
+                                                                        color: bookmarkTopicColor,
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap',
+                                                                    }}
+                                                                >
+                                                                    {b.title}
+                                                                </Typography>
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
+                                                                    <Chip
+                                                                        label={b.type}
+                                                                        size="small"
+                                                                        sx={{
+                                                                            height: '20px',
+                                                                            fontSize: '0.7rem',
+                                                                            fontWeight: 600,
+                                                                            textTransform: 'capitalize',
+                                                                            bgcolor: `${bookmarkTopicColor}20`,
+                                                                            color: bookmarkTopicColor,
+                                                                            border: `1px solid ${bookmarkTopicColor}40`,
+                                                                        }}
+                                                                    />
+                                                                </Box>
+                                                            </Box>
+
+                                                            <ArrowForward
+                                                                className="bookmark-arrow"
+                                                                sx={{
+                                                                    color: bookmarkTopicColor,
+                                                                    fontSize: 20,
+                                                                    flexShrink: 0,
+                                                                    transition: 'transform 0.3s ease',
+                                                                }}
+                                                            />
                                                         </Box>
-                                                    </CardContent>
-                                                </Card>
+                                                    );
+                                                })}
+                                                <Button
+                                                    component={Link}
+                                                    to="/bookmarks"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    sx={{
+                                                        borderRadius: '9999px',
+                                                        mt: 1,
+                                                        borderColor: '#5e5ce6',
+                                                        color: '#5e5ce6',
+                                                        borderWidth: '2px',
+                                                        '&:hover': {
+                                                            borderWidth: '2px',
+                                                            borderColor: '#5e5ce6',
+                                                            background: 'rgba(94, 92, 230, 0.1)',
+                                                        },
+                                                    }}
+                                                >
+                                                    View All Bookmarks
+                                                </Button>
+                                            </Box>
+                                        </CardContent>
+                                    </Card>
                                 </motion.div>
-                                    </Grid>
-                        )}
                             </Grid>
+                        )}
+                    </Grid>
                 </Container>
             )}
 
