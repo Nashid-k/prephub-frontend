@@ -337,14 +337,13 @@ const TopicPage = () => {
                     Categories
                 </Typography>
 
-                {/* Tabs for Super Chapters */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {/* Categories Grid */}
+                <Grid container spacing={3}>
                     {categories.map((category, index) => {
                         const isCompleted = progressMap[category.slug] || false;
                         const isCategoryBookmarked = isBookmarked(category._id);
-                        const isExpanded = expandedCategory === category._id;
-                        const categorySections = sections.filter(s => s.categoryId === category._id || (s.topicId === topic._id && !s.categoryId)).sort((a, b) => a.order - b.order);
 
+                        // Handler for completion
                         const handleToggleCategory = async (e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -352,22 +351,19 @@ const TopicPage = () => {
 
                             try {
                                 await progressAPI.toggleCategory(topic.slug, category.slug, newStatus);
-                                // Optimistic/Local update for immediate feedback
-                                // Ideally we recall fetchAggregateData, but we can also tweak progressMap
                                 setProgressMap(prev => ({
                                     ...prev,
                                     [category.slug]: newStatus
                                 }));
                                 toast.success(newStatus ? 'Category marked completed' : 'Category incomplete');
-
-                                // Invalidate cache
-                                localStorage.removeItem(`prephub_topic_agg_${slug}`);
+                                localStorage.removeItem(`prephub_topic_agg_${topic.slug}`);
                             } catch (err) {
                                 console.error(err);
                                 toast.error('Failed to update category');
                             }
                         };
 
+                        // Handler for bookmark
                         const handleCategoryBookmark = (e) => {
                             e.preventDefault();
                             e.stopPropagation();
@@ -381,14 +377,8 @@ const TopicPage = () => {
                                 topicSlug: topic.slug,
                                 categorySlug: category.slug,
                             });
-
                             if (result.success) {
-                                if (result.message === 'Bookmark added') {
-                                    toast.success('Category bookmarked');
-                                } else {
-                                    toast.success('Bookmark removed');
-                                }
-                                // Force re-render
+                                toast.success(result.message === 'Bookmark added' ? 'Category bookmarked' : 'Bookmark removed');
                                 setCategories([...categories]);
                             } else {
                                 toast.error(result.message);
@@ -396,246 +386,126 @@ const TopicPage = () => {
                         };
 
                         return (
-                            <motion.div
-                                key={category._id}
-                                initial={{ opacity: 0, x: -20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.3, delay: index * 0.05 }}
-                            >
-                                <Card
-                                    sx={{
-                                        borderRadius: '20px',
-                                        background: (theme) =>
-                                            theme.palette.mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.03)'
-                                                : '#fff',
-                                        border: '1px solid',
-                                        borderColor: (theme) =>
-                                            theme.palette.mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.05)'
-                                                : 'rgba(0, 0, 0, 0.05)',
-                                        overflow: 'hidden',
-                                        transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: `0 8px 24px ${topicColor}15`,
-                                            borderColor: `${topicColor}40`,
-                                        },
-                                    }}
+                            <Grid item xs={12} sm={6} md={4} lg={3} key={category._id}>
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                                    style={{ height: '100%' }}
                                 >
-                                    {/* Header Row */}
-                                    <Box
-                                        onClick={() => navigate(`/topic/${topic.slug}/category/${category.slug}`)}
+                                    <Card
                                         sx={{
-                                            p: 3,
+                                            height: '100%',
                                             display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 3,
-                                            cursor: 'pointer',
+                                            flexDirection: 'column',
+                                            borderRadius: '24px',
+                                            background: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.03)'
+                                                    : '#fff',
+                                            border: '1px solid',
+                                            borderColor: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(255, 255, 255, 0.05)'
+                                                    : 'rgba(0, 0, 0, 0.05)',
+                                            overflow: 'hidden',
+                                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                             '&:hover': {
-                                                bgcolor: (theme) =>
-                                                    theme.palette.mode === 'dark'
-                                                        ? 'rgba(255, 255, 255, 0.02)'
-                                                        : 'rgba(0, 0, 0, 0.01)'
-                                            }
+                                                transform: 'translateY(-4px)',
+                                                boxShadow: `0 12px 30px ${topicColor}20`,
+                                                borderColor: `${topicColor}50`,
+                                            },
                                         }}
                                     >
-                                        {/* Index Number */}
-                                        <Typography
-                                            variant="h4"
+                                        <Box
+                                            onClick={() => navigate(`/topic/${topic.slug}/category/${category.slug}`)}
                                             sx={{
-                                                fontWeight: 800,
-                                                color: topicColor,
-                                                opacity: 0.4,
-                                                minWidth: '40px',
-                                                fontFamily: 'monospace'
-                                            }}
-                                        >
-                                            {String(index + 1).padStart(2, '0')}
-                                        </Typography>
-
-                                        {/* Content */}
-                                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                                            <Typography
-                                                variant="h6"
-                                                sx={{
-                                                    fontWeight: 700,
-                                                    mb: 0.5,
-                                                    color: isCompleted ? 'text.secondary' : 'text.primary',
-                                                    textDecoration: isCompleted ? 'line-through' : 'none',
-
-                                                }}
-                                            >
-                                                {category.name}
-                                            </Typography>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                                <Typography variant="body2" sx={{ color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                                    {category.description || `${category.sectionCount || 0} Sections`}
-                                                </Typography>
-                                                {isCompleted && (
-                                                    <Chip
-                                                        label="Completed"
-                                                        size="small"
-                                                        sx={{
-                                                            borderRadius: '9999px',
-                                                            fontWeight: 700,
-                                                            fontSize: '0.65rem',
-                                                            height: '20px',
-                                                            bgcolor: '#30d15820',
-                                                            color: '#30d158',
-                                                        }}
-                                                    />
-                                                )}
-                                            </Box>
-                                        </Box>
-
-                                        {/* Actions */}
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            {/* Checkbox (Status) */}
-                                            <IconButton
-                                                onClick={handleToggleCategory}
-                                                sx={{
-                                                    color: isCompleted ? '#30d158' : 'text.disabled',
-                                                    bgcolor: isCompleted ? '#30d15815' : 'transparent',
-                                                    border: '1px solid',
-                                                    borderColor: isCompleted ? '#30d15840' : 'rgba(128,128,128,0.2)',
-                                                    '&:hover': { bgcolor: '#30d15825', color: '#30d158' }
-                                                }}
-                                            >
-                                                <CheckCircle />
-                                            </IconButton>
-
-                                            <IconButton
-                                                onClick={handleCategoryBookmark}
-                                                sx={{
-                                                    color: isCategoryBookmarked ? topicColor : 'text.disabled',
-                                                    transition: 'all 0.2s',
-                                                    '&:hover': { color: topicColor, transform: 'scale(1.1)' }
-                                                }}
-                                            >
-                                                {isCategoryBookmarked ? <Bookmark /> : <BookmarkBorder />}
-                                            </IconButton>
-
-                                            {/* Expand Arrow (Styled like Play Btn) */}
-                                            <Box
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setExpandedCategory(isExpanded ? null : category._id);
-                                                }}
-                                                sx={{
-                                                    p: 1,
-                                                    bgcolor: isExpanded ? `${topicColor}20` : 'action.hover',
-                                                    borderRadius: '50%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                    transition: 'all 0.2s',
-                                                    cursor: 'pointer',
-                                                    '&:hover': { bgcolor: isExpanded ? `${topicColor}30` : 'action.selected' }
-                                                }}
-                                            >
-                                                <ExpandMore sx={{
-                                                    color: topicColor,
-                                                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                                                    transition: 'transform 0.3s'
-                                                }} />
-                                            </Box>
-                                        </Box>
-                                    </Box>
-
-                                    {/* Expanded Content (Sections) */}
-                                    <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                                        <Box sx={{ p: 3, pt: 0, pl: { xs: 3, md: 8 } }}>
-                                            <Box sx={{
+                                                p: 3,
+                                                flex: 1,
                                                 display: 'flex',
                                                 flexDirection: 'column',
-                                                gap: 1,
-                                                borderLeft: `2px solid ${topicColor}20`,
-                                                pl: 2
-                                            }}>
-                                                {categorySections.length > 0 ? (
-                                                    categorySections.map((section, sIndex) => {
-                                                        // Fallback logic for checks, just list item here
-                                                        return (
-                                                            <Box
-                                                                key={section._id}
-                                                                component={Link}
-                                                                to={`/topic/${topic.slug}/category/${category.slug}/section/${section.slug}`}
-                                                                sx={{
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    gap: 2,
-                                                                    p: 1.5,
-                                                                    borderRadius: '12px',
-                                                                    textDecoration: 'none',
-                                                                    color: 'text.primary',
-                                                                    transition: 'all 0.2s',
-                                                                    '&:hover': {
-                                                                        bgcolor: 'action.hover',
-                                                                        transform: 'translateX(4px)',
-                                                                        color: topicColor
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <PlayCircleOutline sx={{ fontSize: 20, color: topicColor, opacity: 0.7 }} />
-                                                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                                                    {section.title}
-                                                                </Typography>
-                                                                {section.difficulty && (
-                                                                    <Chip
-                                                                        label={section.difficulty}
-                                                                        size="small"
-                                                                        sx={{
-                                                                            height: 20,
-                                                                            fontSize: '0.7rem',
-                                                                            ml: 'auto',
-                                                                            bgcolor: section.difficulty === 'beginner' ? '#30d15820' : section.difficulty === 'intermediate' ? '#ff9f0a20' : '#ff453a20',
-                                                                            color: section.difficulty === 'beginner' ? '#30d158' : section.difficulty === 'intermediate' ? '#ff9f0a' : '#ff453a',
-                                                                        }}
-                                                                    />
-                                                                )}
-                                                            </Box>
-                                                        );
-                                                    })
-                                                ) : (
-                                                    <Typography variant="body2" color="text.secondary" sx={{ py: 1 }}>
-                                                        No sections available.
-                                                    </Typography>
-                                                )}
-
-                                                <Button
-                                                    component={Link}
-                                                    to={`/topic/${topic.slug}/category/${category.slug}`}
-                                                    endIcon={<ArrowForward />}
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                {/* Index Badge */}
+                                                <Box
                                                     sx={{
-                                                        mt: 1,
-                                                        alignSelf: 'flex-start',
-                                                        borderRadius: '9999px',
-                                                        textTransform: 'none',
-                                                        color: topicColor
+                                                        width: 40, height: 40,
+                                                        borderRadius: '12px',
+                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        background: `${topicColor}15`,
+                                                        color: topicColor,
+                                                        fontWeight: 800,
+                                                        fontSize: '1.2rem'
                                                     }}
                                                 >
-                                                    View All Sections & Details
-                                                </Button>
-                                            </Box>
-                                        </Box>
-                                    </Collapse>
-                                </Card>
-                            </motion.div>
-                        );
-                    })}
-                </Box>
+                                                    {index + 1}
+                                                </Box>
 
-                {/* Empty State */}
-                {categories.length === 0 && (
-                    <Box sx={{ textAlign: 'center', py: 8 }}>
-                        <Typography variant="h5" color="text.secondary">
-                            No categories available yet
-                        </Typography>
-                    </Box>
-                )}
-            </Container>
+                                                {/* Actions */}
+                                                <Box sx={{ display: 'flex', gap: 1 }}>
+                                                    <IconButton
+                                                        onClick={handleCategoryBookmark}
+                                                        size="small"
+                                                        sx={{ color: isCategoryBookmarked ? topicColor : 'text.disabled' }}
+                                                    >
+                                                        {isCategoryBookmarked ? <Bookmark fontSize="small" /> : <BookmarkBorder fontSize="small" />}
+                                                    </IconButton>
+                                                </Box>
+                                            </Box>
+
+                                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, lineHeight: 1.3 }}>
+                                                {category.name}
+                                            </Typography>
+
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                sx={{
+                                                    mb: 2,
+                                                    flex: 1,
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 3,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden'
+                                                }}
+                                            >
+                                                {category.description || `${category.sectionCount || 0} Sections`}
+                                            </Typography>
+
+                                            {/* Footer Info */}
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
+                                                <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', opacity: 0.8 }}>
+                                                    {category.sectionCount || 0} Sections
+                                                </Typography>
+                                                textTransform: 'none',
+                                                color: topicColor
+                                                    }}
+                                                >
+                                                View All Sections & Details
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                </Collapse>
+                            </Card>
+                            </motion.div>
+                );
+                    })}
         </Box>
+
+                {/* Empty State */ }
+    {
+        categories.length === 0 && (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+                <Typography variant="h5" color="text.secondary">
+                    No categories available yet
+                </Typography>
+            </Box>
+        )
+    }
+            </Container >
+        </Box >
     );
 };
 
