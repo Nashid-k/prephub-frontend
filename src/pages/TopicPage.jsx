@@ -337,83 +337,188 @@ const TopicPage = () => {
                     Categories
                 </Typography>
 
-                {/* Categories Grid */}
-                <Grid container spacing={3}>
-                    {categories.map((category, index) => {
-                        const isCompleted = progressMap[category.slug] || false;
-                        const isCategoryBookmarked = isBookmarked(category._id);
+                {/* Hybrid Layout: Grid for Groups, List for Standard Topics */}
+                {['algorithms-data-structures', 'cs-fundamentals', 'system-design-architecture', 'engineering-practices'].includes(topic.slug) ? (
+                    <Grid container spacing={3}>
+                        {categories.map((category, index) => {
+                            const isCompleted = progressMap[category.slug] || false;
+                            const isCategoryBookmarked = isBookmarked(category._id);
 
-                        // Handler for completion
-                        const handleToggleCategory = async (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            const newStatus = !isCompleted;
+                            const handleToggleCategory = async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const newStatus = !isCompleted;
+                                try {
+                                    await progressAPI.toggleCategory(topic.slug, category.slug, newStatus);
+                                    setProgressMap(prev => ({ ...prev, [category.slug]: newStatus }));
+                                    toast.success(newStatus ? 'Category marked completed' : 'Category incomplete');
+                                    localStorage.removeItem(`prephub_topic_agg_${topic.slug}`);
+                                } catch (err) {
+                                    toast.error('Failed to update category');
+                                }
+                            };
 
-                            try {
-                                await progressAPI.toggleCategory(topic.slug, category.slug, newStatus);
-                                setProgressMap(prev => ({
-                                    ...prev,
-                                    [category.slug]: newStatus
-                                }));
-                                toast.success(newStatus ? 'Category marked completed' : 'Category incomplete');
-                                localStorage.removeItem(`prephub_topic_agg_${topic.slug}`);
-                            } catch (err) {
-                                console.error(err);
-                                toast.error('Failed to update category');
-                            }
-                        };
+                            const handleCategoryBookmark = (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const result = toggleBookmark({
+                                    id: category._id, type: 'category', title: category.name,
+                                    description: category.description, slug: category.slug,
+                                    topicSlug: topic.slug, categorySlug: category.slug,
+                                });
+                                if (result.success) {
+                                    toast.success(result.message === 'Bookmark added' ? 'Category bookmarked' : 'Bookmark removed');
+                                    setCategories([...categories]);
+                                } else {
+                                    toast.error(result.message);
+                                }
+                            };
 
-                        // Handler for bookmark
-                        const handleCategoryBookmark = (e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
+                            return (
+                                <Grid item xs={12} sm={6} md={4} lg={3} key={category._id}>
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                                        style={{ height: '100%' }}
+                                    >
+                                        <Card
+                                            sx={{
+                                                height: '100%',
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                borderRadius: '24px',
+                                                background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#fff',
+                                                border: '1px solid',
+                                                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                                                overflow: 'hidden',
+                                                transition: 'all 0.3s',
+                                                '&:hover': {
+                                                    transform: 'translateY(-4px)',
+                                                    boxShadow: `0 12px 30px ${topicColor}20`,
+                                                    borderColor: `${topicColor}50`,
+                                                },
+                                            }}
+                                        >
+                                            <Box
+                                                onClick={() => navigate(`/topic/${topic.slug}/category/${category.slug}`)}
+                                                sx={{
+                                                    p: 3,
+                                                    flex: 1,
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    cursor: 'pointer',
+                                                }}
+                                            >
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                                                    <Box
+                                                        sx={{
+                                                            width: 40, height: 40, borderRadius: '12px',
+                                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                            background: `${topicColor}15`, color: topicColor,
+                                                            fontWeight: 800, fontSize: '1.2rem'
+                                                        }}
+                                                    >
+                                                        {index + 1}
+                                                    </Box>
+                                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                                        <IconButton
+                                                            onClick={handleCategoryBookmark}
+                                                            size="small"
+                                                            sx={{ color: isCategoryBookmarked ? topicColor : 'text.disabled' }}
+                                                        >
+                                                            {isCategoryBookmarked ? <Bookmark fontSize="small" /> : <BookmarkBorder fontSize="small" />}
+                                                        </IconButton>
+                                                    </Box>
+                                                </Box>
 
-                            const result = toggleBookmark({
-                                id: category._id,
-                                type: 'category',
-                                title: category.name,
-                                description: category.description,
-                                slug: category.slug,
-                                topicSlug: topic.slug,
-                                categorySlug: category.slug,
-                            });
-                            if (result.success) {
-                                toast.success(result.message === 'Bookmark added' ? 'Category bookmarked' : 'Bookmark removed');
-                                setCategories([...categories]);
-                            } else {
-                                toast.error(result.message);
-                            }
-                        };
+                                                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, lineHeight: 1.3 }}>
+                                                    {category.name}
+                                                </Typography>
 
-                        return (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={category._id}>
+                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, flex: 1, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    {category.description || `${category.sectionCount || 0} Sections`}
+                                                </Typography>
+
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', opacity: 0.8 }}>
+                                                        {category.sectionCount || 0} Sections
+                                                    </Typography>
+                                                    <IconButton
+                                                        onClick={handleToggleCategory}
+                                                        size="small"
+                                                        sx={{
+                                                            color: isCompleted ? '#30d158' : 'text.disabled',
+                                                            bgcolor: isCompleted ? '#30d15815' : 'transparent',
+                                                            '&:hover': { bgcolor: '#30d15825', color: '#30d158' }
+                                                        }}
+                                                    >
+                                                        <CheckCircle fontSize="small" />
+                                                    </IconButton>
+                                                </Box>
+                                            </Box>
+                                        </Card>
+                                    </motion.div>
+                                </Grid>
+                            );
+                        })}
+                    </Grid>
+                ) : (
+                    // List Layout for Standard Topics
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {categories.map((category, index) => {
+                            const isCompleted = progressMap[category.slug] || false;
+                            const isCategoryBookmarked = isBookmarked(category._id);
+
+                            const handleToggleCategory = async (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const newStatus = !isCompleted;
+                                try {
+                                    await progressAPI.toggleCategory(topic.slug, category.slug, newStatus);
+                                    setProgressMap(prev => ({ ...prev, [category.slug]: newStatus }));
+                                    toast.success(newStatus ? 'Category marked completed' : 'Category incomplete');
+                                    localStorage.removeItem(`prephub_topic_agg_${topic.slug}`);
+                                } catch (err) {
+                                    toast.error('Failed to update category');
+                                }
+                            };
+
+                            const handleCategoryBookmark = (e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const result = toggleBookmark({
+                                    id: category._id, type: 'category', title: category.name,
+                                    description: category.description, slug: category.slug,
+                                    topicSlug: topic.slug, categorySlug: category.slug,
+                                });
+                                if (result.success) {
+                                    toast.success(result.message === 'Bookmark added' ? 'Category bookmarked' : 'Bookmark removed');
+                                    setCategories([...categories]);
+                                } else {
+                                    toast.error(result.message);
+                                }
+                            };
+
+                            return (
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
+                                    key={category._id}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
                                     transition={{ duration: 0.3, delay: index * 0.05 }}
-                                    style={{ height: '100%' }}
                                 >
                                     <Card
                                         sx={{
-                                            height: '100%',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            borderRadius: '24px',
-                                            background: (theme) =>
-                                                theme.palette.mode === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.03)'
-                                                    : '#fff',
+                                            borderRadius: '20px',
+                                            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : '#fff',
                                             border: '1px solid',
-                                            borderColor: (theme) =>
-                                                theme.palette.mode === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.05)'
-                                                    : 'rgba(0, 0, 0, 0.05)',
+                                            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
                                             overflow: 'hidden',
                                             transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                             '&:hover': {
-                                                transform: 'translateY(-4px)',
-                                                boxShadow: `0 12px 30px ${topicColor}20`,
-                                                borderColor: `${topicColor}50`,
+                                                transform: 'translateY(-2px)',
+                                                boxShadow: `0 8px 24px ${topicColor}15`,
+                                                borderColor: `${topicColor}40`,
                                             },
                                         }}
                                     >
@@ -421,140 +526,87 @@ const TopicPage = () => {
                                             onClick={() => navigate(`/topic/${topic.slug}/category/${category.slug}`)}
                                             sx={{
                                                 p: 3,
-                                                flex: 1,
                                                 display: 'flex',
-                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                gap: 3,
                                                 cursor: 'pointer',
+                                                '&:hover': {
+                                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)'
+                                                }
                                             }}
                                         >
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                                                {/* Index Badge */}
-                                                <Box
-                                                    sx={{
-                                                        width: 40, height: 40,
-                                                        borderRadius: '12px',
-                                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                        background: `${topicColor}15`,
-                                                        color: topicColor,
-                                                        fontWeight: 800,
-                                                        fontSize: '1.2rem'
-                                                    }}
-                                                >
-                                                    {index + 1}
-                                                </Box>
-
-                                                {/* Actions */}
-                                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                                    <IconButton
-                                                        onClick={handleCategoryBookmark}
-                                                        size="small"
-                                                        sx={{ color: isCategoryBookmarked ? topicColor : 'text.disabled' }}
-                                                    >
-                                                        {isCategoryBookmarked ? <Bookmark fontSize="small" /> : <BookmarkBorder fontSize="small" />}
-                                                    </IconButton>
-                                                </Box>
-                                            </Box>
-
-                                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, lineHeight: 1.3 }}>
-                                                {category.name}
-                                            </Typography>
-
                                             <Typography
-                                                variant="body2"
-                                                color="text.secondary"
+                                                variant="h4"
                                                 sx={{
-                                                    mb: 2,
-                                                    flex: 1,
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 3,
-                                                    WebkitBoxOrient: 'vertical',
-                                                    overflow: 'hidden'
+                                                    fontWeight: 800,
+                                                    color: topicColor,
+                                                    opacity: 0.4,
+                                                    minWidth: '40px',
+                                                    fontFamily: 'monospace'
                                                 }}
                                             >
-                                                {category.description || `${category.sectionCount || 0} Sections`}
+                                                {String(index + 1).padStart(2, '0')}
                                             </Typography>
 
-                                            {/* Footer Info */}
-                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
-                                                <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', opacity: 0.8 }}>
-                                                    {category.sectionCount || 0} Sections
+                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                <Typography
+                                                    variant="h6"
+                                                    sx={{
+                                                        fontWeight: 700,
+                                                        mb: 0.5,
+                                                        color: isCompleted ? 'text.secondary' : 'text.primary',
+                                                        textDecoration: isCompleted ? 'line-through' : 'none',
+                                                    }}
+                                                >
+                                                    {category.name}
                                                 </Typography>
+                                                <Typography variant="body2" sx={{ color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    {category.description || `${category.sectionCount || 0} Sections`}
+                                                </Typography>
+                                            </Box>
 
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                 <IconButton
                                                     onClick={handleToggleCategory}
-                                                    size="small"
                                                     sx={{
                                                         color: isCompleted ? '#30d158' : 'text.disabled',
                                                         bgcolor: isCompleted ? '#30d15815' : 'transparent',
+                                                        border: '1px solid',
+                                                        borderColor: isCompleted ? '#30d15840' : 'rgba(128,128,128,0.2)',
                                                         '&:hover': { bgcolor: '#30d15825', color: '#30d158' }
                                                     }}
                                                 >
-                                                    <CheckCircle fontSize="small" />
+                                                    <CheckCircle />
+                                                </IconButton>
+
+                                                <IconButton
+                                                    onClick={handleCategoryBookmark}
+                                                    sx={{
+                                                        color: isCategoryBookmarked ? topicColor : 'text.disabled',
+                                                        transition: 'all 0.2s',
+                                                        '&:hover': { color: topicColor, transform: 'scale(1.1)' }
+                                                    }}
+                                                >
+                                                    {isCategoryBookmarked ? <Bookmark /> : <BookmarkBorder />}
                                                 </IconButton>
                                             </Box>
                                         </Box>
                                     </Card>
                                 </motion.div>
-                            </Grid>
-                        );
-                    })}
-                </Grid>
-                sx={{ color: isCategoryBookmarked ? topicColor : 'text.disabled' }}
-                                                    >
-                {isCategoryBookmarked ? <Bookmark fontSize="small" /> : <BookmarkBorder fontSize="small" />}
-            </IconButton>
-        </Box>
-                                            </Box >
-
-                                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, lineHeight: 1.3 }}>
-                                                {category.name}
-                                            </Typography>
-
-                                            <Typography
-                                                variant="body2"
-                                                color="text.secondary"
-                                                sx={{
-                                                    mb: 2,
-                                                    flex: 1,
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: 3,
-                                                    WebkitBoxOrient: 'vertical',
-                                                    overflow: 'hidden'
-                                                }}
-                                            >
-                                                {category.description || `${category.sectionCount || 0} Sections`}
-                                            </Typography>
-
-{/* Footer Info */ }
-<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
-    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', opacity: 0.8 }}>
-        {category.sectionCount || 0} Sections
-    </Typography>
-    textTransform: 'none',
-    color: topicColor
-                                                    }}
-                                                >
-    View All Sections & Details
-</Button>
-                                        </Box >
-                                    </Box >
-                                </Collapse >
-                            </Card >
-                            </motion.div >
-                );
-                    })}
-        </Box >
-
-    {/* Empty State */ }
-{
-    categories.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-            <Typography variant="h5" color="text.secondary">
-                No categories available yet
-            </Typography>
-        </Box>
-    )
-}
+                            );
+                        })}
+                    </Box>
+                )}
+                {/* Empty State */}
+                {
+                    categories.length === 0 && (
+                        <Box sx={{ textAlign: 'center', py: 8 }}>
+                            <Typography variant="h5" color="text.secondary">
+                                No categories available yet
+                            </Typography>
+                        </Box>
+                    )
+                }
             </Container >
         </Box >
     );
