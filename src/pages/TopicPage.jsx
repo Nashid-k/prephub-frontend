@@ -479,31 +479,82 @@ const TopicPage = () => {
                                                 <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', opacity: 0.8 }}>
                                                     {category.sectionCount || 0} Sections
                                                 </Typography>
-                                                textTransform: 'none',
-                                                color: topicColor
+
+                                                <IconButton
+                                                    onClick={handleToggleCategory}
+                                                    size="small"
+                                                    sx={{
+                                                        color: isCompleted ? '#30d158' : 'text.disabled',
+                                                        bgcolor: isCompleted ? '#30d15815' : 'transparent',
+                                                        '&:hover': { bgcolor: '#30d15825', color: '#30d158' }
                                                     }}
                                                 >
-                                                View All Sections & Details
-                                            </Button>
+                                                    <CheckCircle fontSize="small" />
+                                                </IconButton>
+                                            </Box>
                                         </Box>
-                                    </Box>
-                                </Collapse>
-                            </Card>
-                            </motion.div>
+                                    </Card>
+                                </motion.div>
+                            </Grid>
+                        );
+                    })}
+                </Grid>
+                sx={{ color: isCategoryBookmarked ? topicColor : 'text.disabled' }}
+                                                    >
+                {isCategoryBookmarked ? <Bookmark fontSize="small" /> : <BookmarkBorder fontSize="small" />}
+            </IconButton>
+        </Box>
+                                            </Box >
+
+                                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, lineHeight: 1.3 }}>
+                                                {category.name}
+                                            </Typography>
+
+                                            <Typography
+                                                variant="body2"
+                                                color="text.secondary"
+                                                sx={{
+                                                    mb: 2,
+                                                    flex: 1,
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: 3,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden'
+                                                }}
+                                            >
+                                                {category.description || `${category.sectionCount || 0} Sections`}
+                                            </Typography>
+
+{/* Footer Info */ }
+<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 'auto' }}>
+    <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary', opacity: 0.8 }}>
+        {category.sectionCount || 0} Sections
+    </Typography>
+    textTransform: 'none',
+    color: topicColor
+                                                    }}
+                                                >
+    View All Sections & Details
+</Button>
+                                        </Box >
+                                    </Box >
+                                </Collapse >
+                            </Card >
+                            </motion.div >
                 );
                     })}
-        </Box>
+        </Box >
 
-                {/* Empty State */ }
-    {
-        categories.length === 0 && (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Typography variant="h5" color="text.secondary">
-                    No categories available yet
-                </Typography>
-            </Box>
-        )
-    }
+    {/* Empty State */ }
+{
+    categories.length === 0 && (
+        <Box sx={{ textAlign: 'center', py: 8 }}>
+            <Typography variant="h5" color="text.secondary">
+                No categories available yet
+            </Typography>
+        </Box>
+    )
+}
             </Container >
         </Box >
     );
