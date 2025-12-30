@@ -44,7 +44,11 @@ import {
     Add,
     List as ListIcon,
     KeyboardArrowDown,
-    KeyboardArrowUp
+    KeyboardArrowUp,
+    Menu as MenuIcon,
+    Pause,
+    Save,
+    Psychology
 } from '@mui/icons-material';
 import { toggleBookmark, isBookmarked } from '../utils/bookmarks';
 import toast from 'react-hot-toast';
@@ -69,6 +73,7 @@ const SectionPage = () => {
     const [contentLoading, setContentLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('learn');
     const [problemContent, setProblemContent] = useState('');
+    const [isQuizOpen, setIsQuizOpen] = useState(false);
     const [hints, setHints] = useState([]);
     const [visibleHints, setVisibleHints] = useState(0);
     const [solutions, setSolutions] = useState(null);
@@ -460,6 +465,27 @@ Explain clearly why approach #3 is superior to the others.`;
                         Back to {category?.name || 'Category'}
                     </Button>
                     <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button
+                            startIcon={<Psychology />}
+                            onClick={() => setIsQuizOpen(true)}
+                            sx={{
+                                display: { xs: 'none', sm: 'flex' },
+                                borderRadius: '9999px',
+                                px: 3,
+                                py: 1,
+                                background: bookmarked ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' : 'transparent',
+                                border: '1px solid',
+                                borderColor: 'rgba(128,128,128,0.2)',
+                                color: 'text.primary',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                    borderColor: topicColor,
+                                }
+                            }}
+                        >
+                            Take Quiz
+                        </Button>
                         <IconButton
                             onClick={handleToggleBookmark}
                             sx={{
@@ -473,6 +499,14 @@ Explain clearly why approach #3 is superior to the others.`;
                         </IconButton>
                     </Box>
                 </Box>
+
+                <QuizModal
+                    open={isQuizOpen}
+                    onClose={() => setIsQuizOpen(false)}
+                    topic={topicSlug}
+                    section={section.title}
+                    isDark={isDark}
+                />
 
                 <Box sx={{
                     height: 'calc(100vh - 140px)', // Adjust based on navbar/header
