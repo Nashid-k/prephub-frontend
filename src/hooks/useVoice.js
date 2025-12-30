@@ -65,13 +65,14 @@ const useVoice = (langCode = 'en-US') => {
             voices.find(v => v.lang === langCode) ||
             voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
 
-        const chunks = text.match(/[^.?!,|]+[.?!,|]?/g) || [text]; 
+        // Better chunking: Split on natural phrase boundaries
+        const chunks = text.match(/[^.?!,;:|]+[.?!,;:|]?/g) || [text]; 
         let chunkIndex = 0;
 
         const speakNextChunk = () => {
             if (chunkIndex >= chunks.length) {
                 setIsSpeaking(false);
-                if (onEndCallback) onEndCallback(); // Trigger callback when fully done
+                if (onEndCallback) onEndCallback();
                 return;
             }
 
@@ -85,11 +86,29 @@ const useVoice = (langCode = 'en-US') => {
             const utterance = new SpeechSynthesisUtterance(chunkText);
             utterance.lang = langCode;
             if (preferredVoice) utterance.voice = preferredVoice;
-            utterance.rate = 1.0; 
-            utterance.pitch = 1.0; 
+            
+            // Human-like dynamic rate variation (subtle randomness)
+            // Slow down slightly for longer/complex chunks, speed up for short ones
+            const wordCount = chunkText.split(' ').length;
+            const baseRate = wordCount > 8 ? 0.92 : 0.98; // Slow down for longer phrases
+            const randomVariation = (Math.random() * 0.08) - 0.04; // ±0.04
+            utterance.rate = Math.max(0.85, Math.min(1.05, baseRate + randomVariation));
+            
+            // Slight pitch variation for naturalness
+            utterance.pitch = 0.98 + (Math.random() * 0.08); // 0.98-1.06
 
+            // Enhanced breathing pauses
             const isSentenceEnd = ['.', '!', '?', '|'].some(char => chunkText.endsWith(char));
-            const pauseDuration = isSentenceEnd ? 600 : 300;
+            const isLongPause = [';', ':'].some(char => chunkText.endsWith(char));
+            
+            let pauseDuration;
+            if (isSentenceEnd) {
+                pauseDuration = 900 + Math.random() * 200; // 900-1100ms (natural "breath")
+            } else if (isLongPause) {
+                pauseDuration = 600 + Math.random() * 100; // 600-700ms (thinking pause)
+            } else {
+                pauseDuration = 350 + Math.random() * 100; // 350-450ms (comma pause)
+            }
 
             utterance.onstart = () => setIsSpeaking(true);
             utterance.onend = () => {
