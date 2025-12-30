@@ -62,7 +62,7 @@ const QuizModal = ({ open, onClose, topic, section, isDark }) => {
         }
     }, [open, topic, section]);
 
-    const fetchQuiz = async () => {
+    const fetchQuiz = async (regenerate = false) => {
         setLoading(true);
         setError(null);
         setQuiz([]);
@@ -73,7 +73,7 @@ const QuizModal = ({ open, onClose, topic, section, isDark }) => {
         setShowExplanation(false);
 
         try {
-            const response = await aiAPI.generateQuiz(topic, section);
+            const response = await aiAPI.generateQuiz(topic, section, regenerate);
             if (response.data.success && response.data.quiz) {
                 setQuiz(response.data.quiz);
             } else {
@@ -179,7 +179,7 @@ const QuizModal = ({ open, onClose, topic, section, isDark }) => {
                             <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
                                 <Button
                                     variant="outlined"
-                                    onClick={fetchQuiz}
+                                    onClick={() => fetchQuiz(true)}
                                     startIcon={<Refresh />}
                                     sx={{ borderRadius: '24px', px: 4, py: 1.5 }}
                                 >
