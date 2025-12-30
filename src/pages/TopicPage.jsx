@@ -246,8 +246,11 @@ const TopicPage = () => {
                                     <SafeImage
                                         src={getTopicImage(topic.slug)}
                                         alt={topic.name}
-                                        width="60%"
-                                        height="60%"
+                                        sx={{
+                                            width: '70%',
+                                            height: '70%',
+                                            margin: 'auto'
+                                        }}
                                     />
                                 </Box>
                             </motion.div>

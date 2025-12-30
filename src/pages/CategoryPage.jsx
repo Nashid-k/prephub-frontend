@@ -239,13 +239,30 @@ const CategoryPage = () => {
                             opacity: 0.1,
                             pointerEvents: 'none',
                         }} />
-                        <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none overflow-hidden">
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 0,
+                            right: 0,
+                            width: '200px',
+                            height: '200px',
+                            opacity: 0.08,
+                            pointerEvents: 'none',
+                            overflow: 'hidden',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}>
                             <SafeImage
                                 src={getTopicImage(topicSlug)}
                                 alt=""
-                                className="w-full h-full object-contain translate-x-1/4 translate-y-1/4 scale-150 grayscale"
+                                sx={{
+                                    width: '150px',
+                                    height: '150px',
+                                    filter: 'grayscale(100%)',
+                                    transform: 'translate(25%, 25%)'
+                                }}
                             />
-                        </div>
+                        </Box>
                     </Box>
                 </Box>
 
