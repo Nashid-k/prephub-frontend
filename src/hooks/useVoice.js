@@ -1,13 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
 
-const useVoice = (langCode = 'en-US') => {
+const useVoice = () => {
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState('');
     const [isSpeaking, setIsSpeaking] = useState(false);
     const recognitionRef = useRef(null);
 
-    // Re-initialize recognition when language changes
+    // Speech Recognition (English only)
     useEffect(() => {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -15,7 +15,7 @@ const useVoice = (langCode = 'en-US') => {
             recognitionRef.current = new SpeechRecognition();
             recognitionRef.current.continuous = false;
             recognitionRef.current.interimResults = true;
-            recognitionRef.current.lang = langCode; // Dynamic language
+            recognitionRef.current.lang = 'en-US';
 
             recognitionRef.current.onstart = () => setIsListening(true);
             recognitionRef.current.onresult = (event) => {
@@ -33,7 +33,7 @@ const useVoice = (langCode = 'en-US') => {
         return () => {
             if (recognitionRef.current) recognitionRef.current.stop();
         };
-    }, [langCode]);
+    }, []);
 
     const startListening = useCallback(() => {
         if (recognitionRef.current) {
@@ -62,10 +62,12 @@ const useVoice = (langCode = 'en-US') => {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tts/elevenlabs`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, language: langCode })
+                body: JSON.stringify({ text })
             });
 
-            if (!response.ok) throw new Error('TTS API failed');
+            if (!response.ok) {
+                throw new Error(`TTS failed: ${response.status}`);
+            }
 
             const { audio } = await response.json();
             
@@ -83,7 +85,8 @@ const useVoice = (langCode = 'en-US') => {
                 if (onEndCallback) onEndCallback();
             };
 
-            audioElement.onerror = () => {
+            audioElement.onerror = (err) => {
+                console.error('Audio playback error:', err);
                 setIsSpeaking(false);
                 URL.revokeObjectURL(audioUrl);
             };
@@ -93,9 +96,9 @@ const useVoice = (langCode = 'en-US') => {
         } catch (error) {
             console.error('ElevenLabs TTS Error:', error);
             setIsSpeaking(false);
-            toast.error('Voice synthesis failed');
+            toast.error('Voice failed');
         }
-    }, [langCode]);
+    }, []);
 
     const cancelSpeech = useCallback(() => {
         // ElevenLabs audio playback automatically stops on component unmount
