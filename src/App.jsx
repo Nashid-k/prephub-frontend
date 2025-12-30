@@ -16,6 +16,10 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 import createAppTheme from './theme';
 import './App.css';
+import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
+import { initAnalytics, trackPageView } from './services/analytics';
+import { useLocation } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
@@ -33,12 +37,17 @@ function AppContent() {
     const { theme } = useTheme();
     const muiTheme = React.useMemo(() => createAppTheme(theme), [theme]);
 
+    React.useEffect(() => {
+        initAnalytics();
+    }, []);
+
     return (
         <MuiThemeProvider theme={muiTheme}>
             <CssBaseline />
             <ErrorBoundary>
                 <AuthProvider>
                     <Router>
+                        <AnalyticsWrapper />
                         <div className="App">
                             <Navbar />
                             <Routes>
@@ -101,6 +110,21 @@ function AppContent() {
                 </AuthProvider>
             </ErrorBoundary>
         </MuiThemeProvider>
+    );
+}
+
+function AnalyticsWrapper() {
+    const location = useLocation();
+
+    React.useEffect(() => {
+        trackPageView(location.pathname + location.search);
+    }, [location]);
+
+    return (
+        <>
+            <Analytics />
+            <SpeedInsights />
+        </>
     );
 }
 

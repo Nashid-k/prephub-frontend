@@ -47,6 +47,7 @@ import {
 import { toggleBookmark, isBookmarked } from '../utils/bookmarks';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
+import { trackAIExplanation, trackCodeExecution, trackTopicStart, trackProgressToggle } from '../services/analytics';
 import './SectionPage.css';
 
 const SectionPage = () => {
@@ -106,6 +107,7 @@ const SectionPage = () => {
 
             const res = await aiAPI.askQuestion(prompt, context);
             setAiOutput({ type: 'ai', results: res.data.answer || res.data });
+            trackAIExplanation(topicSlug, section?.title);
         } catch (err) {
             setAiOutput({ type: 'error', error: 'Failed to get AI help' });
         }
@@ -230,6 +232,7 @@ function ${functionName}(${functionSignature}) {
                     await generateAIContent(response.data.section, categoryRes.data.category);
                 }
 
+                trackTopicStart(topicSlug);
                 setBookmarked(isBookmarked(response.data.section._id));
             }
         } catch (err) {

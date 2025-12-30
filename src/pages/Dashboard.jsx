@@ -13,18 +13,40 @@ const Dashboard = () => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        // 1. Load from cache first for instant UI
+        const cachedTopics = localStorage.getItem('prephub_topics');
+        if (cachedTopics) {
+            try {
+                setTopics(JSON.parse(cachedTopics));
+                setLoading(false); // Stop loading if we have cached data
+            } catch (e) {
+                console.error('Failed to parse cached topics');
+            }
+        }
+
         fetchTopics();
     }, []);
 
     const fetchTopics = async () => {
         try {
-            setLoading(true);
+            // Only show loader if we don't have cached data
+            if (!localStorage.getItem('prephub_topics')) {
+                setLoading(true);
+            }
+
             const response = await curriculumAPI.getAllTopics();
-            setTopics(response.data.topics);
+            const newTopics = response.data.topics;
+
+            setTopics(newTopics);
+            // 2. Save to cache for next visit
+            localStorage.setItem('prephub_topics', JSON.stringify(newTopics));
             setError(null);
         } catch (err) {
             console.error('Error fetching topics:', err);
-            setError('Failed to load topics. Please try again.');
+            // If we have cached data, don't show error (just use stale data)
+            if (!localStorage.getItem('prephub_topics')) {
+                setError('Failed to load topics. Please try again.');
+            }
         } finally {
             setLoading(false);
         }

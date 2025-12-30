@@ -46,20 +46,51 @@ const TopicPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // 1. Load from cache first
+        const cacheKey = `prephub_topic_${slug}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            try {
+                const { topic: t, categories: c, sections: s } = JSON.parse(cachedData);
+                setTopic(t);
+                setCategories(c);
+                setSections(s);
+                setLoading(false);
+            } catch (e) {
+                console.error('Failed to parse cached topic data');
+            }
+        }
+
         fetchTopicData();
         fetchProgressData();
     }, [slug]);
 
     const fetchTopicData = async () => {
         try {
-            setLoading(true);
+            const cacheKey = `prephub_topic_${slug}`;
+            if (!localStorage.getItem(cacheKey)) {
+                setLoading(true);
+            }
+
             const [topicResponse, categoriesResponse] = await Promise.all([
                 curriculumAPI.getTopicBySlug(slug),
                 categoryAPI.getCategoriesByTopic(slug)
             ]);
-            setTopic(topicResponse.data.topic);
-            setSections(topicResponse.data.sections || []);
-            setCategories(categoriesResponse.data.categories);
+
+            const topicData = topicResponse.data.topic;
+            const sectionsData = topicResponse.data.sections || [];
+            const categoriesData = categoriesResponse.data.categories;
+
+            setTopic(topicData);
+            setSections(sectionsData);
+            setCategories(categoriesData);
+
+            // 2. Save to cache
+            localStorage.setItem(cacheKey, JSON.stringify({
+                topic: topicData,
+                categories: categoriesData,
+                sections: sectionsData
+            }));
         } catch (err) {
             console.error('Error fetching topic:', err);
         } finally {

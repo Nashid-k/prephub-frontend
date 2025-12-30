@@ -3,6 +3,7 @@ import Editor from '@monaco-editor/react';
 import { compilerAPI } from '../services/api';
 import { Box, Button, Select, MenuItem, Typography, IconButton, Tooltip, CircularProgress, Chip, Stack } from '@mui/material';
 import { PlayArrow, CheckCircle, BugReport, Lightbulb, AutoFixHigh, ExpandMore, Code as CodeIcon } from '@mui/icons-material';
+import { trackCodeExecution } from '../services/analytics';
 import './CodeEditor.css';
 
 const CodeEditor = ({
@@ -81,6 +82,7 @@ const CodeEditor = ({
                         type: 'output',
                         output: response.data.output || 'Program executed successfully (no output)'
                     });
+                    trackCodeExecution(language);
                 } else {
                     setError(response.data.error || 'Execution failed');
                 }
@@ -94,6 +96,7 @@ const CodeEditor = ({
                 try {
                     const results = JSON.parse(response.data.output.trim());
                     setTestResults({ type: 'run', results });
+                    trackCodeExecution(language);
                 } catch (e) {
                     setError(`Failed to parse test results. Raw output: ${response.data.output}`);
                 }
