@@ -23,7 +23,7 @@ const Walkthrough = ({ run, onClose }) => {
                     element: '#dashboard-header',
                     popover: {
                         title: 'Welcome to PrepHub! 🚀',
-                        description: 'Your ultimate companion for mastering the MERN stack. Let\'s show you around.',
+                        description: 'Your ultimate companion for mastering programming. Let\'s show you around.',
                         side: 'bottom',
                         align: 'start'
                     }

@@ -47,7 +47,7 @@ const CertificateGenerator = ({ open, onClose, userName, topicName, completionDa
         // Subtitle
         ctx.fillStyle = '#666';
         ctx.font = '24px Inter, sans-serif';
-        ctx.fillText('PrepHub - MERN Stack Learning Platform', 600, 260);
+        ctx.fillText('PrepHub - Programming Learning Platform', 600, 260);
 
         // Presented to
         ctx.fillStyle = '#333';
@@ -181,7 +181,7 @@ const CertificateGenerator = ({ open, onClose, userName, topicName, completionDa
                         </Box>
 
                         <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
-                            Share your achievement on LinkedIn with #PrepHub #MERN
+                            Share your achievement on LinkedIn with #PrepHub #Programming
                         </Typography>
                     </Box>
                 )}

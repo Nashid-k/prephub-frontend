@@ -200,7 +200,7 @@ const Home = () => {
                                             WebkitTextFillColor: 'transparent',
                                         }}
                                     >
-                                        MERN Stack
+                                        Art of Code
                                     </Box>
                                 </Typography>
                             )}
@@ -212,7 +212,7 @@ const Home = () => {
                             >
                                 {hasActivity
                                     ? 'Continue where you left off'
-                                    : 'Your comprehensive preparation platform. Learn with AI, practice code, and ace interviews.'}
+                                    : 'Your comprehensive learning platform. Master multiple technologies with AI-powered guidance, practice coding, and ace technical interviews.'}
                             </Typography>
 
                             {/* CTA Buttons */}

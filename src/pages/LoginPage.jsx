@@ -78,7 +78,7 @@ const LoginPage = () => {
                             Welcome to PrepHub
                         </Typography>
                         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-                            Your ultimate MERN Stack preparation companion
+                            Your comprehensive programming learning companion
                         </Typography>
 
                         <Divider sx={{ my: 4 }} />

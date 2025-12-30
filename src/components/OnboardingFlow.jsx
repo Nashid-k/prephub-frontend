@@ -110,7 +110,7 @@ const OnboardingFlow = ({ onComplete }) => {
                             Welcome to PrepHub! 🎉
                         </Typography>
                         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-                            Your journey to MERN stack mastery starts here
+                            Your journey to programming mastery starts here
                         </Typography>
                         <Box sx={{ maxWidth: 600, mx: 'auto', textAlign: 'left' }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
