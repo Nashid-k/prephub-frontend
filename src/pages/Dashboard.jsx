@@ -4,12 +4,11 @@ import { Container, Typography, Box, Button, Alert, useTheme as useMuiTheme, Fad
 import { Refresh, School, Code, Storage, Cloud, Psychology, TrendingUp, Timer, EmojiEvents, Computer, Architecture, Handyman } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/TopicCard';
-import LoadingSpinner from '../components/LoadingSpinner';
-import StreakBadge from '../components/StreakBadge';
-import RecommendationCard from '../components/RecommendationCard';
+import DashboardHeader from '../components/DashboardHeader';
 import Walkthrough from '../components/Walkthrough'; // New import
 import { useAuth } from '../context/AuthContext'; // New import
 import axios from 'axios'; // New import
+import { getStreakData } from '../utils/streakTracker';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -163,13 +162,39 @@ const Dashboard = () => {
 
                         {/* Stats & Recommendations Section */}
                         <Box sx={{ maxWidth: '1000px', mx: 'auto', mt: 4 }}>
+                            {/* Dashboard Hero Section */}
+                            <DashboardHeader user={user} />
+
+                            {/* Curriculum Grid */}
+                            <Typography variant="h5" sx={{ fontWeight: 800, mb: 3 }}>
+                                Your Learning Path
+                            </Typography>
+
                             <Grid container spacing={3}>
-                                <Grid item xs={12} md={6}>
-                                    <StreakBadge variant="full" />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <RecommendationCard isDark={theme.palette.mode === 'dark'} />
-                                </Grid>
+                                {loading ? (
+                                    // ... Skeletons ...
+                                    [1, 2, 3, 4].map((n) => (
+                                        <Grid item xs={12} sm={6} md={4} key={n}>
+                                            <Skeleton variant="rectangular" height={280} sx={{ borderRadius: 4 }} />
+                                        </Grid>
+                                    ))
+                                ) : (
+                                    topics.map((topic, index) => (
+                                        <Grid item xs={12} sm={6} md={4} key={topic.slug}>
+                                            {/* ... existing Topic Card ... */}
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: index * 0.1 }}
+                                            >
+                                                <TopicCard
+                                                    topic={topic}
+                                                    onClick={() => handleTopicClick(topic.slug)}
+                                                />
+                                            </motion.div>
+                                        </Grid>
+                                    ))
+                                )}
                             </Grid>
                         </Box>
                     </Box>
