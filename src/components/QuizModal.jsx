@@ -127,11 +127,12 @@ const QuizModal = ({ open, onClose, topic, section, isDark }) => {
         <Dialog
             open={open}
             onClose={handleClose}
-            TransitionComponent={Transition}
             maxWidth="md"
             fullWidth
+            fullScreen={false}
             PaperProps={{
                 sx: {
+                    m: 2,
                     bgcolor: isDark ? 'rgba(30, 30, 32, 0.85)' : 'rgba(255, 255, 255, 0.95)',
                     backdropFilter: 'blur(16px)',
                     border: '1px solid',
