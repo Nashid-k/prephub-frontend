@@ -192,38 +192,6 @@ const Dashboard = () => {
                         <Box sx={{ mx: 'auto', mt: 4 }}>
                             {/* Dashboard Hero Section */}
                             <DashboardHeader user={user} />
-
-                            {/* Curriculum Grid */}
-                            <Typography variant="h5" sx={{ fontWeight: 800, mb: 3 }}>
-                                Your Learning Path
-                            </Typography>
-
-                            <Grid container spacing={3}>
-                                {loading ? (
-                                    // Skeletons
-                                    [1, 2, 3, 4].map((n) => (
-                                        <Grid item xs={12} sm={6} md={4} lg={3} key={n}>
-                                            <Skeleton variant="rectangular" height={280} sx={{ borderRadius: 4 }} />
-                                        </Grid>
-                                    ))
-                                ) : (
-                                    topics.map((topic, index) => (
-                                        <Grid item xs={12} sm={6} md={4} lg={3} key={topic.slug}>
-                                            {/* ... existing Topic Card ... */}
-                                            <motion.div
-                                                initial={{ opacity: 0, y: 20 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                transition={{ delay: index * 0.1 }}
-                                            >
-                                                <TopicCard
-                                                    topic={topic}
-                                                    onClick={() => handleTopicClick(topic.slug)}
-                                                />
-                                            </motion.div>
-                                        </Grid>
-                                    ))
-                                )}
-                            </Grid>
                         </Box>
                     </Box>
                 </motion.div>
@@ -239,7 +207,7 @@ const Dashboard = () => {
                             xl: 'repeat(4, 1fr)'
                         },
                         gap: 3,
-                        maxWidth: '1400px',
+                        maxWidth: '100%',
                         mx: 'auto',
                         px: 2
                     }}
@@ -339,7 +307,9 @@ const Dashboard = () => {
                         'algorithms', 'data-structures', 'blind-75', 'dsa',
                         'operating-systems', 'networking',
                         'system-design', 'api-design', 'security-engineering', 'reliability-observability', 'caching-performance', 'concurrency',
-                        'testing-strategy', 'devops-basics', 'code-quality', 'product-thinking'
+                        'testing-strategy', 'devops-basics', 'code-quality', 'product-thinking',
+                        // Also exclude the Core Groups because they are Manually Rendered above
+                        'algorithms-data-structures', 'cs-fundamentals', 'system-design-architecture', 'engineering-practices'
                     ].includes(t.slug)).map((topic, index) => (
                         <Box key={topic._id} sx={{ display: 'flex', height: 'auto' }}>
                             <motion.div
