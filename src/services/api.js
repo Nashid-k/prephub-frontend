@@ -14,12 +14,26 @@ const api = axios.create({
   }
 });
 
-// Add a request interceptor to include the auth token
+// Generate or retrieve session ID for anonymous users
+const getSessionId = () => {
+  let sessionId = localStorage.getItem('prephub_session_id');
+  if (!sessionId) {
+    // Generate a unique session ID
+    sessionId = 'anon_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+    localStorage.setItem('prephub_session_id', sessionId);
+  }
+  return sessionId;
+};
+
+// Add a request interceptor to include the auth token and session ID
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      // For anonymous users, send session ID
+      config.headers['x-session-id'] = getSessionId();
     }
     return config;
   },
@@ -34,11 +48,18 @@ export const curriculumAPI = {
   getTopicBySlug: (slug) => api.get(`/curriculum/topics/${slug}`),
   getSectionBySlug: (topicSlug, sectionSlug) => 
     api.get(`/curriculum/sections/${topicSlug}/${sectionSlug}`),
+  // Aggregate endpoints (includes user progress)
   getTopicAggregate: (slug) => api.get(`/curriculum/aggregate/topic/${slug}`),
   getCategoryAggregate: (topicSlug, categorySlug) =>
     api.get(`/curriculum/aggregate/category/${topicSlug}/${categorySlug}`),
   getSectionAggregate: (topicSlug, sectionSlug) =>
-    api.get(`/curriculum/aggregate/section/${topicSlug}/${sectionSlug}`)
+    api.get(`/curriculum/aggregate/section/${topicSlug}/${sectionSlug}`),
+  // Static endpoints (NO user progress - globally cacheable)
+  getTopicStatic: (slug) => api.get(`/curriculum/static/topic/${slug}`),
+  getCategoryStatic: (topicSlug, categorySlug) =>
+    api.get(`/curriculum/static/category/${topicSlug}/${categorySlug}`),
+  getSectionStatic: (topicSlug, sectionSlug) =>
+    api.get(`/curriculum/static/section/${topicSlug}/${sectionSlug}`)
 };
 
 // AI API

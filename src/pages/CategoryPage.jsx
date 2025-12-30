@@ -114,15 +114,41 @@ const CategoryPage = () => {
         e.stopPropagation();
         const currentStatus = progressMap[sectionSlug] || false;
         const newStatus = !currentStatus;
+
+        // Optimistic update
         setProgressMap(prev => ({ ...prev, [sectionSlug]: newStatus }));
+
         try {
             await progressAPI.toggleProgress(topicSlug, sectionSlug, newStatus);
+
+            // Update the cache with the new progress
+            const cacheKey = `prephub_category_agg_${topicSlug}_${categorySlug}`;
+            const cachedData = localStorage.getItem(cacheKey);
+            if (cachedData) {
+                try {
+                    const data = JSON.parse(cachedData);
+                    data.progress = { ...data.progress, [sectionSlug]: newStatus };
+                    localStorage.setItem(cacheKey, JSON.stringify(data));
+                } catch (e) {
+                    console.error('Failed to update cache');
+                }
+            }
+
+            // Also invalidate related caches for consistency
+            localStorage.removeItem(`prephub_topic_agg_${topicSlug}`);
+            localStorage.removeItem('prephub_global_progress');
+            localStorage.removeItem('prephub_topics');
         } catch (err) {
+            console.error('Failed to toggle progress:', err);
+            // Revert on error
             setProgressMap(prev => ({ ...prev, [sectionSlug]: currentStatus }));
         }
     };
 
-    const allStudied = sections.length > 0 && sections.every(s => progressMap[s.slug]);
+    // Memoize expensive calculation to prevent recalculation on every render
+    const allStudied = React.useMemo(() => {
+        return sections.length > 0 && sections.every(s => progressMap[s.slug]);
+    }, [sections, progressMap]);
 
     if (loading) return <LoadingSpinner message="Loading category..." />;
     if (!category) return <Typography>Category not found</Typography>;

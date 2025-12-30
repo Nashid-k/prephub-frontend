@@ -52,4 +52,5 @@ const SafeImage = ({
     );
 };
 
-export default SafeImage;
+// Memoize to prevent unnecessary re-renders when parent updates
+export default React.memo(SafeImage);

@@ -223,4 +223,11 @@ const TopicCard = ({ topic }) => {
     );
 };
 
-export default TopicCard;
+// Memoize with custom comparison to prevent re-renders
+// Only re-render if topic ID or progress actually changes
+export default React.memo(TopicCard, (prevProps, nextProps) => {
+    return (
+        prevProps.topic._id === nextProps.topic._id &&
+        prevProps.progress === nextProps.progress
+    );
+});
