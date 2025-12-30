@@ -62,9 +62,36 @@ const Dashboard = () => {
             const response = await curriculumAPI.getAllTopics();
             const newTopics = response.data.topics;
 
-            setTopics(newTopics);
+            // Filter out known child topics that are covered by Groups
+            // This cleans up the dashboard to show only Roots
+            const HIDDEN_SLUGS = [
+                'blind-75', 'algorithms', 'dsa', 'data-structures', // Inside Algo & DS
+                'operating-systems', 'networking', // Inside CS Fundamentals
+                'system-design', 'api-design', 'caching-performance', 'reliability-observability', 'security-engineering', 'concurrency-async', // Inside Sys Design
+                'devops-basics', 'code-quality', 'testing-strategy', 'product-thinking' // Inside Eng Practices
+            ];
+
+            const CORE_GROUPS = [
+                'algorithms-data-structures',
+                'cs-fundamentals',
+                'system-design-architecture',
+                'engineering-practices'
+            ];
+
+            const filteredTopics = newTopics.filter(t => !HIDDEN_SLUGS.includes(t.slug));
+
+            // Sort: Core Groups first, then others (like MERN)
+            const sortedTopics = filteredTopics.sort((a, b) => {
+                const aIsGroup = CORE_GROUPS.includes(a.slug);
+                const bIsGroup = CORE_GROUPS.includes(b.slug);
+                if (aIsGroup && !bIsGroup) return -1;
+                if (!aIsGroup && bIsGroup) return 1;
+                return 0; // Keep original order for others
+            });
+
+            setTopics(sortedTopics);
             // 2. Save to cache for next visit
-            localStorage.setItem('prephub_topics', JSON.stringify(newTopics));
+            localStorage.setItem('prephub_topics', JSON.stringify(sortedTopics));
             setError(null);
         } catch (err) {
             console.error('Error fetching topics:', err);
