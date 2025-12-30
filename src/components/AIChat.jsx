@@ -95,6 +95,15 @@ const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeConte
 
     // ... (rest of update modal logic)
 
+    // ... (rest of update modal logic)
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSend();
+        }
+    };
+
     return (
         <div className="ai-chat glass">
             {/* ... modal ... */}
