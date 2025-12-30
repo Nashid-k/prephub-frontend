@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+    </radialGradient>
+    
+    <!-- Glow Gradients -->
+    <linearGradient id="neonBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="neonPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e879f9;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#a855f7;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="url(#bg)"/>
+
+  <!-- Grid Pattern (Code Matrix vibe) -->
+  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#334155" stroke-width="0.5" opacity="0.3"/>
+  </pattern>
+  <rect width="800" height="600" fill="url(#grid)" />
+
+  <!-- Abstract Data Structures -->
+  <g filter="url(#glow)">
+    <!-- Binary Tree / Network -->
+    <g stroke="url(#neonBlue)" stroke-width="2" fill="none">
+        <!-- Root to L1 -->
+        <line x1="400" y1="180" x2="280" y2="300" opacity="0.6"/>
+        <line x1="400" y1="180" x2="520" y2="300" opacity="0.6"/>
+        
+        <!-- L1 to L2 -->
+        <line x1="280" y1="300" x2="220" y2="420" opacity="0.4"/>
+        <line x1="280" y1="300" x2="340" y2="420" opacity="0.4"/>
+        <line x1="520" y1="300" x2="460" y2="420" opacity="0.4"/>
+        <line x1="520" y1="300" x2="580" y2="420" opacity="0.4"/>
+        
+        <!-- Cross connections (Graph vibe) -->
+        <line x1="340" y1="420" x2="460" y2="420" stroke="url(#neonPurple)" stroke-dasharray="5,5" opacity="0.5"/>
+    </g>
+
+    <!-- Nodes -->
+    <g>
+        <circle cx="400" cy="180" r="25" fill="#1e293b" stroke="url(#neonBlue)" stroke-width="3"/>
+        <circle cx="280" cy="300" r="20" fill="#1e293b" stroke="url(#neonBlue)" stroke-width="2"/>
+        <circle cx="520" cy="300" r="20" fill="#1e293b" stroke="url(#neonBlue)" stroke-width="2"/>
+        
+        <circle cx="220" cy="420" r="15" fill="#1e293b" stroke="url(#neonPurple)" stroke-width="2"/>
+        <circle cx="340" cy="420" r="15" fill="#1e293b" stroke="url(#neonPurple)" stroke-width="2"/>
+        <circle cx="460" cy="420" r="15" fill="#1e293b" stroke="url(#neonPurple)" stroke-width="2"/>
+        <circle cx="580" cy="420" r="15" fill="#1e293b" stroke="url(#neonPurple)" stroke-width="2"/>
+    </g>
+    
+    <!-- Code Snippets Abstract -->
+    <g font-family="monospace" font-size="14" fill="#64748b" opacity="0.4">
+        <text x="50" y="100">const Node = (val) => {</text>
+        <text x="70" y="120">this.val = val;</text>
+        <text x="70" y="140">this.next = null;</text>
+        <text x="50" y="160">}</text>
+        
+        <text x="600" y="500">O(log n)</text>
+        <text x="650" y="530">BFS/DFS</text>
+    </g>
+  </g>
+
+  <!-- Title -->
+  <text x="50%" y="540" text-anchor="middle" font-family="'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="56" fill="url(#neonBlue)" letter-spacing="4" filter="url(#glow)">DSA</text>
+</svg>

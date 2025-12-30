@@ -1,0 +1,138 @@
+.ios-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-2xl);
+    min-height: 60vh;
+}
+
+.ios-spinner {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    animation: rotate 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.spinner-ring:nth-child(1) {
+    border-top-color: #0a84ff;
+    animation-delay: 0s;
+}
+
+.spinner-ring:nth-child(2) {
+    border-top-color: #5e5ce6;
+    animation-delay: 0.15s;
+    width: 70%;
+    height: 70%;
+}
+
+.spinner-ring:nth-child(3) {
+    border-top-color: #30d158;
+    animation-delay: 0.3s;
+    width: 50%;
+    height: 50%;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Success State */
+.ios-spinner.success .spinner-ring {
+    animation: scaleOut 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes scaleOut {
+    to {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.checkmark {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    opacity: 0;
+    animation: scaleIn 0.5s 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0) rotate(-45deg);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+.checkmark-circle {
+    stroke: #30d158;
+    stroke-width: 3;
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    animation: drawCircle 0.6s 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes drawCircle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.checkmark-check {
+    stroke: #30d158;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    animation: drawCheck 0.4s 0.6s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes drawCheck {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.loading-message {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    animation: fadeIn 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

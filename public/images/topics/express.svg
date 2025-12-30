@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#333333;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </radialGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bg)"/>
+
+  <!-- Minimalist Speed/Server Graphic -->
+  <g transform="translate(400, 300)">
+     <!-- Outer Ring -->
+     <circle r="180" fill="none" stroke="#444" stroke-width="2" stroke-dasharray="10, 10" opacity="0.5">
+       <animateTransform attributeName="transform" type="rotate" from="0" to="360" dur="20s" repeatCount="indefinite" />
+     </circle>
+     
+     <!-- Inner Ring -->
+     <circle r="140" fill="none" stroke="#666" stroke-width="1" opacity="0.3"/>
+     
+     <!-- Server Nodes -->
+     <circle cx="0" cy="-140" r="8" fill="#fff" />
+     <circle cx="121" cy="70" r="8" fill="#fff" />
+     <circle cx="-121" cy="70" r="8" fill="#fff" />
+  </g>
+
+  <!-- Express Text Logo Design -->
+  <g filter="url(#shadow)">
+      <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="bold" font-size="130" fill="#ffffff" letter-spacing="-2">EXPRESS</text>
+      <text x="50%" y="65%" text-anchor="middle" font-family="monospace" font-size="24" fill="#aaaaaa" letter-spacing="8">FRAMEWORK</text>
+  </g>
+  
+  <!-- Accent Line -->
+  <line x1="250" y1="360" x2="550" y2="360" stroke="#fbbf24" stroke-width="4" stroke-linecap="round" />
+</svg>
