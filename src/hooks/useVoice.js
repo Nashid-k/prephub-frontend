@@ -1,53 +1,39 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import toast from 'react-hot-toast';
 
-const useVoice = () => {
+const useVoice = (langCode = 'en-US') => {
     const [isListening, setIsListening] = useState(false);
     const [transcript, setTranscript] = useState('');
     const [isSpeaking, setIsSpeaking] = useState(false);
     const recognitionRef = useRef(null);
 
+    // Re-initialize recognition when language changes
     useEffect(() => {
-        // Initialize Speech Recognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
         if (SpeechRecognition) {
             recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = false; // Stop after one sentence/command for now
+            recognitionRef.current.continuous = false;
             recognitionRef.current.interimResults = true;
-            recognitionRef.current.lang = 'en-US';
+            recognitionRef.current.lang = langCode; // Dynamic language
 
-            recognitionRef.current.onstart = () => {
-                setIsListening(true);
-            };
-
+            recognitionRef.current.onstart = () => setIsListening(true);
             recognitionRef.current.onresult = (event) => {
                 const current = event.resultIndex;
                 const transcriptText = event.results[current][0].transcript;
                 setTranscript(transcriptText);
             };
-
             recognitionRef.current.onerror = (event) => {
-                console.error('Speech recognition error', event.error);
-                if (event.error === 'not-allowed') {
-                    toast.error('Microphone access denied');
-                }
+                console.error('Speech error', event.error);
                 setIsListening(false);
             };
-
-            recognitionRef.current.onend = () => {
-                setIsListening(false);
-            };
-        } else {
-            console.warn('Browser does not support Speech Recognition');
+            recognitionRef.current.onend = () => setIsListening(false);
         }
 
         return () => {
-            if (recognitionRef.current) {
-                recognitionRef.current.stop();
-            }
+            if (recognitionRef.current) recognitionRef.current.stop();
         };
-    }, []);
+    }, [langCode]);
 
     const startListening = useCallback(() => {
         if (recognitionRef.current) {
@@ -55,38 +41,33 @@ const useVoice = () => {
                 setTranscript('');
                 recognitionRef.current.start();
             } catch (e) {
-                console.error("Already started", e);
+                console.error("Restarting recognition", e);
+                recognitionRef.current.stop();
+                setTimeout(() => recognitionRef.current.start(), 200);
             }
         } else {
-            toast.error('Voice not supported in this browser');
+            toast.error('Voice not supported');
         }
     }, []);
 
     const stopListening = useCallback(() => {
-        if (recognitionRef.current) {
-            recognitionRef.current.stop();
-        }
+        if (recognitionRef.current) recognitionRef.current.stop();
     }, []);
 
     const speak = useCallback((text) => {
         if (!window.speechSynthesis) return;
-        
-        // Stop any current speech
         window.speechSynthesis.cancel();
 
-        // 1. Voice Selection Strategy: Hunt for "best" voices
+        // Voice Selection: Match the language code
         const voices = window.speechSynthesis.getVoices();
-        // Priority: Google US English -> Microsoft -> Samantha -> Default
-        const preferredVoice = voices.find(v => v.name.includes('Google US English')) || 
-                               voices.find(v => v.name.includes('Google')) ||
-                               voices.find(v => v.name.includes('Microsoft David')) ||
-                               voices.find(v => v.name.includes('Natural')) ||
-                               voices[0];
+        
+        // Priority: Exact match -> Same Lang -> Google -> fallback
+        const preferredVoice = 
+            voices.find(v => v.lang === langCode && v.name.includes('Google')) ||
+            voices.find(v => v.lang === langCode) ||
+            voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
 
-        // 2. "Humanizer": Split text into chunks for "breath" pauses
-        // Split by punctuation (. ? ! ,) but keep the delimiter
-        const chunks = text.match(/[^.?!,]+[.?!,]?/g) || [text];
-
+        const chunks = text.match(/[^.?!,|]+[.?!,|]?/g) || [text]; // Added | for Hindi sometimes
         let chunkIndex = 0;
 
         const speakNextChunk = () => {
@@ -103,21 +84,19 @@ const useVoice = () => {
             }
 
             const utterance = new SpeechSynthesisUtterance(chunkText);
-            
+            utterance.lang = langCode;
             if (preferredVoice) utterance.voice = preferredVoice;
             
-            // 3. Dynamic Prosody: Vary pitch/rate slightly for realism
             utterance.rate = 1.0; 
             utterance.pitch = 1.0; 
 
-            // Add slight "breath" pause after commas/sentences
-            const isSentenceEnd = ['.', '!', '?'].some(char => chunkText.endsWith(char));
-            const pauseDuration = isSentenceEnd ? 600 : 300; // Longer pause for full stops
+            const isSentenceEnd = ['.', '!', '?', '|'].some(char => chunkText.endsWith(char));
+            const pauseDuration = isSentenceEnd ? 600 : 300;
 
             utterance.onstart = () => setIsSpeaking(true);
             utterance.onend = () => {
                 chunkIndex++;
-                setTimeout(speakNextChunk, pauseDuration); // "Breath" pause
+                setTimeout(speakNextChunk, pauseDuration);
             };
             utterance.onerror = () => setIsSpeaking(false);
 
@@ -125,8 +104,7 @@ const useVoice = () => {
         };
 
         speakNextChunk();
-
-    }, []);
+    }, [langCode]);
 
     const cancelSpeech = useCallback(() => {
         if (window.speechSynthesis) {

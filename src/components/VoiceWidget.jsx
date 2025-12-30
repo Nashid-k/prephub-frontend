@@ -1,29 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { Mic, MicOff, VolumeUp, Stop } from '@mui/icons-material';
-import { Box, Tooltip, IconButton, Fade } from '@mui/material';
+import { Mic, MicOff, Translate, Stop } from '@mui/icons-material';
+import { Box, IconButton, Menu, MenuItem } from '@mui/material';
 import useVoice from '../hooks/useVoice';
 import { aiAPI } from '../services/api';
 import './VoiceWidget.css';
 
+const LANGUAGES = [
+    { code: 'en-US', label: 'English', name: 'English' },
+    { code: 'hi-IN', label: 'Hindi (हिंदी)', name: 'Hindi' },
+    { code: 'ta-IN', label: 'Tamil (தமிழ்)', name: 'Tamil' },
+    { code: 'ml-IN', label: 'Malayalam (മലയാളം)', name: 'Malayalam' }
+];
+
 const VoiceWidget = ({ context, onAiResponse }) => {
-    const { isListening, transcript, startListening, stopListening, speak, isSpeaking, cancelSpeech } = useVoice();
+    const [lang, setLang] = useState(LANGUAGES[0]);
+    const { isListening, transcript, startListening, stopListening, speak, isSpeaking, cancelSpeech } = useVoice(lang.code);
     const [isProcessing, setIsProcessing] = useState(false);
     const [silenceTimer, setSilenceTimer] = useState(null);
+    const [anchorEl, setAnchorEl] = useState(null);
 
-    // Auto-stop listening logic (simple silence-like effect)
-    // In a real app we'd use more complex VAD, but here we assume if transcript updates, user is talking.
-    // If transcript doesn't update for 2s while listening, we submit.
-
+    // Auto-stop listening logic
     useEffect(() => {
         if (isListening && transcript) {
-            // Reset timer on new input
             if (silenceTimer) clearTimeout(silenceTimer);
-
             const timer = setTimeout(() => {
-                stopListening(); // Stop first
+                stopListening();
                 handleVoiceSubmit(transcript);
-            }, 2500); // 2.5s of silence triggers submit
-
+            }, 2500);
             setSilenceTimer(timer);
         }
         return () => {
@@ -36,26 +39,24 @@ const VoiceWidget = ({ context, onAiResponse }) => {
 
         setIsProcessing(true);
         try {
-            // Context injection for AI
             const aiContext = {
-                ...context, // Module, Section, etc.
-                mode: 'voice_tutor' // Add a hint to AI it's a voice convo
+                ...context,
+                mode: 'voice_tutor'
             };
 
-            const prompt = `[VOICE_MODE] User said: "${text}". Reply conversationally and concisely (under 2 sentences if possible, unless explaining a concept). Do not use markdown code blocks if possible, or keep them very brief.`;
+            const prompt = `[VOICE_MODE] User said (in ${lang.name}): "${text}". 
+            Reply conversationally in ${lang.name} language only. 
+            Keep it concise (under 2 sentences) and simple. Do not use code blocks.`;
 
             const res = await aiAPI.askQuestion(prompt, aiContext);
-            const answer = res.data.answer || res.data; // Adjust based on actual API response structure
+            const answer = res.data.answer || res.data;
 
-            // Speak the answer
             speak(answer);
-
-            // Optional: Pass back to parent if we want to show it in chat potentially?
             if (onAiResponse) onAiResponse(text, answer);
 
         } catch (error) {
             console.error("Voice AI Error:", error);
-            speak("Sorry, I had trouble understanding that.");
+            speak("Sorry, technical error.");
         } finally {
             setIsProcessing(false);
         }
@@ -69,7 +70,6 @@ const VoiceWidget = ({ context, onAiResponse }) => {
 
         if (isListening) {
             stopListening();
-            // If we stopped manually and have text, submit it immediately
             if (transcript) handleVoiceSubmit(transcript);
         } else {
             startListening();
@@ -79,10 +79,37 @@ const VoiceWidget = ({ context, onAiResponse }) => {
     return (
         <Box className="voice-widget-container">
             <div className={`voice-status ${isListening || isSpeaking || isProcessing ? 'visible' : ''}`}>
-                {isListening ? (transcript ? 'Listening...' : 'Speak now...') :
+                {isListening ? (transcript ? 'Listening...' : `Speak ${lang.name}...`) :
                     isProcessing ? 'Thinking...' :
                         isSpeaking ? 'Speaking...' : ''}
             </div>
+
+            {/* Language Selector */}
+            <IconButton
+                size="small"
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                sx={{ bgcolor: 'rgba(0,0,0,0.4)', color: 'white', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' }, mb: 1, width: 32, height: 32 }}
+            >
+                <Translate fontSize="small" />
+            </IconButton>
+
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={() => setAnchorEl(null)}
+                PaperProps={{ sx: { bgcolor: 'rgba(20,20,30,0.95)', color: 'white', backdropFilter: 'blur(10px)' } }}
+            >
+                {LANGUAGES.map((l) => (
+                    <MenuItem
+                        key={l.code}
+                        onClick={() => { setLang(l); setAnchorEl(null); }}
+                        selected={lang.code === l.code}
+                        sx={{ fontSize: '0.85rem' }}
+                    >
+                        {l.label}
+                    </MenuItem>
+                ))}
+            </Menu>
 
             <button
                 className={`voice-btn ${isListening ? 'listening' : ''} ${isSpeaking ? 'speaking' : ''}`}
