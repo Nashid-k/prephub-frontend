@@ -24,9 +24,25 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
 
+        // Check if running on localhost to bypass login
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
         if (storedToken && storedUser) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
+        } else if (isLocal) {
+            // Auto-login for local development
+            const devUser = {
+                _id: 'dev-user-id',
+                name: 'Local Developer',
+                email: 'dev@prephub.local',
+                picture: 'https://ui-avatars.com/api/?name=Local+Developer',
+                isDev: true
+            };
+            setUser(devUser);
+            // We don't necessarily need a real JWT for local UI testing 
+            // unless the local backend also requires it (which it usually does).
+            // But this bypasses the Front-end "Protected" checks.
         }
         setLoading(false);
     }, []);

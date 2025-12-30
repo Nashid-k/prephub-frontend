@@ -3,14 +3,17 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import TopicPage from './pages/TopicPage';
-import CategoryPage from './pages/CategoryPage';
-import SectionPage from './pages/SectionPage';
-import CompilerPage from './pages/CompilerPage';
-import ProgressPage from './pages/ProgressPage';
-import BookmarksPage from './pages/BookmarksPage';
+import LoadingSpinner from './components/LoadingSpinner';
+
+const Home = React.lazy(() => import('./pages/Home'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const TopicPage = React.lazy(() => import('./pages/TopicPage'));
+const CategoryPage = React.lazy(() => import('./pages/CategoryPage'));
+const SectionPage = React.lazy(() => import('./pages/SectionPage'));
+const CompilerPage = React.lazy(() => import('./pages/CompilerPage'));
+const ProgressPage = React.lazy(() => import('./pages/ProgressPage'));
+const BookmarksPage = React.lazy(() => import('./pages/BookmarksPage'));
+const LoginPage = React.lazy(() => import('./pages/LoginPage'));
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
@@ -22,7 +25,6 @@ import { initAnalytics, trackPageView } from './services/analytics';
 import { useLocation } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
-import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -50,38 +52,40 @@ function AppContent() {
                         <AnalyticsWrapper />
                         <div className="App">
                             <Navbar />
-                            <Routes>
-                                <Route path="/" element={<Home />} />
-                                <Route path="/login" element={<LoginPage />} />
-                                <Route
-                                    path="/dashboard"
-                                    element={
-                                        <ProtectedRoute>
-                                            <Dashboard />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route path="/topic/:slug" element={<TopicPage />} />
-                                <Route path="/topic/:topicSlug/category/:categorySlug" element={<CategoryPage />} />
-                                <Route path="/topic/:topicSlug/category/:categorySlug/section/:sectionSlug" element={<SectionPage />} />
-                                <Route
-                                    path="/progress"
-                                    element={
-                                        <ProtectedRoute>
-                                            <ProgressPage />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                                <Route path="/compiler" element={<CompilerPage />} />
-                                <Route
-                                    path="/bookmarks"
-                                    element={
-                                        <ProtectedRoute>
-                                            <BookmarksPage />
-                                        </ProtectedRoute>
-                                    }
-                                />
-                            </Routes>
+                            <React.Suspense fallback={<LoadingSpinner message="Loading page..." />}>
+                                <Routes>
+                                    <Route path="/" element={<Home />} />
+                                    <Route path="/login" element={<LoginPage />} />
+                                    <Route
+                                        path="/dashboard"
+                                        element={
+                                            <ProtectedRoute>
+                                                <Dashboard />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route path="/topic/:slug" element={<TopicPage />} />
+                                    <Route path="/topic/:topicSlug/category/:categorySlug" element={<CategoryPage />} />
+                                    <Route path="/topic/:topicSlug/category/:categorySlug/section/:sectionSlug" element={<SectionPage />} />
+                                    <Route
+                                        path="/progress"
+                                        element={
+                                            <ProtectedRoute>
+                                                <ProgressPage />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                    <Route path="/compiler" element={<CompilerPage />} />
+                                    <Route
+                                        path="/bookmarks"
+                                        element={
+                                            <ProtectedRoute>
+                                                <BookmarksPage />
+                                            </ProtectedRoute>
+                                        }
+                                    />
+                                </Routes>
+                            </React.Suspense>
                             <Toaster
                                 position="top-right"
                                 toastOptions={{

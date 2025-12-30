@@ -196,44 +196,42 @@ function ${functionName}(${functionSignature}) {
     const fetchSectionData = async () => {
         try {
             setLoading(true);
-            const response = await curriculumAPI.getSectionBySlug(topicSlug, sectionSlug);
-            setSection(response.data.section);
-            setQuestions(response.data.questions || []);
 
-            const topicResponse = await curriculumAPI.getTopicBySlug(topicSlug);
-            setTopic(topicResponse.data.topic);
+            // Parallel fetch of initial data
+            const [sectionResponse, topicResponse, categoryRes] = await Promise.all([
+                curriculumAPI.getSectionBySlug(topicSlug, sectionSlug),
+                curriculumAPI.getTopicBySlug(topicSlug),
+                curriculumAPI.getCategoryWithSections(topicSlug, categorySlug)
+            ]);
 
-            const categoryRes = await curriculumAPI.getCategoryWithSections(topicSlug, categorySlug);
-            setCategory(categoryRes.data.category);
+            const sectionData = sectionResponse.data.section;
+            const categoryData = categoryRes.data.category;
             const sections = categoryRes.data.sections || [];
+
+            setSection(sectionData);
+            setQuestions(sectionResponse.data.questions || []);
+            setTopic(topicResponse.data.topic);
+            setCategory(categoryData);
             setAllSections(sections);
 
-            const isBlind75 = categoryRes.data.category?.group?.startsWith('Blind 75');
-
+            const isBlind75 = categoryData?.group?.startsWith('Blind 75');
             if (isBlind75) {
                 setActiveTab('practice');
-                generateTestCases(response.data.section);
+                generateTestCases(sectionData);
             }
 
             const idx = sections.findIndex(s => s.slug === sectionSlug);
             setCurrentIndex(idx);
 
-            if (response.data.section) {
-                try {
-                    const progressRes = await progressAPI.getProgress(topicSlug, sectionSlug);
-                    setIsCompleted(progressRes.data.isCompleted);
-                } catch (e) {
-                    console.error('Failed to load progress', e);
-                }
-
-                if (isBlind75) {
-                    await generateProblemContent(response.data.section);
-                } else {
-                    await generateAIContent(response.data.section, categoryRes.data.category);
-                }
+            if (sectionData) {
+                // Secondary non-blocking fetches
+                Promise.all([
+                    progressAPI.getProgress(topicSlug, sectionSlug).then(res => setIsCompleted(res.data.isCompleted)).catch(e => console.error('Progress load failed', e)),
+                    isBlind75 ? generateProblemContent(sectionData) : generateAIContent(sectionData, categoryData)
+                ]);
 
                 trackTopicStart(topicSlug);
-                setBookmarked(isBookmarked(response.data.section._id));
+                setBookmarked(isBookmarked(sectionData._id));
             }
         } catch (err) {
             console.error('Error fetching section:', err);
