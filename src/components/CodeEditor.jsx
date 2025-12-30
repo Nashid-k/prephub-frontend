@@ -179,6 +179,37 @@ const CodeEditor = ({
     const renderTestResults = () => {
         if (!testResults) return null;
 
+        if (testResults.type === 'loading') {
+            return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2 }}>
+                    <CircularProgress size={30} />
+                    <Typography variant="body2" color="text.secondary">{testResults.message || 'Processing...'}</Typography>
+                </Box>
+            );
+        }
+
+        if (testResults.type === 'error') {
+            return (
+                <Box sx={{ p: 2, color: 'error.main', bgcolor: 'rgba(211, 47, 47, 0.05)', borderRadius: 2, border: '1px solid', borderColor: 'error.main' }}>
+                    <strong>Error:</strong> {testResults.error}
+                </Box>
+            );
+        }
+
+        if (testResults.type === 'ai') {
+            return (
+                <Box sx={{ p: 2, fontSize: '0.9rem', lineHeight: 1.6 }}>
+                    <Box sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main', fontWeight: 600 }}>
+                        <AutoFixHigh fontSize="small" /> AI Analysis
+                    </Box>
+                    <Box sx={{ whiteSpace: 'pre-wrap' }}>
+                        {/* If it's a string, display it. if object, stringify */}
+                        {typeof testResults.results === 'string' ? testResults.results : JSON.stringify(testResults.results, null, 2)}
+                    </Box>
+                </Box>
+            );
+        }
+
         if (testResults.type === 'output') {
             return (
                 <Box sx={{ fontFamily: 'monospace', fontSize: '0.9rem', whiteSpace: 'pre-wrap' }}>
@@ -187,7 +218,17 @@ const CodeEditor = ({
             );
         }
 
+        // Default: Run/Submit results (Expects Array)
         const { type, results } = testResults;
+
+        if (!Array.isArray(results)) {
+            return (
+                <Box sx={{ p: 2, color: 'text.secondary' }}>
+                    Output: {JSON.stringify(results)}
+                </Box>
+            );
+        }
+
         const passedCount = results.filter(r => r.passed).length;
         const totalCount = results.length;
         const allPassed = passedCount === totalCount;
@@ -214,7 +255,7 @@ const CodeEditor = ({
                 </Box>
 
                 <Stack spacing={2}>
-                    {Array.isArray(results) && results.map((result, index) => (
+                    {results.map((result, index) => (
                         <Box key={index} sx={{
                             p: 2,
                             borderRadius: 2,
