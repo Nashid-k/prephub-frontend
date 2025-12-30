@@ -103,14 +103,14 @@ const TopicPage = () => {
         categories.forEach(c => {
             if (c.group && c.group.includes(':')) {
                 groups.add(c.group.split(':')[0].trim());
-            } else if (c.group && c.group !== 'general' && topic?.slug === 'dsa') {
+            } else if (c.group && c.group !== 'general') {
                 groups.add(c.group);
             }
         });
         const sorted = Array.from(groups).sort();
         if (sorted.length > 0) return sorted;
         return [];
-    }, [categories, topic]);
+    }, [categories]);
 
     // Filter categories based on active tab
     const filteredCategories = React.useMemo(() => {

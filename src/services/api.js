@@ -102,6 +102,15 @@ export const progressAPI = {
     api.get('/progress/all')
 };
 
+// Add time tracking method
+progressAPI.updateTime = (topicSlug, sectionSlug, minutes) => 
+  api.post('/progress/time', { topicSlug, sectionSlug, minutes });
+
+// Add spaced repetition methods
+progressAPI.getDueReviews = () => api.get('/progress/reviews/due');
+progressAPI.updateReview = (topicSlug, sectionSlug, quality) =>
+  api.post('/progress/reviews/update', { topicSlug, sectionSlug, quality });
+
 // Test Case API
 export const testCaseAPI = {
   generateTestCases: (problemTitle, problemDescription, functionSignature) =>

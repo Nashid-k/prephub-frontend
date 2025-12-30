@@ -5,6 +5,7 @@ import { Refresh, School } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/TopicCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import StreakBadge from '../components/StreakBadge';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -118,32 +119,26 @@ const Dashboard = () => {
                             <School sx={{ fontSize: 40, color: 'white' }} />
                         </Box>
                         <Typography
-                            variant="h2"
-                            component="h1"
-                            gutterBottom
+                            variant="h3"
                             sx={{
                                 fontWeight: 700,
                                 mb: 2,
-                                fontSize: { xs: '2rem', md: '3rem' },
                                 background: 'linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%)',
+                                backgroundClip: 'text',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                             }}
                         >
-                            Your Learning Dashboard
+                            Your Learning Journey
                         </Typography>
-                        <Typography
-                            variant="h6"
-                            color="text.secondary"
-                            sx={{
-                                maxWidth: '600px',
-                                mx: 'auto',
-                                fontWeight: 400,
-                                fontSize: { xs: '1rem', md: '1.25rem' },
-                            }}
-                        >
-                            Choose a topic to begin your MERN stack mastery journey
+                        <Typography variant="h6" sx={{ opacity: 0.7, fontWeight: 400, mb: 3 }}>
+                            Choose a topic to begin mastering
                         </Typography>
+
+                        {/* Streak Badge */}
+                        <Box sx={{ maxWidth: 400, mx: 'auto' }}>
+                            <StreakBadge variant="full" />
+                        </Box>
                     </Box>
                 </motion.div>
 

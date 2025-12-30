@@ -14,6 +14,8 @@ const CompilerPage = React.lazy(() => import('./pages/CompilerPage'));
 const ProgressPage = React.lazy(() => import('./pages/ProgressPage'));
 const BookmarksPage = React.lazy(() => import('./pages/BookmarksPage'));
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
+const ShareCodePage = React.lazy(() => import('./pages/ShareCodePage'));
+const ReviewQueuePage = React.lazy(() => import('./pages/ReviewQueuePage'));
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
@@ -84,6 +86,8 @@ function AppContent() {
                                             </ProtectedRoute>
                                         }
                                     />
+                                    <Route path="/share" element={<ShareCodePage />} />
+                                    <Route path="/reviews" element={<ReviewQueuePage />} />
                                 </Routes>
                             </React.Suspense>
                             <Toaster
