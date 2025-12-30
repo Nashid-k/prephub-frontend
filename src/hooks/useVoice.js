@@ -74,21 +74,58 @@ const useVoice = () => {
         // Stop any current speech
         window.speechSynthesis.cancel();
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'en-US';
-        utterance.rate = 1.0; // Normal speed
-        utterance.pitch = 1.05; // Slightly higher/friendly pitch
-        
-        // Try to pick a "Google US English" voice if available, or just the first one
+        // 1. Voice Selection Strategy: Hunt for "best" voices
         const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = voices.find(v => v.name.includes('Google US English')) || voices[0];
-        if (preferredVoice) utterance.voice = preferredVoice;
+        // Priority: Google US English -> Microsoft -> Samantha -> Default
+        const preferredVoice = voices.find(v => v.name.includes('Google US English')) || 
+                               voices.find(v => v.name.includes('Google')) ||
+                               voices.find(v => v.name.includes('Microsoft David')) ||
+                               voices.find(v => v.name.includes('Natural')) ||
+                               voices[0];
 
-        utterance.onstart = () => setIsSpeaking(true);
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
+        // 2. "Humanizer": Split text into chunks for "breath" pauses
+        // Split by punctuation (. ? ! ,) but keep the delimiter
+        const chunks = text.match(/[^.?!,]+[.?!,]?/g) || [text];
 
-        window.speechSynthesis.speak(utterance);
+        let chunkIndex = 0;
+
+        const speakNextChunk = () => {
+            if (chunkIndex >= chunks.length) {
+                setIsSpeaking(false);
+                return;
+            }
+
+            const chunkText = chunks[chunkIndex].trim();
+            if (!chunkText) {
+                chunkIndex++;
+                speakNextChunk();
+                return;
+            }
+
+            const utterance = new SpeechSynthesisUtterance(chunkText);
+            
+            if (preferredVoice) utterance.voice = preferredVoice;
+            
+            // 3. Dynamic Prosody: Vary pitch/rate slightly for realism
+            utterance.rate = 1.0; 
+            utterance.pitch = 1.0; 
+
+            // Add slight "breath" pause after commas/sentences
+            const isSentenceEnd = ['.', '!', '?'].some(char => chunkText.endsWith(char));
+            const pauseDuration = isSentenceEnd ? 600 : 300; // Longer pause for full stops
+
+            utterance.onstart = () => setIsSpeaking(true);
+            utterance.onend = () => {
+                chunkIndex++;
+                setTimeout(speakNextChunk, pauseDuration); // "Breath" pause
+            };
+            utterance.onerror = () => setIsSpeaking(false);
+
+            window.speechSynthesis.speak(utterance);
+        };
+
+        speakNextChunk();
+
     }, []);
 
     const cancelSpeech = useCallback(() => {
