@@ -158,12 +158,13 @@ const SectionPage = () => {
     }, [topicSlug, categorySlug, sectionSlug]);
 
     const applyAggregateData = async (data) => {
-        const { section: sectionData, topic: topicData, category: categoryData, siblingSections, userProgress } = data;
+        const { section: sectionData, topic: topicData, category: categoryData, siblingSections, allTopicSections, userProgress } = data;
 
         setSection(sectionData);
         setTopic(topicData);
         setCategory(categoryData);
-        setAllSections(siblingSections || []);
+        // Prefer allTopicSections (full course), fallback to siblingSections (category only)
+        setAllSections(allTopicSections || siblingSections || []);
         setIsCompleted(userProgress?.completed || false);
         setBookmarked(isBookmarked(sectionData._id));
 
