@@ -123,7 +123,7 @@ const SectionPage = () => {
         }
     };
 
-    const chatRef = useRef(null);
+
 
     const topicColor = getTopicColor(topicSlug, isDark);
 
