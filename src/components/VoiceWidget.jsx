@@ -79,7 +79,15 @@ const VoiceWidget = ({ context, onAiResponse }) => {
 
             const prompt = `[VOICE_MODE] User said (in ${lang.name}): "${text}". 
             Reply conversationally in ${lang.name} language only. 
-            Keep it concise (under 2 sentences) and simple. Do not use code blocks.`;
+            Keep it concise (under 2 sentences) and simple. Do not use code blocks.
+            
+            IMPORTANT: You can use emotional audio tags to make your voice more expressive:
+            - [whispers] for quiet/intimate moments
+            - [giggles] or [laughs] when something is funny
+            - [sarcastically] for sarcasm
+            - [excited] when enthusiastic
+            - [calm] for soothing explanations
+            Use these tags sparingly and naturally where appropriate.`;
 
             const res = await aiAPI.askQuestion(prompt, aiContext);
             const answer = res.data.answer || res.data;
