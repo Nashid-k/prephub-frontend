@@ -64,6 +64,8 @@ const SectionPage = () => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
+    const chatRef = useRef(null); // Ref for AI Chat container
+
     const [section, setSection] = useState(null);
     const [allSections, setAllSections] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(-1);
@@ -124,6 +126,24 @@ const SectionPage = () => {
     const chatRef = useRef(null);
 
     const topicColor = getTopicColor(topicSlug, isDark);
+
+    // Close chat when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (isChatOpen &&
+                chatRef.current &&
+                !chatRef.current.contains(event.target) &&
+                !event.target.closest('button[aria-label="chat-toggle"]')
+            ) {
+                setIsChatOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isChatOpen]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -703,6 +723,7 @@ Explain clearly why approach #3 is superior to the others.`;
 
                 {/* Floating AI Chat Button */}
                 <IconButton
+                    aria-label="chat-toggle"
                     onClick={() => setIsChatOpen(!isChatOpen)}
                     sx={{
                         position: 'fixed',
