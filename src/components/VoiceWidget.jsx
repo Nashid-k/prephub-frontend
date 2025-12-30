@@ -34,6 +34,39 @@ const VoiceWidget = ({ context, onAiResponse }) => {
         };
     }, [transcript, isListening]);
 
+    // ═══════════════════════════════════════════════════
+    // BREATHING AI: Inject verbal fillers for naturalness
+    // ═══════════════════════════════════════════════════
+    const humanizeText = (text, language) => {
+        // Language-specific fillers
+        const fillers = {
+            'en-US': ['um', 'uh', 'well', 'so', 'you know', 'like'],
+            'hi-IN': ['उम्म', 'आह', 'तो', 'देखो'],
+            'ta-IN': ['உம்', 'அப்படி', 'சரி'],
+            'ml-IN': ['ഉം', 'അത്', 'ശരി']
+        };
+
+        const langFillers = fillers[language] || fillers['en-US'];
+
+        // Split into sentences
+        let sentences = text.match(/[^.!?]+[.!?]*/g) || [text];
+
+        // Inject fillers strategically (15% chance per sentence)
+        sentences = sentences.map((sentence, idx) => {
+            // Skip first sentence (AI starts confidently)
+            if (idx === 0) return sentence;
+
+            // 15% chance to add a filler at sentence start
+            if (Math.random() < 0.15) {
+                const filler = langFillers[Math.floor(Math.random() * langFillers.length)];
+                return `${filler}... ${sentence.trim()}`;
+            }
+            return sentence;
+        });
+
+        return sentences.join(' ');
+    };
+
     const handleVoiceSubmit = async (text) => {
         if (!text.trim()) return;
 
@@ -51,8 +84,11 @@ const VoiceWidget = ({ context, onAiResponse }) => {
             const res = await aiAPI.askQuestion(prompt, aiContext);
             const answer = res.data.answer || res.data;
 
+            // Apply "Breathing AI" humanization
+            const humanizedAnswer = humanizeText(answer, lang.code);
+
             // Speak the answer, then restart listening (Continuous Mode)
-            speak(answer, () => {
+            speak(humanizedAnswer, () => {
                 // Short delay to avoid picking up system audio if echo cancellation is poor
                 setTimeout(() => {
                     startListening();
