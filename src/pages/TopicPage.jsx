@@ -375,7 +375,7 @@ const TopicPage = () => {
                             };
 
                             return (
-                                <Grid item xs={12} sm={6} md={4} lg={3} key={category._id}>
+                                <Grid item xs={12} sm={6} md={3} lg={3} xl={3} key={category._id}>
                                     <motion.div
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
