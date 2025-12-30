@@ -32,8 +32,6 @@ import {
 } from '@mui/material';
 import {
     MenuBook,
-    Code,
-    HelpOutline,
     CheckCircle,
     RadioButtonUnchecked,
     ArrowBack,
@@ -69,7 +67,6 @@ const SectionPage = () => {
     const [topic, setTopic] = useState(null);
     const [category, setCategory] = useState(null);
     const [aiContent, setAiContent] = useState('');
-    const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [contentLoading, setContentLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('learn');
@@ -166,7 +163,6 @@ const SectionPage = () => {
         setTopic(topicData);
         setCategory(categoryData);
         setAllSections(siblingSections || []);
-        setQuestions(questionsData || []);
         setIsCompleted(userProgress?.completed || false);
         setBookmarked(isBookmarked(sectionData._id));
 
@@ -613,11 +609,9 @@ Explain clearly why approach #3 is superior to the others.`;
                         <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
                             {[
                                 { id: 'learn', label: 'Learn Concept', icon: <MenuBook /> },
-                                { id: 'practice', label: 'Practice', icon: <Code /> },
-                                { id: 'questions', label: 'Questions', icon: <HelpOutline /> }
+                                { id: 'learn', label: 'Learn Concept', icon: <MenuBook /> },
+                                { id: 'practice', label: 'Practice', icon: <Code /> }
                             ].map((tab) => {
-                                // Hide Questions tab for Blind 75?
-                                if (category?.group?.startsWith('Blind 75') && tab.id === 'questions') return null;
                                 const isActive = activeTab === tab.id;
                                 return (
                                     <Button
@@ -699,27 +693,6 @@ Explain clearly why approach #3 is superior to the others.`;
                                     </Box>
                                 )}
 
-                                {activeTab === 'questions' && (
-                                    <Box>
-                                        <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>Practice Questions</Typography>
-                                        {questions.map((q, idx) => (
-                                            <Card key={idx} sx={{ mb: 2, bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', border: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '16px' }}>
-                                                <CardContent>
-                                                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Q{idx + 1}: {q.question}</Typography>
-                                                    <details style={{ marginTop: '1rem' }}>
-                                                        <summary style={{ cursor: 'pointer', color: topicColor }}>Show Answer</summary>
-                                                        <Box sx={{ mt: 2, p: 2, bgcolor: 'action.hover', borderRadius: '8px' }}>
-                                                            <ReactMarkdown>{q.answer}</ReactMarkdown>
-                                                        </Box>
-                                                    </details>
-                                                </CardContent>
-                                            </Card>
-                                        ))}
-                                        <Button onClick={fetchMoreQuestions} variant="outlined" sx={{ mt: 2, borderColor: topicColor, color: topicColor }}>
-                                            Load More
-                                        </Button>
-                                    </Box>
-                                )}
                             </Box>
                         </Card>
                     </Box>
