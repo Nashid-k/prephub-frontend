@@ -30,20 +30,32 @@ const ProgressPage = () => {
     const isDark = theme.palette.mode === 'dark';
 
     useEffect(() => {
+        // 1. Load from cache first for instant UI
+        const cachedProgress = localStorage.getItem('prephub_global_progress');
+        if (cachedProgress) {
+            try {
+                setTopics(JSON.parse(cachedProgress));
+                setLoading(false);
+            } catch (e) {
+                console.error('Failed to parse cached progress');
+            }
+        }
+
         fetchProgress();
     }, []);
 
     const fetchProgress = async () => {
         try {
-            setLoading(true);
-            const response = await progressAPI.getAllProgress();
-            console.log('API Response:', response.data);
-            console.log('Topics array:', response.data.topics);
-            if (response.data.topics && response.data.topics.length > 0) {
-                console.log('First topic object:', response.data.topics[0]);
-                console.log('Topic properties:', Object.keys(response.data.topics[0]));
+            if (!localStorage.getItem('prephub_global_progress')) {
+                setLoading(true);
             }
-            setTopics(response.data.topics);
+
+            const response = await progressAPI.getAllProgress();
+            const newTopics = response.data.topics;
+
+            setTopics(newTopics);
+            // 2. Save to cache
+            localStorage.setItem('prephub_global_progress', JSON.stringify(newTopics));
         } catch (err) {
             console.error('Error fetching global progress:', err);
         } finally {

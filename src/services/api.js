@@ -34,8 +34,11 @@ export const curriculumAPI = {
   getTopicBySlug: (slug) => api.get(`/curriculum/topics/${slug}`),
   getSectionBySlug: (topicSlug, sectionSlug) => 
     api.get(`/curriculum/sections/${topicSlug}/${sectionSlug}`),
-  getCategoryWithSections: (topicSlug, categorySlug) =>
-    api.get(`/category/${topicSlug}/categories/${categorySlug}`)
+  getTopicAggregate: (slug) => api.get(`/curriculum/aggregate/topic/${slug}`),
+  getCategoryAggregate: (topicSlug, categorySlug) =>
+    api.get(`/curriculum/aggregate/category/${topicSlug}/${categorySlug}`),
+  getSectionAggregate: (topicSlug, sectionSlug) =>
+    api.get(`/curriculum/aggregate/section/${topicSlug}/${sectionSlug}`)
 };
 
 // AI API

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { categoryAPI, progressAPI, curriculumAPI } from '../services/api';
-import { isBookmarked, toggleBookmark } from '../utils/bookmarks';
+import { useBookmarks } from '../context/BookmarkContext';
+import SafeImage from '../components/SafeImage';
+import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import toast from 'react-hot-toast';
 import {
     Container,
@@ -33,66 +35,58 @@ const CategoryPage = () => {
     const navigate = useNavigate();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
+    const { isBookmarked, toggleBookmark } = useBookmarks();
 
     const [category, setCategory] = useState(null);
     const [sections, setSections] = useState([]);
     const [progressMap, setProgressMap] = useState({});
     const [loading, setLoading] = useState(true);
-    const [isBookmarkedState, setIsBookmarkedState] = useState(false);
     const [topic, setTopic] = useState(null);
-
-    // Helper for topic color
-    const getTopicColor = (slug) => {
-        const colors = {
-            'react': '#61DAFB',
-            'nodejs': '#339933',
-            'javascript': '#F7DF1E',
-            'typescript': '#3178C6',
-            'mongodb': '#47A248',
-            'dsa': '#FF3B30',
-        };
-        return colors[slug] || '#61DAFB';
-    };
 
     const topicColor = getTopicColor(topicSlug);
 
     useEffect(() => {
-        fetchCategoryData();
-        fetchProgressData();
+        // 1. Load from cache first for instant UI
+        const cacheKey = `prephub_category_agg_${topicSlug}_${categorySlug}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            try {
+                const data = JSON.parse(cachedData);
+                applyAggregateData(data);
+                setLoading(false);
+            } catch (e) {
+                console.error('Failed to parse cached category data');
+            }
+        }
+
+        fetchAggregateData();
     }, [topicSlug, categorySlug]);
 
-    useEffect(() => {
-        if (category) {
-            setIsBookmarkedState(isBookmarked(category._id));
-        }
-    }, [category]);
-
-    const fetchCategoryData = async () => {
-        try {
-            setLoading(true);
-            const response = await categoryAPI.getCategoryWithSections(topicSlug, categorySlug);
-            setCategory(response.data.category);
-            setSections(response.data.sections);
-
-            // Get topic for context/image if needed (optional, using dummy for now or just color)
-            try {
-                const tr = await curriculumAPI.getTopicBySlug(topicSlug);
-                setTopic(tr.data.topic);
-            } catch (e) { }
-
-        } catch (err) {
-            console.error('Error fetching category:', err);
-        } finally {
-            setLoading(false);
-        }
+    const applyAggregateData = (data) => {
+        setCategory(data.category);
+        setSections(data.sections);
+        setTopic(data.topic);
+        setProgressMap(data.progress || {});
     };
 
-    const fetchProgressData = async () => {
+    const fetchAggregateData = async () => {
         try {
-            const response = await progressAPI.getCategoryProgress(topicSlug, categorySlug);
-            setProgressMap(response.data.progress);
+            const cacheKey = `prephub_category_agg_${topicSlug}_${categorySlug}`;
+            if (!localStorage.getItem(cacheKey)) {
+                setLoading(true);
+            }
+
+            const response = await curriculumAPI.getCategoryAggregate(topicSlug, categorySlug);
+            const data = response.data;
+
+            applyAggregateData(data);
+
+            // 2. Save to cache
+            localStorage.setItem(cacheKey, JSON.stringify(data));
         } catch (err) {
-            console.error('Error fetching progress:', err);
+            console.error('Error fetching category aggregate:', err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -108,7 +102,6 @@ const CategoryPage = () => {
             group: category.group
         });
         if (result.success) {
-            setIsBookmarkedState(!isBookmarkedState);
             toast.success(result.message);
         } else {
             toast.error(result.message);
@@ -205,14 +198,14 @@ const CategoryPage = () => {
                                         width: 48,
                                         height: 48,
                                         borderRadius: '16px',
-                                        color: isBookmarkedState ? topicColor : 'text.secondary',
-                                        bgcolor: isBookmarkedState ? `${topicColor}15` : 'transparent',
+                                        color: isBookmarked(category._id) ? topicColor : 'text.secondary',
+                                        bgcolor: isBookmarked(category._id) ? `${topicColor}15` : 'transparent',
                                         border: '1px solid',
-                                        borderColor: isBookmarkedState ? `${topicColor}40` : 'rgba(128,128,128,0.2)',
+                                        borderColor: isBookmarked(category._id) ? `${topicColor}40` : 'rgba(128,128,128,0.2)',
                                         '&:hover': { bgcolor: `${topicColor}15` }
                                     }}
                                 >
-                                    {isBookmarkedState ? <Bookmark /> : <BookmarkBorder />}
+                                    {isBookmarked(category._id) ? <Bookmark /> : <BookmarkBorder />}
                                 </IconButton>
                             </Box>
 
@@ -245,6 +238,13 @@ const CategoryPage = () => {
                             opacity: 0.1,
                             pointerEvents: 'none',
                         }} />
+                        <div className="absolute top-0 right-0 w-1/3 h-full opacity-10 pointer-events-none overflow-hidden">
+                            <SafeImage
+                                src={getTopicImage(topicSlug)}
+                                alt=""
+                                className="w-full h-full object-contain translate-x-1/4 translate-y-1/4 scale-150 grayscale"
+                            />
+                        </div>
                     </Box>
                 </Box>
 

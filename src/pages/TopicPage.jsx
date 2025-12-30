@@ -29,6 +29,7 @@ import { curriculumAPI, categoryAPI, progressAPI } from '../services/api';
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
+import SafeImage from '../components/SafeImage';
 
 const TopicPage = () => {
     const { slug } = useParams();
@@ -46,67 +47,50 @@ const TopicPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // 1. Load from cache first
-        const cacheKey = `prephub_topic_${slug}`;
+        // 1. Load from cache first for instant visual
+        const cacheKey = `prephub_topic_agg_${slug}`;
         const cachedData = localStorage.getItem(cacheKey);
         if (cachedData) {
             try {
-                const { topic: t, categories: c, sections: s } = JSON.parse(cachedData);
-                setTopic(t);
-                setCategories(c);
-                setSections(s);
+                const data = JSON.parse(cachedData);
+                applyAggregateData(data);
                 setLoading(false);
             } catch (e) {
                 console.error('Failed to parse cached topic data');
             }
         }
 
-        fetchTopicData();
-        fetchProgressData();
+        fetchAggregateData();
     }, [slug]);
 
-    const fetchTopicData = async () => {
+    const applyAggregateData = (data) => {
+        setTopic(data.topic);
+        setCategories(data.categories);
+        setSections(data.sections);
+        setProgressMap(data.progress);
+        if (data.stats) {
+            setProgressStats(data.stats);
+        }
+    };
+
+    const fetchAggregateData = async () => {
         try {
-            const cacheKey = `prephub_topic_${slug}`;
+            const cacheKey = `prephub_topic_agg_${slug}`;
             if (!localStorage.getItem(cacheKey)) {
                 setLoading(true);
             }
 
-            const [topicResponse, categoriesResponse] = await Promise.all([
-                curriculumAPI.getTopicBySlug(slug),
-                categoryAPI.getCategoriesByTopic(slug)
-            ]);
+            const response = await curriculumAPI.getTopicAggregate(slug);
+            const data = response.data;
 
-            const topicData = topicResponse.data.topic;
-            const sectionsData = topicResponse.data.sections || [];
-            const categoriesData = categoriesResponse.data.categories;
-
-            setTopic(topicData);
-            setSections(sectionsData);
-            setCategories(categoriesData);
+            applyAggregateData(data);
 
             // 2. Save to cache
-            localStorage.setItem(cacheKey, JSON.stringify({
-                topic: topicData,
-                categories: categoriesData,
-                sections: sectionsData
-            }));
+            localStorage.setItem(cacheKey, JSON.stringify(data));
         } catch (err) {
-            console.error('Error fetching topic:', err);
+            console.error('Error fetching topic aggregate:', err);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const fetchProgressData = async () => {
-        try {
-            const response = await progressAPI.getTopicProgress(slug);
-            setProgressMap(response.data.progress);
-            if (response.data.stats) {
-                setProgressStats(response.data.stats);
-            }
-        } catch (err) {
-            console.error('Error fetching topic progress:', err);
         }
     };
 
@@ -222,7 +206,9 @@ const TopicPage = () => {
                 }}
             >
                 {/* Large Background Logo */}
-                <Box
+                <SafeImage
+                    src={getTopicImage(topic.slug)}
+                    alt=""
                     sx={{
                         position: 'absolute',
                         top: -100,
@@ -232,17 +218,7 @@ const TopicPage = () => {
                         opacity: (theme) => theme.palette.mode === 'dark' ? 0.15 : 0.05,
                         pointerEvents: 'none',
                     }}
-                >
-                    <img
-                        src={getTopicImage(topic.slug)}
-                        alt=""
-                        style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'contain',
-                        }}
-                    />
-                </Box>
+                />
 
                 <Container maxWidth="xl">
                     <motion.div
@@ -301,16 +277,14 @@ const TopicPage = () => {
                                         border: '2px solid',
                                         borderColor: `${topicColor}40`,
                                         boxShadow: `0 12px 40px ${topicColor}30`,
+                                        overflow: 'hidden'
                                     }}
                                 >
-                                    <img
+                                    <SafeImage
                                         src={getTopicImage(topic.slug)}
                                         alt={topic.name}
-                                        style={{
-                                            width: '60%',
-                                            height: '60%',
-                                            objectFit: 'contain',
-                                        }}
+                                        width="60%"
+                                        height="60%"
                                     />
                                 </Box>
                             </motion.div>

@@ -6,6 +6,8 @@ import CodeEditor from '../components/CodeEditor';
 import AIChat from '../components/AIChat';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/Breadcrumb';
+import SafeImage from '../components/SafeImage';
+import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import {
     Container,
     Typography,
@@ -131,8 +133,70 @@ const SectionPage = () => {
     const topicColor = getTopicColor(topicSlug);
 
     useEffect(() => {
-        fetchSectionData();
+        // 1. Load from cache first for instant UI
+        const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+            try {
+                const data = JSON.parse(cachedData);
+                applyAggregateData(data);
+                setLoading(false);
+            } catch (e) {
+                console.error('Failed to parse cached section data');
+            }
+        }
+
+        fetchAggregateData();
     }, [topicSlug, categorySlug, sectionSlug]);
+
+    const applyAggregateData = (data) => {
+        const { section: sectionData, topic: topicData, category: categoryData, siblingSections, questions: questionsData, userProgress } = data;
+
+        setSection(sectionData);
+        setTopic(topicData);
+        setCategory(categoryData);
+        setAllSections(siblingSections || []);
+        setQuestions(questionsData || []);
+        setIsCompleted(userProgress?.completed || false);
+        setBookmarked(isBookmarked(sectionData._id));
+
+        const isBlind75 = categoryData?.group?.startsWith('Blind 75');
+
+        // Initialize Editor Code if not already set or if section changed
+        if (sectionData) {
+            if (isBlind75) {
+                const problemName = sectionData.title.toLowerCase();
+                let functionSignature = 'nums';
+                let exampleLog = 'console.log("Input array:", nums);';
+
+                if (problemName.includes('two sum')) {
+                    functionSignature = 'nums, target';
+                    exampleLog = 'console.log("nums:", nums, "target:", target);';
+                } else if (problemName.includes('three sum')) {
+                    functionSignature = 'nums';
+                } else if (problemName.includes('best time') || problemName.includes('stock')) {
+                    functionSignature = 'prices';
+                    exampleLog = 'console.log("Prices:", prices);';
+                }
+
+                const functionName = sectionData.title.replace(/\s+/g, '');
+                setEditorCode(`// Practice ${sectionData.title}\n\nfunction ${functionName}(${functionSignature}) {\n  // Write your solution here\n  ${exampleLog}\n  return null;\n}`);
+            } else {
+                setEditorCode(`// Practice ${sectionData.title}\n\n// Write your solution here...`);
+            }
+        }
+
+        if (isBlind75) {
+            setActiveTab('practice');
+            if (!testCases) generateTestCases(sectionData);
+            if (!problemContent) generateProblemContent(sectionData);
+        } else {
+            if (!aiContent) generateAIContent(sectionData, categoryData);
+        }
+
+        const idx = (siblingSections || []).findIndex(s => s.slug === sectionSlug);
+        setCurrentIndex(idx);
+    };
 
     useEffect(() => {
         if (typeof window.hljs !== 'undefined') {
@@ -144,97 +208,24 @@ const SectionPage = () => {
         }
     }, [aiContent, questions, activeTab]);
 
-    useEffect(() => {
-        if (section) {
-            const isBlind75 = category?.group?.startsWith('Blind 75');
-            if (isBlind75) {
-                const problemName = section.title.toLowerCase();
-                let functionSignature = 'nums';
-                let exampleLog = 'console.log("Input array:", nums);';
-
-                if (problemName.includes('two sum')) {
-                    functionSignature = 'nums, target';
-                    exampleLog = 'console.log("nums:", nums, "target:", target);';
-                } else if (problemName.includes('three sum')) {
-                    functionSignature = 'nums';
-                    exampleLog = 'console.log("Input array:", nums);';
-                } else if (problemName.includes('best time') || problemName.includes('stock')) {
-                    functionSignature = 'prices';
-                    exampleLog = 'console.log("Prices:", prices);';
-                }
-
-                const functionName = section.title.replace(/\s+/g, '');
-
-                setEditorCode(`// Practice ${section.title}
-
-function ${functionName}(${functionSignature}) {
-  // Write your solution here
-  
-  // Your console.log statements will appear in the output
-  ${exampleLog}
-  
-  return ${functionSignature.split(',')[0].trim()}; // Replace with your solution
-}
-
-// The function will automatically run with test cases!
-// Just click "Run" to see the results.
-// You can also add your own console.log statements for debugging.`);
-            } else {
-                setEditorCode(`// Practice ${section.title}\n\n// Write your solution here...`);
-            }
-        }
-    }, [section, category]);
-
-    useEffect(() => {
-        if (category?.group?.startsWith('Blind 75') && section) {
-            if (activeTab === 'learn' && !aiContent && !contentLoading) {
-                generateAIContent(section, category);
-            }
-        }
-    }, [activeTab, category, section, aiContent, contentLoading]);
-
-    const fetchSectionData = async () => {
+    const fetchAggregateData = async () => {
         try {
-            setLoading(true);
-
-            // Parallel fetch of initial data
-            const [sectionResponse, topicResponse, categoryRes] = await Promise.all([
-                curriculumAPI.getSectionBySlug(topicSlug, sectionSlug),
-                curriculumAPI.getTopicBySlug(topicSlug),
-                curriculumAPI.getCategoryWithSections(topicSlug, categorySlug)
-            ]);
-
-            const sectionData = sectionResponse.data.section;
-            const categoryData = categoryRes.data.category;
-            const sections = categoryRes.data.sections || [];
-
-            setSection(sectionData);
-            setQuestions(sectionResponse.data.questions || []);
-            setTopic(topicResponse.data.topic);
-            setCategory(categoryData);
-            setAllSections(sections);
-
-            const isBlind75 = categoryData?.group?.startsWith('Blind 75');
-            if (isBlind75) {
-                setActiveTab('practice');
-                generateTestCases(sectionData);
+            const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
+            if (!localStorage.getItem(cacheKey)) {
+                setLoading(true);
             }
 
-            const idx = sections.findIndex(s => s.slug === sectionSlug);
-            setCurrentIndex(idx);
+            const response = await curriculumAPI.getSectionAggregate(topicSlug, sectionSlug);
+            const data = response.data;
 
-            if (sectionData) {
-                // Secondary non-blocking fetches
-                Promise.all([
-                    progressAPI.getProgress(topicSlug, sectionSlug).then(res => setIsCompleted(res.data.isCompleted)).catch(e => console.error('Progress load failed', e)),
-                    isBlind75 ? generateProblemContent(sectionData) : generateAIContent(sectionData, categoryData)
-                ]);
+            applyAggregateData(data);
 
-                trackTopicStart(topicSlug);
-                setBookmarked(isBookmarked(sectionData._id));
-            }
+            // 2. Save to cache
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+
+            trackTopicStart(topicSlug);
         } catch (err) {
-            console.error('Error fetching section:', err);
+            console.error('Error fetching section aggregate:', err);
         } finally {
             setLoading(false);
         }
@@ -627,7 +618,10 @@ Explain clearly why approach #3 is superior to the others.`;
                                     <Box sx={{ display: 'flex', height: '100%', width: '100%', gap: 0 }}>
                                         {category?.group?.startsWith('Blind 75') ? (
                                             <>
-                                                <Box sx={{ width: '250px', height: '100%', overflowY: 'auto', borderRight: '1px solid', borderColor: 'divider', p: 2, flexShrink: 0 }}>
+                                                <Box sx={{ width: '300px', height: '100%', overflowY: 'auto', borderRight: '1px solid', borderColor: 'divider', p: 3, flexShrink: 0, position: 'relative' }}>
+                                                    <Box sx={{ position: 'absolute', top: 0, right: 0, p: 2, opacity: 0.05, pointerEvents: 'none' }}>
+                                                        <SafeImage src={getTopicImage(topicSlug)} alt="" style={{ width: 100 }} />
+                                                    </Box>
                                                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>Problem</Typography>
                                                     <div className="markdown-content">
                                                         <ReactMarkdown>{problemContent || section.content}</ReactMarkdown>
