@@ -24,7 +24,8 @@ import toast from 'react-hot-toast';
 
 const BookmarksPage = () => {
     const [bookmarks, setBookmarks] = useState([]);
-    const [filter, setFilter] = useState('all');
+    const [filter, setFilter] = useState('all'); // Language filter
+    const [typeFilter, setTypeFilter] = useState('all'); // Type filter (category/section)
     const [clearDialogOpen, setClearDialogOpen] = useState(false);
     const navigate = useNavigate();
     const theme = useTheme();
@@ -70,15 +71,50 @@ const BookmarksPage = () => {
         }
     };
 
+    // Get unique languages/topics from bookmarks (excluding topic-type bookmarks)
+    const availableLanguages = React.useMemo(() => {
+        const languages = new Set();
+        bookmarks
+            .filter(b => b.type !== 'topic') // Exclude topic bookmarks
+            .forEach(b => {
+                if (b.topicSlug) {
+                    languages.add(b.topicSlug);
+                }
+            });
+        return Array.from(languages).sort();
+    }, [bookmarks]);
 
+    // Filter bookmarks by both language AND type, excluding topics
+    const filteredBookmarks = React.useMemo(() => {
+        let filtered = bookmarks.filter(b => b.type !== 'topic'); // Always exclude topics
 
-    const filteredBookmarks = filter === 'all'
-        ? bookmarks
-        : bookmarks.filter(b => b.type === filter);
+        // Apply language filter
+        if (filter !== 'all') {
+            filtered = filtered.filter(b => b.topicSlug === filter);
+        }
 
-    const filterOptions = [
-        { value: 'all', label: 'All' },
-        { value: 'topic', label: 'Topics' },
+        // Apply type filter (category/section)
+        if (typeFilter !== 'all') {
+            filtered = filtered.filter(b => b.type === typeFilter);
+        }
+
+        return filtered;
+    }, [bookmarks, filter, typeFilter]);
+
+    // Create language filter options
+    const languageFilterOptions = React.useMemo(() => {
+        const options = [{ value: 'all', label: 'All Languages' }];
+        availableLanguages.forEach(lang => {
+            // Capitalize language names
+            const label = lang.charAt(0).toUpperCase() + lang.slice(1);
+            options.push({ value: lang, label });
+        });
+        return options;
+    }, [availableLanguages]);
+
+    // Type filter options (category/section only)
+    const typeFilterOptions = [
+        { value: 'all', label: 'All Types' },
         { value: 'category', label: 'Categories' },
         { value: 'section', label: 'Sections' },
     ];
@@ -148,31 +184,66 @@ const BookmarksPage = () => {
             <Container maxWidth="xl">
                 {/* Filter Chips */}
                 {bookmarks.length > 0 && (
-                    <Box sx={{ mb: 4, display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
-                        <FilterList sx={{ color: 'text.secondary' }} />
-                        {filterOptions.map((option) => (
-                            <Chip
-                                key={option.value}
-                                label={option.label}
-                                onClick={() => setFilter(option.value)}
-                                sx={{
-                                    borderRadius: '9999px',
-                                    fontWeight: 600,
-                                    px: 1,
-                                    background: filter === option.value
-                                        ? 'linear-gradient(135deg, #5e5ce6 0%, #7d7bf0 100%)'
-                                        : 'transparent',
-                                    color: filter === option.value ? 'white' : 'text.primary',
-                                    border: '2px solid',
-                                    borderColor: filter === option.value ? '#5e5ce6' : 'rgba(94, 92, 230, 0.3)',
-                                    '&:hover': {
+                    <Box sx={{ mb: 4 }}>
+                        {/* Language Filter Row */}
+                        <Box sx={{ mb: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mr: 1 }}>
+                                Language:
+                            </Typography>
+                            {languageFilterOptions.map((option) => (
+                                <Chip
+                                    key={option.value}
+                                    label={option.label}
+                                    onClick={() => setFilter(option.value)}
+                                    sx={{
+                                        borderRadius: '9999px',
+                                        fontWeight: 600,
+                                        px: 1,
                                         background: filter === option.value
-                                            ? 'linear-gradient(135deg, #7d7bf0 0%, #9d9bf8 100%)'
-                                            : 'rgba(94, 92, 230, 0.1)',
-                                    },
-                                }}
-                            />
-                        ))}
+                                            ? 'linear-gradient(135deg, #5e5ce6 0%, #7d7bf0 100%)'
+                                            : 'transparent',
+                                        color: filter === option.value ? 'white' : 'text.primary',
+                                        border: '2px solid',
+                                        borderColor: filter === option.value ? '#5e5ce6' : 'rgba(94, 92, 230, 0.3)',
+                                        '&:hover': {
+                                            background: filter === option.value
+                                                ? 'linear-gradient(135deg, #7d7bf0 0%, #9d9bf8 100%)'
+                                                : 'rgba(94, 92, 230, 0.1)',
+                                        },
+                                    }}
+                                />
+                            ))}
+                        </Box>
+
+                        {/* Type Filter Row */}
+                        <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'center' }}>
+                            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, mr: 1 }}>
+                                Type:
+                            </Typography>
+                            {typeFilterOptions.map((option) => (
+                                <Chip
+                                    key={option.value}
+                                    label={option.label}
+                                    onClick={() => setTypeFilter(option.value)}
+                                    sx={{
+                                        borderRadius: '9999px',
+                                        fontWeight: 600,
+                                        px: 1,
+                                        background: typeFilter === option.value
+                                            ? 'linear-gradient(135deg, #30d158 0%, #32d65a 100%)'
+                                            : 'transparent',
+                                        color: typeFilter === option.value ? 'white' : 'text.primary',
+                                        border: '2px solid',
+                                        borderColor: typeFilter === option.value ? '#30d158' : 'rgba(48, 209, 88, 0.3)',
+                                        '&:hover': {
+                                            background: typeFilter === option.value
+                                                ? 'linear-gradient(135deg, #32d65a 0%, #34d85c 100%)'
+                                                : 'rgba(48, 209, 88, 0.1)',
+                                        },
+                                    }}
+                                />
+                            ))}
+                        </Box>
                     </Box>
                 )}
 
