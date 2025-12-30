@@ -124,31 +124,7 @@ const TopicPage = () => {
 
 
 
-    const handleToggleTopic = async () => {
-        const isComplete = overallProgress === 100;
-        const newStatus = !isComplete;
 
-        // Optimistic UI update requires complex state management here as everything is derived.
-        // It's easier to just call the API then force a refresh/fetch.
-        // But for better UX, let's assume success and update stats.
-
-        try {
-            await progressAPI.toggleTopic(slug, newStatus);
-            toast.success(newStatus ? 'Topic marked as completed' : 'Topic marked as incomplete');
-
-            // Invalidate caches
-            localStorage.removeItem(`prephub_topic_agg_${slug}`);
-            localStorage.removeItem('prephub_global_progress');
-            localStorage.removeItem('prephub_topics');
-
-            // Reload data
-            setLoading(true);
-            fetchAggregateData();
-        } catch (error) {
-            console.error('Failed to toggle topic:', error);
-            toast.error('Failed to update topic progress');
-        }
-    };
 
     return (
         <Box sx={{ minHeight: 'calc(100vh - 100px)', pb: 6 }}>
@@ -285,20 +261,15 @@ const TopicPage = () => {
                                         }}
                                     />
                                     <Chip
-                                        icon={overallProgress === 100 ? <CheckCircle /> : <Box sx={{ width: 16, height: 16, borderRadius: '50%', border: '2px solid currentColor' }} />}
-                                        label={overallProgress === 100 ? "Topic Completed" : "Mark Topic Complete"}
-                                        onClick={handleToggleTopic}
+                                        icon={<CheckCircle />}
+                                        label={`${completedSections}/${totalSections} Completed`}
                                         sx={{
                                             borderRadius: '9999px',
                                             fontWeight: 700,
-                                            bgcolor: overallProgress === 100 ? `${topicColor}20` : 'transparent',
+                                            bgcolor: overallProgress === 100 ? `${topicColor}20` : 'action.hover',
                                             color: overallProgress === 100 ? topicColor : 'text.secondary',
-                                            border: `2px solid`,
-                                            borderColor: overallProgress === 100 ? `${topicColor}40` : 'rgba(128,128,128,0.3)',
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                                bgcolor: overallProgress === 100 ? `${topicColor}30` : 'action.hover'
-                                            }
+                                            border: '1px solid',
+                                            borderColor: overallProgress === 100 ? `${topicColor}40` : 'transparent',
                                         }}
                                     />
                                 </Box>
