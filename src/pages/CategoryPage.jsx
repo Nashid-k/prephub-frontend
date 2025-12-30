@@ -413,14 +413,37 @@ const CategoryPage = () => {
 
                                                 {/* Content */}
                                                 <Box sx={{ flex: 1 }}>
-                                                    <Typography variant="h6" sx={{
-                                                        fontWeight: 700,
-                                                        mb: 0.5,
-                                                        textDecoration: isCompleted ? 'line-through' : 'none',
-                                                        opacity: isCompleted ? 0.6 : 1
-                                                    }}>
-                                                        {section.title}
-                                                    </Typography>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                                                        <Typography variant="h6" sx={{
+                                                            fontWeight: 700,
+                                                            textDecoration: isCompleted ? 'line-through' : 'none',
+                                                            opacity: isCompleted ? 0.6 : 1
+                                                        }}>
+                                                            {section.title}
+                                                        </Typography>
+                                                        {/* Difficulty Badge */}
+                                                        <Chip
+                                                            label={section.difficulty || 'beginner'}
+                                                            size="small"
+                                                            sx={{
+                                                                height: '20px',
+                                                                fontSize: '0.7rem',
+                                                                fontWeight: 600,
+                                                                textTransform: 'capitalize',
+                                                                borderRadius: '9999px',
+                                                                bgcolor: section.difficulty === 'advanced' ? '#ff453a15' :
+                                                                    section.difficulty === 'intermediate' ? '#ff9f0a15' :
+                                                                        '#30d15815',
+                                                                color: section.difficulty === 'advanced' ? '#ff453a' :
+                                                                    section.difficulty === 'intermediate' ? '#ff9f0a' :
+                                                                        '#30d158',
+                                                                border: '1px solid',
+                                                                borderColor: section.difficulty === 'advanced' ? '#ff453a40' :
+                                                                    section.difficulty === 'intermediate' ? '#ff9f0a40' :
+                                                                        '#30d15840',
+                                                            }}
+                                                        />
+                                                    </Box>
                                                     <Typography variant="body2" sx={{ color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                                         {section.description}
                                                     </Typography>
