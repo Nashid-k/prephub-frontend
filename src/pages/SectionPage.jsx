@@ -205,7 +205,7 @@ const SectionPage = () => {
 
         await Promise.all(promises);
 
-        const idx = (siblingSections || []).findIndex(s => s.slug === sectionSlug);
+        const idx = (allTopicSections || siblingSections || []).findIndex(s => s.slug === sectionSlug);
         setCurrentIndex(idx);
     };
 
