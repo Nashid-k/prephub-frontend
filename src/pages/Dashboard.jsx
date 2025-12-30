@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Container, Typography, Box, Button, Alert, useTheme as useMuiTheme, Fade, Grid } from '@mui/material';
+import { Container, Typography, Box, Button, Alert, useTheme as useMuiTheme, Fade, Grid, Skeleton } from '@mui/material';
 import { Refresh, School, Code, Storage, Cloud, Psychology, TrendingUp, Timer, EmojiEvents, Computer, Architecture, Handyman } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/TopicCard';
 import DashboardHeader from '../components/DashboardHeader';
+import LoadingSpinner from '../components/LoadingSpinner';
 import Walkthrough from '../components/Walkthrough'; // New import
 import { useAuth } from '../context/AuthContext'; // New import
 import axios from 'axios'; // New import
