@@ -56,6 +56,7 @@ const getDesignTokens = (mode) => ({
     },
     typography: {
         fontFamily: [
+            'Inter',
             '-apple-system',
             'BlinkMacSystemFont',
             '"Segoe UI"',
