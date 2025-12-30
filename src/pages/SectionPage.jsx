@@ -524,8 +524,8 @@ Explain clearly why approach #3 is superior to the others.`;
                     }}>
                         <Card sx={{ ...glassSx, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                             <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
-                                <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1 }}>
-                                    SECTION {currentIndex + 1}/{allSections.length}
+                                <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+                                    MODULE: {category?.name || 'GENERAL'}
                                 </Typography>
                                 <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, lineHeight: 1.2 }}>
                                     {section.title}
@@ -734,7 +734,11 @@ Explain clearly why approach #3 is superior to the others.`;
                                 ref={chatRef}
                                 topic={topicSlug}
                                 section={section.title}
-                                context={{ description: section.description, activeTab }}
+                                context={{
+                                    description: section.description,
+                                    activeTab,
+                                    module: category?.name
+                                }}
                                 codeContext={{ code: editorCode, setCode: setEditorCode }}
                             />
                         </Box>
