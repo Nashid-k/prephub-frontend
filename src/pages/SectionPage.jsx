@@ -4,6 +4,7 @@ import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api'
 import ReactMarkdown from 'react-markdown';
 import CodeEditor from '../components/CodeEditor';
 import AIChat from '../components/AIChat';
+import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
