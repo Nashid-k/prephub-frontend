@@ -54,25 +54,24 @@ const useVoice = (langCode = 'en-US') => {
         if (recognitionRef.current) recognitionRef.current.stop();
     }, []);
 
-    const speak = useCallback((text) => {
+    const speak = useCallback((text, onEndCallback = null) => {
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
 
-        // Voice Selection: Match the language code
+        // Voice Selection logic...
         const voices = window.speechSynthesis.getVoices();
-        
-        // Priority: Exact match -> Same Lang -> Google -> fallback
         const preferredVoice = 
             voices.find(v => v.lang === langCode && v.name.includes('Google')) ||
             voices.find(v => v.lang === langCode) ||
             voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
 
-        const chunks = text.match(/[^.?!,|]+[.?!,|]?/g) || [text]; // Added | for Hindi sometimes
+        const chunks = text.match(/[^.?!,|]+[.?!,|]?/g) || [text]; 
         let chunkIndex = 0;
 
         const speakNextChunk = () => {
             if (chunkIndex >= chunks.length) {
                 setIsSpeaking(false);
+                if (onEndCallback) onEndCallback(); // Trigger callback when fully done
                 return;
             }
 
@@ -86,7 +85,6 @@ const useVoice = (langCode = 'en-US') => {
             const utterance = new SpeechSynthesisUtterance(chunkText);
             utterance.lang = langCode;
             if (preferredVoice) utterance.voice = preferredVoice;
-            
             utterance.rate = 1.0; 
             utterance.pitch = 1.0; 
 

@@ -51,7 +51,13 @@ const VoiceWidget = ({ context, onAiResponse }) => {
             const res = await aiAPI.askQuestion(prompt, aiContext);
             const answer = res.data.answer || res.data;
 
-            speak(answer);
+            // Speak the answer, then restart listening (Continuous Mode)
+            speak(answer, () => {
+                // Short delay to avoid picking up system audio if echo cancellation is poor
+                setTimeout(() => {
+                    startListening();
+                }, 500);
+            });
             if (onAiResponse) onAiResponse(text, answer);
 
         } catch (error) {
@@ -65,11 +71,14 @@ const VoiceWidget = ({ context, onAiResponse }) => {
     const toggleVoice = () => {
         if (isSpeaking) {
             cancelSpeech();
+            stopListening(); // Ensure loop is broken
             return;
         }
 
         if (isListening) {
             stopListening();
+            // Manual stop = intent to submit (or just silence)
+            // But usually user clicks stop to abort. Let's send if text exists.
             if (transcript) handleVoiceSubmit(transcript);
         } else {
             startListening();
