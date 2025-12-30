@@ -58,15 +58,17 @@ const useVoice = (langCode = 'en-US') => {
         if (!window.speechSynthesis) return;
         window.speechSynthesis.cancel();
 
-        // Voice Selection logic...
+        // Voice Selection: Prioritize "Enhanced" or "Premium" voices
         const voices = window.speechSynthesis.getVoices();
         const preferredVoice = 
+            voices.find(v => v.lang === langCode && (v.name.includes('Premium') || v.name.includes('Enhanced'))) ||
             voices.find(v => v.lang === langCode && v.name.includes('Google')) ||
+            voices.find(v => v.lang === langCode && !v.localService) || // Prefer cloud voices
             voices.find(v => v.lang === langCode) ||
             voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
 
-        // Better chunking: Split on natural phrase boundaries
-        const chunks = text.match(/[^.?!,;:|]+[.?!,;:|]?/g) || [text]; 
+        // Intelligent chunking: Respect natural phrase boundaries
+        const chunks = text.match(/[^.?!,;:|—–-]+[.?!,;:|—–-]?/g) || [text]; 
         let chunkIndex = 0;
 
         const speakNextChunk = () => {
@@ -87,27 +89,65 @@ const useVoice = (langCode = 'en-US') => {
             utterance.lang = langCode;
             if (preferredVoice) utterance.voice = preferredVoice;
             
-            // Human-like dynamic rate variation (subtle randomness)
-            // Slow down slightly for longer/complex chunks, speed up for short ones
+            // ═══════════════════════════════════════════════════
+            // ADVANCED HUMANIZATION LAYER
+            // ═══════════════════════════════════════════════════
+            
             const wordCount = chunkText.split(' ').length;
-            const baseRate = wordCount > 8 ? 0.92 : 0.98; // Slow down for longer phrases
-            const randomVariation = (Math.random() * 0.08) - 0.04; // ±0.04
-            utterance.rate = Math.max(0.85, Math.min(1.05, baseRate + randomVariation));
+            const hasQuestion = chunkText.includes('?');
+            const hasExclamation = chunkText.includes('!');
+            const isLongPhrase = wordCount > 10;
             
-            // Slight pitch variation for naturalness
-            utterance.pitch = 0.98 + (Math.random() * 0.08); // 0.98-1.06
-
-            // Enhanced breathing pauses
-            const isSentenceEnd = ['.', '!', '?', '|'].some(char => chunkText.endsWith(char));
-            const isLongPause = [';', ':'].some(char => chunkText.endsWith(char));
-            
-            let pauseDuration;
-            if (isSentenceEnd) {
-                pauseDuration = 900 + Math.random() * 200; // 900-1100ms (natural "breath")
-            } else if (isLongPause) {
-                pauseDuration = 600 + Math.random() * 100; // 600-700ms (thinking pause)
+            // 1. EMOTIONAL PROSODY: Adjust based on punctuation
+            if (hasQuestion) {
+                // Questions: Higher pitch, slightly faster
+                utterance.pitch = 1.08 + (Math.random() * 0.06); // 1.08-1.14
+                utterance.rate = 1.02 + (Math.random() * 0.06);  // 1.02-1.08
+            } else if (hasExclamation) {
+                // Excitement: Moderate pitch, faster rate
+                utterance.pitch = 1.05 + (Math.random() * 0.08); // 1.05-1.13
+                utterance.rate = 1.05 + (Math.random() * 0.1);   // 1.05-1.15
             } else {
-                pauseDuration = 350 + Math.random() * 100; // 350-450ms (comma pause)
+                // 2. DYNAMIC RATE: Slow down for complex/long phrases
+                let baseRate;
+                if (isLongPhrase) {
+                    baseRate = 0.88; // Thoughtful, deliberate
+                } else if (wordCount > 5) {
+                    baseRate = 0.93; // Moderate
+                } else {
+                    baseRate = 0.97; // Quick, casual
+                }
+                
+                // Add micro-variations to avoid robotic uniformity
+                const rateJitter = (Math.random() * 0.12) - 0.06; // ±0.06
+                utterance.rate = Math.max(0.82, Math.min(1.1, baseRate + rateJitter));
+                
+                // 3. PITCH VARIATION: Subtle changes for naturalness
+                const pitchJitter = (Math.random() * 0.10) - 0.05; // ±0.05
+                utterance.pitch = Math.max(0.95, Math.min(1.08, 1.0 + pitchJitter));
+            }
+            
+            // 4. BREATHING PAUSES: Context-aware silence durations
+            let pauseDuration;
+            const lastChar = chunkText.slice(-1);
+            
+            if (['.', '!', '?'].includes(lastChar)) {
+                // Sentence end: Deep breath (like a human finishing a thought)
+                pauseDuration = 1000 + (Math.random() * 300); // 1000-1300ms
+            } else if ([';', ':', '—', '–'].includes(lastChar)) {
+                // Clause separator: Thinking pause
+                pauseDuration = 700 + (Math.random() * 150); // 700-850ms
+            } else if (lastChar === ',') {
+                // Comma: Quick breath
+                pauseDuration = 400 + (Math.random() * 150); // 400-550ms
+            } else {
+                // No punctuation: Minimal pause (phrase continuation)
+                pauseDuration = 250 + (Math.random() * 100); // 250-350ms
+            }
+            
+            // 5. LONG PHRASE BONUS PAUSE: Add extra "thinking time"
+            if (isLongPhrase && ['.', '!', '?'].includes(lastChar)) {
+                pauseDuration += 200; // Extra breath for complex sentences
             }
 
             utterance.onstart = () => setIsSpeaking(true);
