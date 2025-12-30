@@ -9,6 +9,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
+import { useAuth } from '../context/AuthContext';
 import {
     Container,
     Typography,
