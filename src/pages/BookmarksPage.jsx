@@ -70,7 +70,7 @@ const BookmarksPage = () => {
         }
     };
 
-    const filteredBookmarks = filter === 'all'
+
 
     const filteredBookmarks = filter === 'all'
         ? bookmarks
