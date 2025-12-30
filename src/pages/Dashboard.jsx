@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Container, Typography, Box, Button, Alert, useTheme as useMuiTheme, Fade } from '@mui/material';
+import { Container, Typography, Box, Button, Alert, useTheme as useMuiTheme, Fade, Grid } from '@mui/material';
 import { Refresh, School, Code, Storage, Cloud, Psychology, TrendingUp, Timer, EmojiEvents, Computer, Architecture, Handyman } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/TopicCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import StreakBadge from '../components/StreakBadge';
+import RecommendationCard from '../components/RecommendationCard';
 import Walkthrough from '../components/Walkthrough'; // New import
 import { useAuth } from '../context/AuthContext'; // New import
 import axios from 'axios'; // New import
@@ -160,9 +161,16 @@ const Dashboard = () => {
                             Choose a topic to begin mastering
                         </Typography>
 
-                        {/* Streak Badge */}
-                        <Box id="stats-overview" sx={{ maxWidth: 400, mx: 'auto' }}>
-                            <StreakBadge variant="full" />
+                        {/* Stats & Recommendations Section */}
+                        <Box sx={{ maxWidth: '1000px', mx: 'auto', mt: 4 }}>
+                            <Grid container spacing={3}>
+                                <Grid item xs={12} md={6}>
+                                    <StreakBadge variant="full" />
+                                </Grid>
+                                <Grid item xs={12} md={6}>
+                                    <RecommendationCard isDark={theme.palette.mode === 'dark'} />
+                                </Grid>
+                            </Grid>
                         </Box>
                     </Box>
                 </motion.div>
