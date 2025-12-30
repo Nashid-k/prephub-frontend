@@ -203,7 +203,7 @@ const TopicCard = ({ topic }) => {
                             gap: 1,
                             mt: 'auto',
                             pt: 2,
-                            color: getTextColor(topic.slug),
+                            color: topicColor,
                             fontWeight: 600,
                             fontSize: '0.9rem',
                         }}

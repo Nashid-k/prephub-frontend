@@ -493,7 +493,7 @@ Explain clearly why approach #3 is superior to the others.`;
                                     <ListItem key={s.slug} disablePadding sx={{ mb: 1 }}>
                                         <ListItemButton
                                             selected={s.slug === sectionSlug}
-                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
+                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`, { replace: true })}
                                             sx={{
                                                 borderRadius: '16px',
                                                 border: '1px solid',
@@ -526,7 +526,7 @@ Explain clearly why approach #3 is superior to the others.`;
                             <Box sx={{ p: 2, display: 'flex', gap: 1, borderTop: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
                                 <Button
                                     disabled={!prevSection}
-                                    onClick={() => prevSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`)}
+                                    onClick={() => prevSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`, { replace: true })}
                                     fullWidth
                                     variant="outlined"
                                     startIcon={<ArrowBack />}
@@ -536,7 +536,7 @@ Explain clearly why approach #3 is superior to the others.`;
                                 </Button>
                                 <Button
                                     disabled={!nextSection}
-                                    onClick={() => nextSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`)}
+                                    onClick={() => nextSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`, { replace: true })}
                                     fullWidth
                                     variant="contained"
                                     endIcon={<ArrowForward />}
