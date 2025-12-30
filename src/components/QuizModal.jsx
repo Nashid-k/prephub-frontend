@@ -125,25 +125,36 @@ const QuizModal = ({ open, onClose, topic, section, isDark }) => {
 
     return (
         <Dialog
-            fullScreen
             open={open}
             onClose={handleClose}
             TransitionComponent={Transition}
-            PaperProps={{ sx: { bgcolor: bgColor } }}
+            maxWidth="md"
+            fullWidth
+            PaperProps={{
+                sx: {
+                    bgcolor: isDark ? 'rgba(30, 30, 32, 0.85)' : 'rgba(255, 255, 255, 0.95)',
+                    backdropFilter: 'blur(16px)',
+                    border: '1px solid',
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                    borderRadius: '24px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+                }
+            }}
         >
-            <AppBar sx={{ position: 'relative', bgcolor: 'transparent', boxShadow: 'none', borderBottom: '1px solid', borderColor: 'divider' }}>
-                <Toolbar>
-                    <IconButton edge="start" color="inherit" onClick={handleClose} aria-label="close">
-                        <Close />
-                    </IconButton>
-                    <Typography sx={{ ml: 2, flex: 1, fontWeight: 700 }} variant="h6" component="div">
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 3, borderBottom: '1px solid', borderColor: 'divider' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Psychology sx={{ color: primaryColor, fontSize: 32 }} />
+                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
                         AI Knowledge Check
                     </Typography>
-                </Toolbar>
-            </AppBar>
+                </Box>
+                <IconButton onClick={handleClose} sx={{ color: 'text.secondary' }}>
+                    <Close />
+                </IconButton>
+            </Box>
 
-            <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 0, height: '100%' }}>
-                <Box sx={{ maxWidth: '800px', width: '100%', p: 3, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <DialogContent sx={{ p: 0 }}>
+                <Box sx={{ p: 4, minHeight: '400px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
 
                     {loading ? (
                         <Box sx={{ textAlign: 'center' }}>
