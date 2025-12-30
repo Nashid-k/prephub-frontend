@@ -610,7 +610,6 @@ Explain clearly why approach #3 is superior to the others.`;
                         <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
                             {[
                                 { id: 'learn', label: 'Learn Concept', icon: <MenuBook /> },
-                                { id: 'learn', label: 'Learn Concept', icon: <MenuBook /> },
                                 { id: 'practice', label: 'Practice', icon: <Code /> }
                             ].map((tab) => {
                                 const isActive = activeTab === tab.id;
