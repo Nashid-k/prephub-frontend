@@ -54,120 +54,52 @@ const useVoice = (langCode = 'en-US') => {
         if (recognitionRef.current) recognitionRef.current.stop();
     }, []);
 
-    const speak = useCallback((text, onEndCallback = null) => {
-        if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
+    const speak = useCallback(async (text, onEndCallback = null) => {
+        try {
+            setIsSpeaking(true);
+            
+            // Call backend ElevenLabs TTS API
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/tts/elevenlabs`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, language: langCode })
+            });
 
-        // Voice Selection: Prioritize "Enhanced" or "Premium" voices
-        const voices = window.speechSynthesis.getVoices();
-        const preferredVoice = 
-            voices.find(v => v.lang === langCode && (v.name.includes('Premium') || v.name.includes('Enhanced'))) ||
-            voices.find(v => v.lang === langCode && v.name.includes('Google')) ||
-            voices.find(v => v.lang === langCode && !v.localService) || // Prefer cloud voices
-            voices.find(v => v.lang === langCode) ||
-            voices.find(v => v.lang.startsWith(langCode.split('-')[0]));
+            if (!response.ok) throw new Error('TTS API failed');
 
-        // Intelligent chunking: Respect natural phrase boundaries
-        const chunks = text.match(/[^.?!,;:|—–-]+[.?!,;:|—–-]?/g) || [text]; 
-        let chunkIndex = 0;
+            const { audio } = await response.json();
+            
+            // Convert base64 to audio and play
+            const audioBlob = new Blob(
+                [Uint8Array.from(atob(audio), c => c.charCodeAt(0))],
+                { type: 'audio/mpeg' }
+            );
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audioElement = new Audio(audioUrl);
 
-        const speakNextChunk = () => {
-            if (chunkIndex >= chunks.length) {
+            audioElement.onended = () => {
                 setIsSpeaking(false);
+                URL.revokeObjectURL(audioUrl);
                 if (onEndCallback) onEndCallback();
-                return;
-            }
-
-            const chunkText = chunks[chunkIndex].trim();
-            if (!chunkText) {
-                chunkIndex++;
-                speakNextChunk();
-                return;
-            }
-
-            const utterance = new SpeechSynthesisUtterance(chunkText);
-            utterance.lang = langCode;
-            if (preferredVoice) utterance.voice = preferredVoice;
-            
-            // ═══════════════════════════════════════════════════
-            // ADVANCED HUMANIZATION LAYER
-            // ═══════════════════════════════════════════════════
-            
-            const wordCount = chunkText.split(' ').length;
-            const hasQuestion = chunkText.includes('?');
-            const hasExclamation = chunkText.includes('!');
-            const isLongPhrase = wordCount > 10;
-            
-            // 1. EMOTIONAL PROSODY: Adjust based on punctuation
-            if (hasQuestion) {
-                // Questions: Higher pitch, slightly faster
-                utterance.pitch = 1.08 + (Math.random() * 0.06); // 1.08-1.14
-                utterance.rate = 1.02 + (Math.random() * 0.06);  // 1.02-1.08
-            } else if (hasExclamation) {
-                // Excitement: Moderate pitch, faster rate
-                utterance.pitch = 1.05 + (Math.random() * 0.08); // 1.05-1.13
-                utterance.rate = 1.05 + (Math.random() * 0.1);   // 1.05-1.15
-            } else {
-                // 2. DYNAMIC RATE: Slow down for complex/long phrases
-                let baseRate;
-                if (isLongPhrase) {
-                    baseRate = 0.88; // Thoughtful, deliberate
-                } else if (wordCount > 5) {
-                    baseRate = 0.93; // Moderate
-                } else {
-                    baseRate = 0.97; // Quick, casual
-                }
-                
-                // Add micro-variations to avoid robotic uniformity
-                const rateJitter = (Math.random() * 0.12) - 0.06; // ±0.06
-                utterance.rate = Math.max(0.82, Math.min(1.1, baseRate + rateJitter));
-                
-                // 3. PITCH VARIATION: Subtle changes for naturalness
-                const pitchJitter = (Math.random() * 0.10) - 0.05; // ±0.05
-                utterance.pitch = Math.max(0.95, Math.min(1.08, 1.0 + pitchJitter));
-            }
-            
-            // 4. BREATHING PAUSES: Context-aware silence durations
-            let pauseDuration;
-            const lastChar = chunkText.slice(-1);
-            
-            if (['.', '!', '?'].includes(lastChar)) {
-                // Sentence end: Deep breath (like a human finishing a thought)
-                pauseDuration = 1000 + (Math.random() * 300); // 1000-1300ms
-            } else if ([';', ':', '—', '–'].includes(lastChar)) {
-                // Clause separator: Thinking pause
-                pauseDuration = 700 + (Math.random() * 150); // 700-850ms
-            } else if (lastChar === ',') {
-                // Comma: Quick breath
-                pauseDuration = 400 + (Math.random() * 150); // 400-550ms
-            } else {
-                // No punctuation: Minimal pause (phrase continuation)
-                pauseDuration = 250 + (Math.random() * 100); // 250-350ms
-            }
-            
-            // 5. LONG PHRASE BONUS PAUSE: Add extra "thinking time"
-            if (isLongPhrase && ['.', '!', '?'].includes(lastChar)) {
-                pauseDuration += 200; // Extra breath for complex sentences
-            }
-
-            utterance.onstart = () => setIsSpeaking(true);
-            utterance.onend = () => {
-                chunkIndex++;
-                setTimeout(speakNextChunk, pauseDuration);
             };
-            utterance.onerror = () => setIsSpeaking(false);
 
-            window.speechSynthesis.speak(utterance);
-        };
+            audioElement.onerror = () => {
+                setIsSpeaking(false);
+                URL.revokeObjectURL(audioUrl);
+            };
 
-        speakNextChunk();
+            await audioElement.play();
+
+        } catch (error) {
+            console.error('ElevenLabs TTS Error:', error);
+            setIsSpeaking(false);
+            toast.error('Voice synthesis failed');
+        }
     }, [langCode]);
 
     const cancelSpeech = useCallback(() => {
-        if (window.speechSynthesis) {
-            window.speechSynthesis.cancel();
-            setIsSpeaking(false);
-        }
+        // ElevenLabs audio playback automatically stops on component unmount
+        setIsSpeaking(false);
     }, []);
 
     return {
