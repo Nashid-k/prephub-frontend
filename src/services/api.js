@@ -71,7 +71,9 @@ export const aiAPI = {
   generateQuestions: (topic, section, difficulty = 'medium') => 
     api.post('/ai/generate-questions', { topic, section, difficulty }),
   generateInterviewQuestions: (topic, type = 'both', difficulty = 'medium') => 
-    api.post('/ai/interview-questions', { topic, type, difficulty })
+    api.post('/ai/interview-questions', { topic, type, difficulty }),
+  generateQuiz: (topic, section) => 
+    api.post('/ai/quiz', { topic, section })
 };
 
 // Compiler API
