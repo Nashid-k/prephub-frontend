@@ -126,8 +126,8 @@ const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeConte
                         <div key={index} className={`message ${msg.role}`}>
                             <div className="message-avatar">
                                 {msg.role === 'user' ? (
-                                    user?.photoURL ?
-                                        <img src={user.photoURL} alt="User" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
+                                    (user?.picture || user?.photoURL) ?
+                                        <img src={user.picture || user.photoURL} alt="User" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
                                         : '👤'
                                 ) : '🤖'}
                             </div>
