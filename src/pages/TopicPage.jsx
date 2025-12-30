@@ -62,6 +62,20 @@ const TopicPage = () => {
         }
 
         fetchAggregateData();
+
+        // Refetch when user returns to this page (e.g., after visiting category page)
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                console.log('TopicPage became visible, refreshing data...');
+                fetchAggregateData();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, [slug]);
 
     const applyAggregateData = (data) => {
