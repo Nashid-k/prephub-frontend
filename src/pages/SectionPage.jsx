@@ -117,20 +117,7 @@ const SectionPage = () => {
 
     const chatRef = useRef(null);
 
-    // Topic Styling Helpers
-    const getTopicColor = (slug) => {
-        const colors = {
-            'react': '#61DAFB',
-            'nodejs': '#339933',
-            'javascript': '#F7DF1E',
-            'typescript': '#3178C6',
-            'mongodb': '#47A248',
-            'dsa': '#FF3B30',
-        };
-        return colors[slug] || '#61DAFB';
-    };
-
-    const topicColor = getTopicColor(topicSlug);
+    const topicColor = getTopicColor(topicSlug, isDark);
 
     useEffect(() => {
         // 1. Load from cache first for instant UI

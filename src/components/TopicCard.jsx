@@ -3,55 +3,15 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent, Typography, Box, Chip, LinearProgress, IconButton, useTheme } from '@mui/material';
 import { TrendingUp, CheckCircle, PlayArrow, MenuBook, ArrowForward } from '@mui/icons-material';
+import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import './TopicCard.css';
 
 const TopicCard = ({ topic }) => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
-    const getTopicImage = (slug) => {
-        const normalizedSlug = slug?.toLowerCase() || '';
-        const imageMap = {
-            'mongodb': '/images/topics/mongodb.svg',
-            'express': '/images/topics/express.svg',
-            'react': '/images/topics/react.png',
-            'dsa': '/images/topics/dsa.svg',
-            'node': '/images/topics/nodejs.png',
-            'nodejs': '/images/topics/nodejs.png',
-            'node.js': '/images/topics/nodejs.png',
-            'javascript': '/images/topics/javascript.png',
-            'typescript': '/images/topics/typescript.png',
-            'postgresql': '/images/topics/postgresql.svg',
-        };
-        return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
-    };
-
-    const getTopicColor = (slug) => {
-        const normalizedSlug = slug?.toLowerCase() || '';
-
-        // Express: white in dark mode, subtle black in light mode
-        if (normalizedSlug === 'express') {
-            return isDark ? '#FFFFFF' : '#1a1a1a';
-        }
-
-        const colorMap = {
-            'mongodb': '#47A248',
-            'react': '#61DAFB',
-            'dsa': '#FF6B6B',
-            'node': '#339933',
-            'nodejs': '#339933',
-            'javascript': '#F7DF1E',
-            'typescript': '#3178C6',
-        };
-        return colorMap[normalizedSlug] || '#0a84ff';
-    };
-
-    const getTextColor = (slug) => {
-        return getTopicColor(slug);
-    };
-
     const progress = topic.progress || 0;
-    const topicColor = getTopicColor(topic.slug);
+    const topicColor = getTopicColor(topic.slug, isDark);
 
     return (
         <motion.div

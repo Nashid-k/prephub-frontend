@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { Delete, DeleteSweep, Bookmark as BookmarkIcon, ArrowForward, FilterList } from '@mui/icons-material';
 import { getBookmarks, removeBookmark, clearAllBookmarks } from '../utils/bookmarks';
+import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import toast from 'react-hot-toast';
 
 const BookmarksPage = () => {
@@ -69,43 +70,7 @@ const BookmarksPage = () => {
         }
     };
 
-    // Get topic-specific color (matching Dashboard)
-    const getTopicColor = (topicSlug) => {
-        const normalizedSlug = topicSlug?.toLowerCase() || '';
-
-        // Express: white in dark mode, black in light mode
-        if (normalizedSlug === 'express') {
-            return isDark ? '#FFFFFF' : '#1a1a1a';
-        }
-
-        const colorMap = {
-            'mongodb': '#47A248',
-            'react': '#61DAFB',
-            'dsa': '#FF6B6B',
-            'node': '#339933',
-            'nodejs': '#339933',
-            'javascript': '#F7DF1E',
-            'typescript': '#3178C6',
-            'postgresql': '#336791',
-        };
-        return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
-    };
-
-    const getTopicImage = (slug) => {
-        const normalizedSlug = slug?.toLowerCase() || '';
-        const imageMap = {
-            'mongodb': '/images/topics/mongodb.svg',
-            'express': '/images/topics/express.svg',
-            'react': '/images/topics/react.png',
-            'dsa': '/images/topics/dsa.svg',
-            'node': '/images/topics/nodejs.png',
-            'nodejs': '/images/topics/nodejs.png',
-            'javascript': '/images/topics/javascript.png',
-            'typescript': '/images/topics/typescript.png',
-            'postgresql': '/images/topics/postgresql.svg',
-        };
-        return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
-    };
+    const filteredBookmarks = filter === 'all'
 
     const filteredBookmarks = filter === 'all'
         ? bookmarks
@@ -215,7 +180,7 @@ const BookmarksPage = () => {
                 {filteredBookmarks.length > 0 ? (
                     <Grid container spacing={3}>
                         {filteredBookmarks.map((bookmark, index) => {
-                            const topicColor = getTopicColor(bookmark.topicSlug);
+                            const topicColor = getTopicColor(bookmark.topicSlug, isDark);
                             return (
                                 <Grid item xs={12} sm={6} md={4} key={bookmark.id}>
                                     <motion.div

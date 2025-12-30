@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { progressAPI } from '../services/api';
 import { getBookmarks } from '../utils/bookmarks';
+import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import './Home.css';
 
 import { useAuth } from '../context/AuthContext';
@@ -41,27 +42,7 @@ const Home = () => {
     const [recentBookmarks, setRecentBookmarks] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Get topic-specific color (matching Dashboard)
-    const getTopicColor = (topicSlug) => {
-        const normalizedSlug = topicSlug?.toLowerCase() || '';
-
-        // Express: white in dark mode, black in light mode
-        if (normalizedSlug === 'express') {
-            return isDark ? '#FFFFFF' : '#1a1a1a';
-        }
-
-        const colorMap = {
-            'mongodb': '#47A248',
-            'react': '#61DAFB',
-            'dsa': '#FF6B6B',
-            'node': '#339933',
-            'nodejs': '#339933',
-            'javascript': '#F7DF1E',
-            'typescript': '#3178C6',
-            'postgresql': '#336791',
-        };
-        return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
-    };
+    // progress stats hook...
 
     useEffect(() => {
         const fetchData = async () => {
@@ -298,22 +279,7 @@ const Home = () => {
                     <Grid container spacing={3}>
                         {/* Continue Learning Card */}
                         {progress?.activeTopic && (() => {
-                            const topicColor = getTopicColor(progress.activeTopic.topicSlug);
-                            const getTopicImage = (slug) => {
-                                const normalizedSlug = slug?.toLowerCase() || '';
-                                const imageMap = {
-                                    'mongodb': '/images/topics/mongodb.svg',
-                                    'express': '/images/topics/express.svg',
-                                    'react': '/images/topics/react.png',
-                                    'dsa': '/images/topics/dsa.svg',
-                                    'node': '/images/topics/nodejs.png',
-                                    'nodejs': '/images/topics/nodejs.png',
-                                    'javascript': '/images/topics/javascript.png',
-                                    'typescript': '/images/topics/typescript.png',
-                                    'postgresql': '/images/topics/postgresql.svg',
-                                };
-                                return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
-                            };
+                            const topicColor = getTopicColor(progress.activeTopic.topicSlug, isDark);
 
                             return (
                                 <Grid item xs={12} md={6}>
@@ -587,22 +553,7 @@ const Home = () => {
                                             </Box>
                                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                                 {recentBookmarks.map((b) => {
-                                                    const bookmarkTopicColor = getTopicColor(b.topicSlug);
-                                                    const getTopicImage = (slug) => {
-                                                        const normalizedSlug = slug?.toLowerCase() || '';
-                                                        const imageMap = {
-                                                            'mongodb': '/images/topics/mongodb.svg',
-                                                            'express': '/images/topics/express.svg',
-                                                            'react': '/images/topics/react.png',
-                                                            'dsa': '/images/topics/dsa.svg',
-                                                            'node': '/images/topics/nodejs.png',
-                                                            'nodejs': '/images/topics/nodejs.png',
-                                                            'javascript': '/images/topics/javascript.png',
-                                                            'typescript': '/images/topics/typescript.png',
-                                                            'postgresql': '/images/topics/postgresql.svg',
-                                                        };
-                                                        return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
-                                                    };
+                                                    const bookmarkTopicColor = getTopicColor(b.topicSlug, isDark);
 
                                                     return (
                                                         <Box

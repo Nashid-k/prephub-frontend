@@ -30,6 +30,7 @@ import { isBookmarked, toggleBookmark } from '../utils/bookmarks';
 import toast from 'react-hot-toast';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SafeImage from '../components/SafeImage';
+import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 
 const TopicPage = () => {
     const { slug } = useParams();
@@ -94,44 +95,7 @@ const TopicPage = () => {
         }
     };
 
-    // Get topic-specific color
-    const getTopicColor = (topicSlug) => {
-        const normalizedSlug = topicSlug?.toLowerCase() || '';
-
-        if (normalizedSlug === 'express') {
-            return isDark ? '#FFFFFF' : '#1a1a1a';
-        }
-
-        const colorMap = {
-            'mongodb': '#47A248',
-            'react': '#61DAFB',
-            'dsa': '#FF6B6B',
-            'node': '#339933',
-            'nodejs': '#339933',
-            'javascript': '#F7DF1E',
-            'typescript': '#3178C6',
-            'postgresql': '#336791',
-        };
-        return colorMap[normalizedSlug] || '#5e5ce6';
-    };
-
-    const getTopicImage = (topicSlug) => {
-        const normalizedSlug = topicSlug?.toLowerCase() || '';
-        const imageMap = {
-            'mongodb': '/images/topics/mongodb.svg',
-            'express': '/images/topics/express.svg',
-            'react': '/images/topics/react.png',
-            'dsa': '/images/topics/dsa.svg',
-            'node': '/images/topics/nodejs.png',
-            'nodejs': '/images/topics/nodejs.png',
-            'javascript': '/images/topics/javascript.png',
-            'typescript': '/images/topics/typescript.png',
-            'postgresql': '/images/topics/postgresql.svg',
-        };
-        return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
-    };
-
-    const topicColor = getTopicColor(topic?.slug);
+    const topicColor = getTopicColor(topic?.slug, isDark);
 
     // Calculate super chapters (groups) for tabs
     const superChapters = React.useMemo(() => {
