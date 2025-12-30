@@ -173,15 +173,15 @@ const Dashboard = () => {
 
                             <Grid container spacing={3}>
                                 {loading ? (
-                                    // ... Skeletons ...
+                                    // Skeletons
                                     [1, 2, 3, 4].map((n) => (
-                                        <Grid item xs={12} sm={6} md={4} key={n}>
+                                        <Grid item xs={12} sm={6} md={4} lg={3} key={n}>
                                             <Skeleton variant="rectangular" height={280} sx={{ borderRadius: 4 }} />
                                         </Grid>
                                     ))
                                 ) : (
                                     topics.map((topic, index) => (
-                                        <Grid item xs={12} sm={6} md={4} key={topic.slug}>
+                                        <Grid item xs={12} sm={6} md={4} lg={3} key={topic.slug}>
                                             {/* ... existing Topic Card ... */}
                                             <motion.div
                                                 initial={{ opacity: 0, y: 20 }}
