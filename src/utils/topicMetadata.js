@@ -31,6 +31,7 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'devops-basics': '#7209B7',
         'engineering-practices': '#7209B7',
         'python': '#306998', // Python blue
+        'django': '#092E20', // Django dark green
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -69,6 +70,7 @@ export const getTopicImage = (topicSlug) => {
         'devops-basics': '/images/topics/devops.png',
         'engineering-practices': '/images/topics/devops.png',
         'python': '/images/python.png',
+        'django': '/images/django.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
