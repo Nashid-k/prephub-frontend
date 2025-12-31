@@ -316,9 +316,9 @@
 
 .markdown-content {
     color: var(--text-secondary);
-    line-height: 2.0;
-    /* Increased from 1.8 */
-    font-size: 1.1rem;
+    line-height: 1.8;
+    /* Increased for readability */
+    font-size: 1.125rem;
 }
 
 .markdown-content>*:first-child {
@@ -393,18 +393,20 @@
 }
 
 .markdown-content pre {
-    background: #2a2d2e !important; /* Lighter background for better code visibility */
-    padding: 1.5rem;
-    border-radius: 16px;
+    background: #1e1e1e !important;
+    /* Visual Studio Code Dark background */
+    padding: 1rem;
+    border-radius: 8px;
     overflow-x: auto;
-    margin: 2.5rem 0;
-    border: 1px solid rgba(255, 255, 255, 0.12); /* Slightly more visible border */
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    margin: 1.5rem 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .markdown-content code {
-    font-family: 'Fira Code', 'SF Mono', monospace;
-    font-size: 0.95em;
+    font-family: 'Fira Code', 'MB Typewriter', 'SF Mono', monospace;
+    font-size: 1.05em;
+    /* Slightly larger code font */
 }
 
 /* Enhanced Inline code */
@@ -636,7 +638,8 @@
 
 .answer-content {
     padding: var(--spacing-md);
-    background: rgba(255, 255, 255, 0.03); /* Lighter background */
+    background: rgba(255, 255, 255, 0.03);
+    /* Lighter background */
     border-radius: var(--border-radius);
     margin-top: var(--spacing-sm);
     color: var(--text-secondary);
@@ -645,7 +648,8 @@
 }
 
 .answer-content pre {
-    background: #2a2d2e; /* Lighter background matching main code blocks */
+    background: #2a2d2e;
+    /* Lighter background matching main code blocks */
     padding: var(--spacing-md);
     border-radius: var(--border-radius);
     overflow-x: auto;
