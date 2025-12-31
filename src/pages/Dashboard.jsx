@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Container, Typography, Box, Button, Alert, useTheme as useMuiTheme, Fade, Grid, Skeleton } from '@mui/material';
+import { Container, Typography, Box, Button, Alert, useTheme as useMuiTheme, Fade, Grid, Skeleton, Chip } from '@mui/material';
 import { Refresh, School, Code, Storage, Cloud, Psychology, TrendingUp, Timer, EmojiEvents, Computer, Architecture, Handyman } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/TopicCard';
