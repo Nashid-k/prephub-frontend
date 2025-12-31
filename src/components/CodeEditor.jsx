@@ -368,17 +368,17 @@ const CodeEditor = ({
                     {onAiHelp && (
                         <Stack direction="row" spacing={0.5}>
                             <Tooltip title="Explain Code">
-                                <IconButton size="small" onClick={() => onAiHelp('explain')} sx={{ color: 'var(--primary)', bgcolor: 'rgba(10, 132, 255, 0.1)', '&:hover': { bgcolor: 'rgba(10, 132, 255, 0.2)' } }}>
+                                <IconButton size="small" onClick={() => onAiHelp('explain', code, language)} sx={{ color: 'var(--primary)', bgcolor: 'rgba(10, 132, 255, 0.1)', '&:hover': { bgcolor: 'rgba(10, 132, 255, 0.2)' } }}>
                                     <Lightbulb fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Debug Code">
-                                <IconButton size="small" onClick={() => onAiHelp('debug')} sx={{ color: '#ef4444', bgcolor: 'rgba(239, 68, 68, 0.1)', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.2)' } }}>
+                                <IconButton size="small" onClick={() => onAiHelp('debug', code, language)} sx={{ color: '#ef4444', bgcolor: 'rgba(239, 68, 68, 0.1)', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.2)' } }}>
                                     <BugReport fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Optimize/Fix">
-                                <IconButton size="small" onClick={() => onAiHelp('optimize')} sx={{ color: '#8b5cf6', bgcolor: 'rgba(139, 92, 246, 0.1)', '&:hover': { bgcolor: 'rgba(139, 92, 246, 0.2)' } }}>
+                                <IconButton size="small" onClick={() => onAiHelp('optimize', code, language)} sx={{ color: '#8b5cf6', bgcolor: 'rgba(139, 92, 246, 0.1)', '&:hover': { bgcolor: 'rgba(139, 92, 246, 0.2)' } }}>
                                     <AutoFixHigh fontSize="small" />
                                 </IconButton>
                             </Tooltip>

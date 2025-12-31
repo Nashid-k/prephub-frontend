@@ -8,6 +8,7 @@ import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
+import AIOutputModal from '../components/AIOutputModal';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -136,36 +137,74 @@ const SectionPage = () => {
     const [editorCode, setEditorCode] = useState('// Write your code here\nconsole.log("Hello, PrepHub!");');
     const [aiOutput, setAiOutput] = useState(null);
 
+    // AI Modal States
+    const [aiModalOpen, setAiModalOpen] = useState(false);
+    const [aiModalType, setAiModalType] = useState('');
+    const [aiModalResponse, setAiModalResponse] = useState('');
+    const [aiModalLoading, setAiModalLoading] = useState(false);
+
     const handleAiHelp = async (type, code, lang = 'javascript') => {
-        setAiOutput({ type: 'loading', message: `Analyzing code for ${type}...` });
+        setAiModalType(type);
+        setAiModalOpen(true);
+        setAiModalLoading(true);
+
         try {
+            let prompt = '';
+            switch (type) {
+                case 'explain':
+                    prompt = `Explain this ${lang} code concisely:
+
+\`\`\`${lang}
+${code}
+\`\`\`
+
+Provide:
+1. **Purpose** (1 sentence)
+2. **Key concepts** (bullet points)
+3. **How it works** (brief steps)`;
+                    break;
+                case 'debug':
+                    prompt = `Analyze this ${lang} code for bugs and issues:
+
+\`\`\`${lang}
+${code}
+\`\`\`
+
+Provide:
+1. **Issues found** (list each)
+2. **Why they're problems**
+3. **How to fix them** (with code examples)`;
+                    break;
+                case 'optimize':
+                    prompt = `Suggest optimizations for this ${lang} code:
+
+\`\`\`${lang}
+${code}
+\`\`\`
+
+Provide:
+1. **Performance improvements**
+2. **Best practices** to follow
+3. **Cleaner alternatives** (with code)`;
+                    break;
+                default:
+                    prompt = `Help me with this ${lang} code:\n\n${code}`;
+            }
+
             const context = {
                 topic: topicSlug,
                 section: section?.title,
                 code: code,
-                problem: section?.content
+                problem: ''
             };
 
-            let prompt = '';
-            switch (type) {
-                case 'explain':
-                    prompt = 'Explain the current code logic and potential improvements.';
-                    break;
-                case 'debug':
-                    prompt = 'Find bugs in this code and suggest fixes.';
-                    break;
-                case 'optimize':
-                    prompt = 'Optimize this code for time and space complexity.';
-                    break;
-                default:
-                    prompt = 'Help me with this code.';
-            }
-
             const res = await aiAPI.askQuestion(prompt, context, lang);
-            setAiOutput({ type: 'ai', results: res.data.answer || res.data });
+            setAiModalResponse(res.data.answer || res.data);
+            setAiModalLoading(false);
             trackAIExplanation(topicSlug, section?.title);
         } catch (err) {
-            setAiOutput({ type: 'error', error: 'Failed to get AI help' });
+            setAiModalResponse('Failed to get AI help. Please try again.');
+            setAiModalLoading(false);
         }
     };
 
