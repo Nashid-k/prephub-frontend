@@ -36,7 +36,6 @@ import {
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import SearchBar from './SearchBar';
-import SupportModal from './SupportModal';
 import './Navbar.css';
 
 const Navbar = () => {
@@ -49,7 +48,6 @@ const Navbar = () => {
 
     const [showSearch, setShowSearch] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
-    const [showSupport, setShowSupport] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
 
     // Keyboard shortcut for search (Ctrl/Cmd + K)
@@ -270,7 +268,10 @@ const Navbar = () => {
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
                                 {/* Buy Me a Coffee */}
                                 <IconButton
-                                    onClick={() => setShowSupport(true)}
+                                    component="a"
+                                    href="https://buymeacoffee.com/shadowishere"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     size="small"
                                     sx={{
                                         width: 36,
@@ -483,9 +484,6 @@ const Navbar = () => {
 
             {/* Search Modal */}
             {showSearch && <SearchBar onClose={() => setShowSearch(false)} />}
-
-            {/* Support Modal */}
-            <SupportModal open={showSupport} onClose={() => setShowSupport(false)} />
         </>
     );
 };
