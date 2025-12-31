@@ -38,8 +38,6 @@ import {
     Menu,
     MenuItem,
     InputLabel,
-    MenuItem,
-    InputLabel,
     FormControl,
     CircularProgress
 } from '@mui/material';
@@ -577,71 +575,69 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
 
                     <Box sx={{ display: 'flex', gap: 1 }}>
                         {showLanguageSwitcher && (
-                            { showLanguageSwitcher && (
-                                <>
-                                    <Button
-                                        onClick={handleLanguageMenuOpen}
-                                        sx={{
-                                            borderRadius: '9999px',
-                                            px: 3,
-                                            py: 1,
-                                            background: 'transparent',
-                                            border: '1px solid',
-                                            borderColor: 'rgba(128,128,128,0.2)',
-                                            color: 'text.primary',
-                                            textTransform: 'none',
-                                            '&:hover': {
-                                                background: `${topicColor}15`,
-                                                borderColor: topicColor
-                                            },
-                                            position: 'relative',
-                                            overflow: 'visible'
-                                        }}
-                                    >
-                                        <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
-                                        {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
-                                        <KeyboardArrowDown sx={{ ml: 0.5 }} />
-                                    </Button>
-                                    <Menu
-                                        anchorEl={languageMenuAnchor}
-                                        open={Boolean(languageMenuAnchor)}
-                                        onClose={handleLanguageMenuClose}
-                                        PaperProps={{
-                                            sx: {
-                                                mt: 1,
-                                                borderRadius: 2,
-                                                minWidth: 150,
-                                                ...glassSx
-                                            }
-                                        }}
-                                    >
-                                        {[
-                                            { code: 'javascript', label: 'JavaScript' },
-                                            { code: 'python', label: 'Python' },
-                                            { code: 'java', label: 'Java' },
-                                            { code: 'cpp', label: 'C++' },
-                                            { code: 'csharp', label: 'C#' },
-                                            { code: 'go', label: 'Go' },
-                                            { code: 'dart', label: 'Dart' }
-                                        ].map((lang) => (
-                                            <MenuItem
-                                                key={lang.code}
-                                                onClick={() => handleLanguageSelect(lang.code)}
-                                                selected={selectedLanguage === lang.code}
-                                                sx={{
-                                                    '&.Mui-selected': {
-                                                        bgcolor: `${topicColor}15`,
-                                                        color: topicColor,
-                                                        '&:hover': { bgcolor: `${topicColor}25` }
-                                                    }
-                                                }}
-                                            >
-                                                {lang.label}
-                                            </MenuItem>
-                                        ))}
-                                    </Menu>
-                                </>
-                            )}
+                            <>
+                                <Button
+                                    onClick={handleLanguageMenuOpen}
+                                    sx={{
+                                        borderRadius: '9999px',
+                                        px: 3,
+                                        py: 1,
+                                        background: 'transparent',
+                                        border: '1px solid',
+                                        borderColor: 'rgba(128,128,128,0.2)',
+                                        color: 'text.primary',
+                                        textTransform: 'none',
+                                        '&:hover': {
+                                            background: `${topicColor}15`,
+                                            borderColor: topicColor
+                                        },
+                                        position: 'relative',
+                                        overflow: 'visible'
+                                    }}
+                                >
+                                    <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
+                                    {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                                    <KeyboardArrowDown sx={{ ml: 0.5 }} />
+                                </Button>
+                                <Menu
+                                    anchorEl={languageMenuAnchor}
+                                    open={Boolean(languageMenuAnchor)}
+                                    onClose={handleLanguageMenuClose}
+                                    PaperProps={{
+                                        sx: {
+                                            mt: 1,
+                                            borderRadius: 2,
+                                            minWidth: 150,
+                                            ...glassSx
+                                        }
+                                    }}
+                                >
+                                    {[
+                                        { code: 'javascript', label: 'JavaScript' },
+                                        { code: 'python', label: 'Python' },
+                                        { code: 'java', label: 'Java' },
+                                        { code: 'cpp', label: 'C++' },
+                                        { code: 'csharp', label: 'C#' },
+                                        { code: 'go', label: 'Go' },
+                                        { code: 'dart', label: 'Dart' }
+                                    ].map((lang) => (
+                                        <MenuItem
+                                            key={lang.code}
+                                            onClick={() => handleLanguageSelect(lang.code)}
+                                            selected={selectedLanguage === lang.code}
+                                            sx={{
+                                                '&.Mui-selected': {
+                                                    bgcolor: `${topicColor}15`,
+                                                    color: topicColor,
+                                                    '&:hover': { bgcolor: `${topicColor}25` }
+                                                }
+                                            }}
+                                        >
+                                            {lang.label}
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </>
                         )}
                         <Button
                             startIcon={<Psychology />}
