@@ -32,6 +32,7 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'engineering-practices': '#7209B7',
         'python': '#306998', // Python blue
         'django': '#092E20', // Django dark green
+        'flutter': '#02569B', // Flutter blue
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -71,6 +72,7 @@ export const getTopicImage = (topicSlug) => {
         'engineering-practices': '/images/topics/devops.png',
         'python': '/images/python.png',
         'django': '/images/django.png',
+        'flutter': '/images/flutter.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
