@@ -8,6 +8,7 @@ import CodeEditor from '../components/CodeEditor';
 import AIChat from '../components/AIChat';
 import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { Drawer } from '@mui/material';
 import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
 import AIOutputModal from '../components/AIOutputModal';
@@ -115,6 +116,7 @@ const SectionPage = () => {
     const [solutionLoading, setSolutionLoading] = useState(false);
     const [testCases, setTestCases] = useState(null);
     const [testCasesLoading, setTestCasesLoading] = useState(false);
+    const [progressMap, setProgressMap] = useState({});
 
     // State for Language Switcher - always defaults to JavaScript
     const [selectedLanguage, setSelectedLanguage] = useState(defaultLanguage);
@@ -129,6 +131,7 @@ const SectionPage = () => {
 
     // State for Language Menu
     const [languageMenuAnchor, setLanguageMenuAnchor] = useState(null);
+    const [mobileOpen, setMobileOpen] = useState(false); // Mobile sidebar state
 
     const handleLanguageMenuOpen = (event) => {
         setLanguageMenuAnchor(event.currentTarget);
@@ -357,7 +360,7 @@ Provide:
             isMounted = false;
             abortControllerRef.current?.abort();
         };
-    }, [topicSlug, sectionSlug]); // Removed categorySlug dependency
+    }, [topicSlug, categorySlug, sectionSlug]); // categorySlug needed for proper re-loading
 
     const applyAggregateData = async (data) => {
         const { section: sectionData, topic: topicData, category: categoryData, siblingSections, allTopicSections, userProgress } = data;
@@ -366,9 +369,27 @@ Provide:
         setTopic(topicData);
         setCategory(categoryData);
         // Prefer allTopicSections (full course), fallback to siblingSections (category only)
-        setAllSections(allTopicSections || siblingSections || []);
+        const allSecs = allTopicSections || siblingSections || [];
+        setAllSections(allSecs);
+
         setIsCompleted(userProgress?.completed || false);
         setBookmarked(isBookmarked(sectionData._id));
+
+        // Create progress map (assuming the API returns progress for all sections or we default to false)
+        // If the API doesn't return full progress map, we might need to adjust the backend or just track current.
+        // For now, let's try to derive it if possible, or init empty.
+        // Actually, checking TopicPage logic, it gets `progress` object map.
+        // The `getSectionAggregate` endpoint likely includes `progress` map or similar if we updated it recently.
+        // Let's check what data holds. If `data.progress` exists, use it.
+        if (data.progress) {
+            setProgressMap(data.progress);
+        } else {
+            // Fallback: at least mark current as completed if true
+            setProgressMap(prev => ({
+                ...prev,
+                [sectionData.slug]: userProgress?.completed || false
+            }));
+        }
 
         const isBlind75 = categoryData?.group?.startsWith('Blind 75');
 
@@ -617,7 +638,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                 <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Button
                         startIcon={<ArrowBack />}
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}`)}
                         sx={{
                             borderRadius: '9999px',
                             px: 3,
@@ -643,6 +664,19 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                     >
                         Back to {category?.name || 'Category'}
                     </Button>
+
+                    {/* Mobile Sidebar Toggle */}
+                    <IconButton
+                        onClick={() => setMobileOpen(true)}
+                        sx={{
+                            display: { xs: 'flex', md: 'none' },
+                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                            borderRadius: '12px',
+                            ml: 1
+                        }}
+                    >
+                        <ListIcon />
+                    </IconButton>
 
                     <Box sx={{ display: 'flex', gap: 1 }}>
                         {showLanguageSwitcher && (
@@ -773,7 +807,8 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                         <Card sx={{ ...glassSx, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                             <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
                                 <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
-                                    MODULE: {category?.name || 'GENERAL'}
+                                    {category?.group && <span style={{ opacity: 0.7 }}>{category.group} / </span>}
+                                    {category?.name || 'CATEGORY'}
                                 </Typography>
                                 <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, lineHeight: 1.2 }}>
                                     {section.title}
@@ -798,16 +833,10 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                             selected={s.slug === sectionSlug}
                                             onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
                                             sx={{
-                                                borderRadius: '16px',
-                                                border: '1px solid',
-                                                borderColor: 'transparent',
-                                                transition: 'all 0.2s',
-                                                '&.Mui-selected': {
-                                                    bgcolor: `${topicColor}15`,
-                                                    color: topicColor,
-                                                    borderColor: `${topicColor}30`,
-                                                    '&:hover': { bgcolor: `${topicColor}25` }
-                                                },
+                                                bgcolor: `${topicColor}15`,
+                                                color: topicColor,
+                                                borderColor: `${topicColor}30`,
+                                                '&:hover': { bgcolor: `${topicColor}25` },
                                                 '&:not(.Mui-selected):hover': {
                                                     bgcolor: 'action.hover',
                                                     borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
@@ -850,6 +879,62 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                             </Box>
                         </Card>
                     </Box>
+
+                    {/* Mobile Drawer */}
+                    <Drawer
+                        anchor="left"
+                        open={mobileOpen}
+                        onClose={() => setMobileOpen(false)}
+                        PaperProps={{
+                            sx: { width: 300, bgcolor: 'background.default' }
+                        }}
+                    >
+                        <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                            <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+                                {category?.group && <span style={{ opacity: 0.7 }}>{category.group} / </span>}
+                                {category?.name || 'CATEGORY'}
+                            </Typography>
+                            <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, lineHeight: 1.2 }}>
+                                {section.title}
+                            </Typography>
+                        </Box>
+                        <List sx={{ overflowY: 'auto', flex: 1, px: 2, mt: 2 }}>
+                            {allSections.map((s, idx) => (
+                                <ListItem key={s.slug} disablePadding sx={{ mb: 1 }}>
+                                    <ListItemButton
+                                        selected={s.slug === sectionSlug}
+                                        onClick={() => {
+                                            navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`);
+                                            setMobileOpen(false);
+                                        }}
+                                        sx={{
+                                            borderRadius: '12px',
+                                            mb: 0.5,
+                                            '&.Mui-selected': {
+                                                bgcolor: `${topicColor}15`,
+                                                color: topicColor,
+                                                borderLeft: `3px solid ${topicColor}`,
+                                                '&:hover': { bgcolor: `${topicColor}25` }
+                                            }
+                                        }}
+                                    >
+                                        <ListItemIcon sx={{ minWidth: 32 }}>
+                                            {s.slug === sectionSlug ? <PlayArrow sx={{ fontSize: 18, color: topicColor }} /> :
+                                                progressMap?.[s.slug] ? <CheckCircle sx={{ fontSize: 18, color: '#30d158' }} /> :
+                                                    <RadioButtonUnchecked sx={{ fontSize: 18, color: 'text.disabled' }} />}
+                                        </ListItemIcon>
+                                        <ListItemText
+                                            primary={s.title}
+                                            primaryTypographyProps={{
+                                                fontSize: '0.9rem',
+                                                fontWeight: s.slug === sectionSlug ? 600 : 400
+                                            }}
+                                        />
+                                    </ListItemButton>
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Drawer>
 
                     {/* Main Content */}
                     <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -1040,37 +1125,39 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                 }
 
                 {/* Language Change Loading Overlay */}
-                {languageChangeLoading && (
-                    <Box sx={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        bgcolor: 'rgba(0,0,0,0.7)',
-                        backdropFilter: 'blur(8px)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        zIndex: 9999,
-                        flexDirection: 'column',
-                        gap: 3
-                    }}>
-                        <CircularProgress size={60} sx={{ color: topicColor }} />
-                        <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
-                            {targetLanguage
-                                ? `Translating to ${targetLanguage.charAt(0).toUpperCase() + targetLanguage.slice(1)}...`
-                                : `Generating ${selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)} Examples...`
-                            }
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                            {targetLanguage
-                                ? 'Translating code examples while preserving explanations'
-                                : 'Please wait while AI creates optimized code snippets'
-                            }
-                        </Typography>
-                    </Box>
-                )}
+                {
+                    languageChangeLoading && (
+                        <Box sx={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            bgcolor: 'rgba(0,0,0,0.7)',
+                            backdropFilter: 'blur(8px)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 9999,
+                            flexDirection: 'column',
+                            gap: 3
+                        }}>
+                            <CircularProgress size={60} sx={{ color: topicColor }} />
+                            <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                                {targetLanguage
+                                    ? `Translating to ${targetLanguage.charAt(0).toUpperCase() + targetLanguage.slice(1)}...`
+                                    : `Generating ${selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)} Examples...`
+                                }
+                            </Typography>
+                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                                {targetLanguage
+                                    ? 'Translating code examples while preserving explanations'
+                                    : 'Please wait while AI creates optimized code snippets'
+                                }
+                            </Typography>
+                        </Box>
+                    )
+                }
 
                 {/* AI Output Modal */}
                 <AIOutputModal

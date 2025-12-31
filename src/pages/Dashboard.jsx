@@ -137,7 +137,7 @@ const Dashboard = () => {
         localStorage.setItem('prephub_learning_path', newPath);
     };
 
-    const getFilteredTopics = () => {
+    const filteredTopics = useMemo(() => {
         let rawList = selectedPath === 'all'
             ? topics
             : generateSmartPath(topics, selectedPath);
@@ -217,7 +217,7 @@ const Dashboard = () => {
         }
 
         return processedList;
-    };
+    }, [topics, selectedPath]);
 
     useEffect(() => {
         const hasSeenTour = localStorage.getItem('hasSeenTour');
@@ -287,8 +287,8 @@ const Dashboard = () => {
     const nextRecommendation = useMemo(() => {
         if (!selectedPath || selectedPath === 'all') return null;
         if (loading) return null;
-        return getNextRecommendation(getFilteredTopics());
-    }, [selectedPath, loading, topics]);
+        return getNextRecommendation(filteredTopics);
+    }, [selectedPath, loading, filteredTopics]);
 
     if (loading) {
         return (
@@ -350,8 +350,8 @@ const Dashboard = () => {
                     <Box sx={{ minHeight: '100vh', pb: 8, bgcolor: 'background.default' }}>
                         <Box
                             sx={{
-                                pt: { xs: 8, md: 12 },
-                                pb: { xs: 6, md: 8 },
+                                pt: { xs: 4, md: 12 },
+                                pb: { xs: 4, md: 8 },
                                 px: 3,
                                 textAlign: 'center',
                                 background: theme.palette.mode === 'dark'
@@ -375,7 +375,7 @@ const Dashboard = () => {
                                             : 'linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
-                                        fontSize: { xs: '2.5rem', md: '4rem' }
+                                        fontSize: { xs: '2rem', md: '4rem' }
                                     }}
                                 >
                                     Your Curriculum
@@ -412,8 +412,9 @@ const Dashboard = () => {
                                         sx={{
                                             maxWidth: '700px',
                                             mx: 'auto',
-                                            mb: 5,
-                                            p: 2.5,
+                                            mb: 4,
+                                            p: { xs: 1.5, md: 1.5 },
+                                            pr: { xs: 1.5, md: 2.5 },
                                             borderRadius: '16px',
                                             background: theme.palette.mode === 'dark'
                                                 ? 'rgba(10, 132, 255, 0.1)'
@@ -463,7 +464,9 @@ const Dashboard = () => {
                                             backdropFilter: 'blur(10px)',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            justifyContent: 'space-between',
+                                            width: { xs: '100%', md: 'auto' },
+                                            justifyContent: 'center',
+                                            mt: { xs: 1, md: 0 },
                                             flexDirection: { xs: 'column', sm: 'row' },
                                             gap: 2,
                                             boxShadow: '0 8px 32px rgba(99, 102, 241, 0.15)'
@@ -645,7 +648,7 @@ const Dashboard = () => {
                                 </Box>
                                 {selectedPath !== 'all' && (
                                     <Chip
-                                        label={`${getFilteredTopics().length} topics`}
+                                        label={`${filteredTopics.length} topics`}
                                         size="small"
                                         sx={{
                                             bgcolor: '#5e5ce620',
@@ -777,7 +780,7 @@ const Dashboard = () => {
                                     </Box>
                                 </>
                             )}
-                            {getFilteredTopics().filter(t => {
+                            {filteredTopics.filter(t => {
                                 if (t.isGroup) return true;
                                 const HIDDEN_CHILDREN = [
                                     'algorithms', 'data-structures', 'blind-75', 'dsa',

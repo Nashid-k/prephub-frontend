@@ -150,7 +150,7 @@ const TopicCard = (props) => {
                         theme.palette.mode === 'dark'
                             ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
                             : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                    backdropFilter: 'blur(20px)',
+                    backdropFilter: 'blur(10px)',
                     border: '1px solid',
                     borderColor: (theme) =>
                         theme.palette.mode === 'dark'

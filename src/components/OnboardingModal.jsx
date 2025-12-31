@@ -49,7 +49,7 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
     const fetchTopics = async () => {
         try {
             const response = await axios.get(`${API_URL}/curriculum/topics`);
-            setAllTopics(response.data);
+            setAllTopics(response.data.topics || []);
         } catch (error) {
             console.error('Failed to fetch topics:', error);
         }

@@ -206,17 +206,17 @@ const CategoryPage = () => {
     return (
         <Box sx={{
             minHeight: '100vh',
-            pt: { xs: 12, md: 14 },
-            pb: 8,
+            pt: { xs: 10, md: 14 },
+            pb: 6,
             background: isDark ? 'linear-gradient(180deg, #09090b 0%, #18181b 100%)' : '#f8fafc',
             color: 'text.primary',
         }}>
-            <Container maxWidth="xl">
+            <Container maxWidth="xl" sx={{ px: { xs: 2, md: 3 } }}>
                 {/* Header */}
                 <Box sx={{ mb: 6 }}>
                     <Button
                         startIcon={<ArrowBack />}
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/topic/${topicSlug}`)}
                         sx={{
                             mb: 4,
                             borderRadius: '9999px',
@@ -258,8 +258,8 @@ const CategoryPage = () => {
                         <Box sx={{ position: 'relative', zIndex: 1 }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <Box>
-                                    <Typography variant="overline" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1.5 }}>
-                                        CATEGORY
+                                    <Typography variant="overline" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                                        {category.group || 'CATEGORY'}
                                     </Typography>
                                     <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, color: isDark ? '#fff' : '#1a1a1a', display: 'flex', alignItems: 'center', gap: 2 }}>
                                         {category.name}
@@ -355,7 +355,7 @@ const CategoryPage = () => {
                 <Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, px: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                            Modules
+                            Sections
                         </Typography>
 
                         {/* Difficulty Filter */}

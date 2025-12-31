@@ -224,7 +224,7 @@ const Home = () => {
                                     sx={{
                                         fontWeight: 800,
                                         mb: 2,
-                                        fontSize: { xs: '2.5rem', md: '3.5rem' },
+                                        fontSize: { xs: '2rem', md: '3.5rem' },
                                         letterSpacing: '-0.02em',
                                     }}
                                 >
@@ -248,7 +248,7 @@ const Home = () => {
                                     gutterBottom
                                     sx={{
                                         fontWeight: 800,
-                                        fontSize: { xs: '2.8rem', md: '4.5rem' },
+                                        fontSize: { xs: '2.25rem', md: '4.5rem' },
                                         mb: 2,
                                         letterSpacing: '-0.03em',
                                     }}
@@ -355,7 +355,7 @@ const Home = () => {
                                                 <motion.div whileHover={{ y: -8 }} transition={{ duration: 0.3 }}>
                                                     <Box
                                                         sx={{
-                                                            p: 2.5,
+                                                            p: { xs: 1.5, md: 2.5 },
                                                             borderRadius: '20px',
                                                             background: isDark
                                                                 ? 'rgba(255, 255, 255, 0.05)'
@@ -432,7 +432,7 @@ const Home = () => {
                                                     theme.palette.mode === 'dark'
                                                         ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
                                                         : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                                backdropFilter: 'blur(20px)',
+                                                backdropFilter: 'blur(10px)',
                                                 border: '1px solid',
                                                 borderColor: (theme) =>
                                                     theme.palette.mode === 'dark'
@@ -469,7 +469,7 @@ const Home = () => {
                                                 }}
                                             />
 
-                                            <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 3, position: 'relative', zIndex: 1 }}>
+                                            <CardContent sx={{ p: { xs: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 3, position: 'relative', zIndex: 1 }}>
                                                 {/* Icon */}
                                                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                                                     <Box
@@ -631,7 +631,7 @@ const Home = () => {
                                                 theme.palette.mode === 'dark'
                                                     ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
                                                     : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                            backdropFilter: 'blur(20px)',
+                                            backdropFilter: 'blur(10px)',
                                             border: '1px solid',
                                             borderColor: (theme) =>
                                                 theme.palette.mode === 'dark'
@@ -661,7 +661,7 @@ const Home = () => {
                                             }}
                                         />
 
-                                        <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
+                                        <CardContent sx={{ p: { xs: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                                                 <Box
                                                     sx={{
@@ -830,7 +830,7 @@ const Home = () => {
                         sx={{
                             fontWeight: 800,
                             mb: 2,
-                            fontSize: { xs: '2rem', md: '2.75rem' },
+                            fontSize: { xs: '1.75rem', md: '2.75rem' },
                             letterSpacing: '-0.02em',
                             background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
                             WebkitBackgroundClip: 'text',

@@ -134,8 +134,8 @@ const ProgressPage = () => {
                         theme.palette.mode === 'dark'
                             ? 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.15) 0%, transparent 60%)'
                             : 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.08) 0%, transparent 60%)',
-                    py: 8,
-                    mb: 6,
+                    py: { xs: 6, md: 8 },
+                    mb: { xs: 4, md: 6 },
                 }}
             >
                 <Container maxWidth="xl">
@@ -166,7 +166,7 @@ const ProgressPage = () => {
                                     background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
                                     WebkitBackgroundClip: 'text',
                                     WebkitTextFillColor: 'transparent',
-                                    fontSize: { xs: '2.5rem', md: '3.5rem' },
+                                    fontSize: { xs: '2rem', md: '3.5rem' },
                                 }}
                             >
                                 Your Progress
@@ -206,7 +206,7 @@ const ProgressPage = () => {
                                         }
                                     }}
                                 >
-                                    <CardContent sx={{ p: 4 }}>
+                                    <CardContent sx={{ p: { xs: 3, md: 4 } }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                                             <Box
                                                 sx={{
@@ -370,7 +370,7 @@ const ProgressPage = () => {
                                                 }}
                                             />
 
-                                            <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2, height: '100%', position: 'relative', zIndex: 1 }}>
+                                            <CardContent sx={{ p: { xs: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 2, height: '100%', position: 'relative', zIndex: 1 }}>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                                     <Box
                                                         sx={{
