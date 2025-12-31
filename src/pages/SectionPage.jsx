@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
 import ReactMarkdown from 'react-markdown';
@@ -65,6 +65,8 @@ const SectionPage = () => {
     const isDark = theme.palette.mode === 'dark';
 
     const chatRef = useRef(null); // Ref for AI Chat container
+    const abortControllerRef = useRef(null); // For canceling pending requests
+    const currentRequestRef = useRef(null); // Track current request to prevent race conditions
 
     const [section, setSection] = useState(null);
     const [allSections, setAllSections] = useState([]);
@@ -128,56 +130,62 @@ const SectionPage = () => {
     const topicColor = getTopicColor(topicSlug, isDark);
 
     // Close chat when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (isChatOpen &&
-                chatRef.current &&
-                !chatRef.current.contains(event.target) &&
-                !event.target.closest('button[aria-label="chat-toggle"]')
-            ) {
-                setIsChatOpen(false);
-            }
-        };
+    // Fix event listener leak by using useCallback
+    const handleClickOutside = useCallback((event) => {
+        if (isChatOpen &&
+            chatRef.current &&
+            !chatRef.current.contains(event.target) &&
+            !event.target.closest('button[aria-label="chat-toggle"]')
+        ) {
+            setIsChatOpen(false);
+        }
+    }, [isChatOpen]);
 
+    useEffect(() => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
-    }, [isChatOpen]);
+    }, [handleClickOutside]);
 
     useEffect(() => {
+        let isMounted = true;
+        abortControllerRef.current = new AbortController();
+
         const loadData = async () => {
             // 1. Load from cache first for instant UI
             const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
             const cachedData = localStorage.getItem(cacheKey);
             let cachedLoaded = false;
 
-            if (cachedData) {
+            if (cachedData && isMounted) {
                 try {
                     const data = JSON.parse(cachedData);
                     await applyAggregateData(data);
-                    setLoading(false);
-                    cachedLoaded = true;
+                    if (isMounted) {
+                        setLoading(false);
+                        cachedLoaded = true;
+                    }
                 } catch (e) {
                     console.error('Failed to parse cached section data');
                 }
             }
 
-            if (!cachedLoaded) {
+            if (isMounted && !cachedLoaded) {
                 fetchAggregateData();
-            } else {
-                // Still fetch fresh data in background, but don't show loading spinner if we have cache
-                // Actually, if we want to update content, we should fetch. 
-                // But applyAggregateData handles generation if missing. 
-                // Let's just fetch to be safe, but silent update? 
-                // The user wants 'loading state until content fetches'. 
-                // If cache loaded content, we are good. If cache only had metadata, we awaited generation above.
-                // So we can trigger a background refresh if needed, but for now let's just stick to the requested flow.
-                fetchAggregateData(true); // silent refresh
+            } else if (isMounted && cachedLoaded) {
+                // Silent refresh in background
+                fetchAggregateData(true);
             }
         };
+
         loadData();
-    }, [topicSlug, categorySlug, sectionSlug]);
+
+        return () => {
+            isMounted = false;
+            abortControllerRef.current?.abort();
+        };
+    }, [topicSlug, sectionSlug]); // Removed categorySlug dependency
 
     const applyAggregateData = async (data) => {
         const { section: sectionData, topic: topicData, category: categoryData, siblingSections, allTopicSections, userProgress } = data;

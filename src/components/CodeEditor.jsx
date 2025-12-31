@@ -23,6 +23,7 @@ const CodeEditor = ({
     const [testResults, setTestResults] = useState(null);
     const [isRunning, setIsRunning] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const editorRef = useRef(null); // For Monaco Editor disposal
 
     // Sync with global language
     useEffect(() => {
@@ -38,6 +39,16 @@ const CodeEditor = ({
             setSelectedLanguage(newLang);
         }
     };
+
+    // Dispose Monaco Editor on unmount to prevent memory leaks
+    useEffect(() => {
+        return () => {
+            if (editorRef.current) {
+                editorRef.current.dispose();
+                editorRef.current = null;
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (externalOutput) {
@@ -409,6 +420,7 @@ const CodeEditor = ({
                         language={language}
                         value={code}
                         onChange={(value) => onCodeChange(value || '')}
+                        onMount={(editor) => { editorRef.current = editor; }}
                         theme="vs-dark"
                         options={{
                             minimap: { enabled: false },
