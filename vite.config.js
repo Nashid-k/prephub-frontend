@@ -7,16 +7,20 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
+      devOptions: {
+        enabled: true
+      },
       manifest: {
-        name: 'PrepHub',
+        name: 'PrepHub - AI Learning Platform',
         short_name: 'PrepHub',
-        description: 'Your comprehensive programming learning companion',
+        description: 'Master programming with AI-powered learning and code compiler',
         theme_color: '#5e5ce6',
         background_color: '#000000',
         display: 'standalone',
         scope: '/',
         start_url: '/',
+        orientation: 'portrait',
         icons: [
           {
             src: '/icon-192.png',

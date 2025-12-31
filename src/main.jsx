@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import './App.css';
+import { registerSW } from 'virtual:pwa-register';
+
+// Register Service Worker
+registerSW({ immediate: true });
 
 // Initialize highlight.js globally
 if (typeof window !== 'undefined' && window.hljs) {
