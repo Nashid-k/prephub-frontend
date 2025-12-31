@@ -428,9 +428,12 @@ const CodeEditor = ({
                 height: `${editorHeightPercent}%`,
                 minHeight: '300px',
                 position: 'relative',
-                bgcolor: '#1e1e1e', // Dark background for better text contrast
+                bgcolor: '#1e1e1e', // Match snippet background
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                border: '1px solid rgba(255,255,255,0.1)', // Subtle border instead of weird black box
+                borderRadius: '0 0 12px 12px',
+                overflow: 'hidden'
             }}>
                 {!isEditorReady && (
                     <Box sx={{
@@ -459,13 +462,23 @@ const CodeEditor = ({
                     <Editor
                         height="100%"
                         language={language}
-                        value={code}
+                        defaultValue={code} // Use defaultValue to prevent cursor jumping
                         onChange={(value) => onCodeChange(value || '')}
-                        onMount={(editor) => {
+                        onMount={(editor, monaco) => {
                             editorRef.current = editor;
                             setIsEditorReady(true);
+
+                            // Define custom theme to match exact background
+                            monaco.editor.defineTheme('prephub-dark', {
+                                base: 'vs-dark',
+                                inherit: true,
+                                rules: [],
+                                colors: {
+                                    'editor.background': '#1e1e1e',
+                                }
+                            });
+                            monaco.editor.setTheme('prephub-dark');
                         }}
-                        theme="vs-dark"
                         options={{
                             minimap: { enabled: false },
                             fontSize: 14,
@@ -476,7 +489,10 @@ const CodeEditor = ({
                             padding: { top: 20 },
                             fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
                             wordWrap: 'on',
-                            lineHeight: 24
+                            lineHeight: 24,
+                            renderLineHighlight: 'none', // Cleaner look
+                            hideCursorInOverviewRuler: true,
+                            overviewRulerBorder: false,
                         }}
                     />
                 </Suspense>
