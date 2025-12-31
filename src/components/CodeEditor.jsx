@@ -462,8 +462,9 @@ const CodeEditor = ({
                     <Editor
                         height="100%"
                         language={language}
-                        defaultValue={code} // Use defaultValue to prevent cursor jumping
+                        defaultValue={code}
                         onChange={(value) => onCodeChange(value || '')}
+                        theme="prephub-dark"
                         onMount={(editor, monaco) => {
                             editorRef.current = editor;
                             setIsEditorReady(true);
@@ -477,6 +478,8 @@ const CodeEditor = ({
                                     'editor.background': '#1e1e1e',
                                 }
                             });
+
+                            // FORCE APPLY THEME
                             monaco.editor.setTheme('prephub-dark');
                         }}
                         options={{
@@ -490,9 +493,10 @@ const CodeEditor = ({
                             fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
                             wordWrap: 'on',
                             lineHeight: 24,
-                            renderLineHighlight: 'none', // Cleaner look
+                            renderLineHighlight: 'none',
                             hideCursorInOverviewRuler: true,
                             overviewRulerBorder: false,
+                            theme: 'prephub-dark'
                         }}
                     />
                 </Suspense>
