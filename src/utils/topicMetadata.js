@@ -34,6 +34,9 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'django': '#092E20', // Django dark green
         'flutter': '#02569B', // Flutter blue
         'dart': '#0175C2', // Dart teal/cyan
+        'nextjs': '#000000', // Next.js black
+        'next.js': '#000000',
+        'next': '#000000',
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -75,6 +78,9 @@ export const getTopicImage = (topicSlug) => {
         'django': '/images/django.png',
         'flutter': '/images/flutter.png',
         'dart': '/images/dart.png',
+        'nextjs': '/images/nextjs.png',
+        'next.js': '/images/nextjs.png',
+        'next': '/images/nextjs.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
