@@ -328,7 +328,7 @@ const TopicCard = (props) => {
                             gap: 1,
                             mt: 'auto',
                             pt: 2,
-                            color: topicColor,
+                            color: (theme) => theme.palette.mode === 'dark' ? '#fff' : topicColor,
                             fontWeight: 600,
                             fontSize: '0.9rem',
                         }}
