@@ -45,6 +45,7 @@ api.interceptors.request.use(
 // Curriculum API
 export const curriculumAPI = {
   getAllTopics: () => api.get('/curriculum/topics'),
+  getPersonalizedTopics: () => api.get('/curriculum/topics/personalized'),
   getTopicBySlug: (slug) => api.get(`/curriculum/topics/${slug}`),
   getSectionBySlug: (topicSlug, sectionSlug) => 
     api.get(`/curriculum/sections/${topicSlug}/${sectionSlug}`),
