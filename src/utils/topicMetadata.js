@@ -43,6 +43,8 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'java': '#F89820', // Java orange
         'c-programming': '#A8B9CC', // C slate gray
         'c': '#A8B9CC',
+        'csharp': '#68217A', // C# purple
+        'c#': '#68217A',
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -93,6 +95,8 @@ export const getTopicImage = (topicSlug) => {
         'java': '/images/java.png',
         'c-programming': '/images/c.png',
         'c': '/images/c.png',
+        'csharp': '/images/csharp.png',
+        'c#': '/images/csharp.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
