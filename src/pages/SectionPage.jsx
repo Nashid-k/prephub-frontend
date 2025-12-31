@@ -529,6 +529,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                     section={section.title}
                     isDark={isDark}
                     language={currentLanguage}
+                    content={activeTab === 'learn' ? aiContent : (section.description || section.content)} // Pass context
                 />
 
                 <Box sx={{

@@ -45,7 +45,7 @@ const OptionButton = styled(Box)(({ theme, state }) => ({ // state: 'default' | 
     }
 }));
 
-const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascript' }) => {
+const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascript', content = '' }) => {
     const [loading, setLoading] = useState(true);
     const [quiz, setQuiz] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -58,24 +58,34 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
     // Initial Fetch
     useEffect(() => {
         if (open && topic && section) {
-            fetchQuiz();
+            // Only fetch if empty to avoid reset on re-open unless desired
+            // Actually, usually modals reset on open. Let's keep it fresh.
+            fetchQuiz(false, true);
         }
     }, [open, topic, section]);
 
-    const fetchQuiz = async (regenerate = false) => {
+    const fetchQuiz = async (regenerate = false, reset = false) => {
         setLoading(true);
         setError(null);
-        setQuiz([]);
-        setScore(0);
-        setCurrentIndex(0);
+        if (reset) {
+            setQuiz([]);
+            setScore(0);
+            setCurrentIndex(0);
+        }
         setQuizCompleted(false);
         setSelectedOption(null);
         setShowExplanation(false);
 
         try {
-            const response = await aiAPI.generateQuiz(topic, section, regenerate, language);
+            const response = await aiAPI.generateQuiz(topic, section, regenerate, language, content);
             if (response.data.success && response.data.quiz) {
-                setQuiz(response.data.quiz);
+                if (regenerate && !reset) {
+                    // Append new questions
+                    setQuiz(prev => [...prev, ...response.data.quiz]);
+                    // Don't reset index, user continues
+                } else {
+                    setQuiz(response.data.quiz);
+                }
             } else {
                 setError('Failed to load quiz data.');
             }
@@ -93,6 +103,7 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
         setSelectedOption(index);
         setShowExplanation(true);
 
+        // Adjust index for appended quizzes? No, currentQuestion handles it via currentIndex
         if (index === quiz[currentIndex].correctIndex) {
             setScore(prev => prev + 1);
         }
