@@ -21,6 +21,7 @@ const Dashboard = () => {
     const [stats, setStats] = useState(null); // New state
     const [runTour, setRunTour] = useState(false); // New state
     const [isPersonalized, setIsPersonalized] = useState(false); // Track if order is personalized
+    const [aiSuggestion, setAiSuggestion] = useState(null); // New state for AI Suggestion
 
     useEffect(() => {
         // Check if user is new OR local storage flag implies we haven't seen the tour yet
@@ -60,7 +61,15 @@ const Dashboard = () => {
                 setLoading(true);
             }
 
-            const response = await curriculumAPI.getAllTopics();
+            if (response.data.personalized) {
+                setIsPersonalized(true);
+                if (response.data.aiSuggestion) {
+                    setAiSuggestion(response.data.aiSuggestion);
+                }
+            } else {
+                setIsPersonalized(false);
+            }
+
             const newTopics = response.data.topics;
 
             // Filter out known child topics that are covered by Groups
@@ -194,6 +203,68 @@ const Dashboard = () => {
                                 sx={{ mb: 2, background: 'linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%)' }}
                             />
                         )}
+
+                        {/* AI Suggestion Card */}
+                        {aiSuggestion && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.2 }}
+                            >
+                                <Box
+                                    sx={{
+                                        maxWidth: 600,
+                                        mx: 'auto',
+                                        mb: 4,
+                                        p: 3,
+                                        borderRadius: '24px',
+                                        background: (theme) => theme.palette.mode === 'dark' ?
+                                            'linear-gradient(135deg, rgba(94, 92, 230, 0.2) 0%, rgba(94, 92, 230, 0.05) 100%)' :
+                                            'linear-gradient(135deg, rgba(94, 92, 230, 0.1) 0%, rgba(94, 92, 230, 0.05) 100%)',
+                                        border: '1px solid',
+                                        borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(94, 92, 230, 0.3)' : 'rgba(94, 92, 230, 0.2)',
+                                        backdropFilter: 'blur(10px)',
+                                        textAlign: 'left',
+                                        display: 'flex',
+                                        gap: 2,
+                                        alignItems: 'start'
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            p: 1.5,
+                                            borderRadius: '50%',
+                                            bgcolor: 'primary.main',
+                                            color: 'white',
+                                            display: 'flex'
+                                        }}
+                                    >
+                                        <Psychology fontSize="medium" />
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="subtitle2" color="primary" sx={{ fontWeight: 700, mb: 0.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                            AI Recommended Next Step
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                                            {topics.find(t => t.slug === aiSuggestion.topicSlug)?.name || aiSuggestion.topicSlug}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                            {aiSuggestion.reason}
+                                        </Typography>
+                                        <Button
+                                            variant="outlined"
+                                            size="small"
+                                            color="primary"
+                                            href={`/topic/${aiSuggestion.topicSlug}`}
+                                            sx={{ borderRadius: '9999px', textTransform: 'none' }}
+                                        >
+                                            Start Learning
+                                        </Button>
+                                    </Box>
+                                </Box>
+                            </motion.div>
+                        )}
+
                         {isPersonalized && (
                             <Chip
                                 label="Personalized for you"
