@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box } from '@mui/material';
 import CodeEditor from '../components/CodeEditor';
 import './CompilerPage.css';
 
@@ -23,12 +24,18 @@ console.log(greet("World"));
                     </p>
                 </div>
 
-                <div className="compiler-editor-wrapper">
+                {/* Use same structure as Practice page */}
+                <Box sx={{
+                    flex: 1,
+                    height: '100%',
+                    width: '100%',
+                    overflow: 'hidden'
+                }}>
                     <CodeEditor
                         code={code}
                         onCodeChange={setCode}
                     />
-                </div>
+                </Box>
             </div>
         </div>
     );
