@@ -915,6 +915,42 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                         </Box>
                     )
                 }
+
+                {/* Language Change Loading Overlay */}
+                {languageChangeLoading && (
+                    <Box sx={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        bgcolor: 'rgba(0,0,0,0.7)',
+                        backdropFilter: 'blur(8px)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 9999,
+                        flexDirection: 'column',
+                        gap: 3
+                    }}>
+                        <CircularProgress size={60} sx={{ color: topicColor }} />
+                        <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                            Generating {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)} Examples...
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                            Please wait while AI creates optimized code snippets
+                        </Typography>
+                    </Box>
+                )}
+
+                {/* AI Output Modal */}
+                <AIOutputModal
+                    open={aiModalOpen}
+                    onClose={() => setAiModalOpen(false)}
+                    type={aiModalType}
+                    response={aiModalResponse}
+                    loading={aiModalLoading}
+                />
             </Container >
         </Box >
     );
