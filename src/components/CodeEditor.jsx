@@ -321,7 +321,6 @@ const CodeEditor = ({
     };
 
     return (
-    return (
         <Box className="code-editor glass" ref={containerRef} sx={{
             display: 'flex',
             flexDirection: 'column',
