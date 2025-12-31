@@ -20,6 +20,7 @@ const Dashboard = () => {
     const [error, setError] = useState(null);
     const [stats, setStats] = useState(null); // New state
     const [runTour, setRunTour] = useState(false); // New state
+    const [isPersonalized, setIsPersonalized] = useState(false); // Track if order is personalized
 
     useEffect(() => {
         // Check if user is new OR local storage flag implies we haven't seen the tour yet
@@ -184,6 +185,23 @@ const Dashboard = () => {
                         >
                             Your Learning Journey
                         </Typography>
+                        {isPersonalized && (
+                            <Chip
+                                label="Personalized for you"
+                                color="primary"
+                                size="small"
+                                icon={<TrendingUp />}
+                                sx={{ mb: 2, background: 'linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%)' }}
+                            />
+                        )}
+                        {isPersonalized && (
+                            <Chip
+                                label="Personalized for you"
+                                color="primary"
+                                size="small"
+                                sx={{ mb: 2, background: 'linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%)' }}
+                            />
+                        )}
                         <Typography variant="h6" sx={{ opacity: 0.7, fontWeight: 400, mb: 3 }}>
                             Choose a topic to begin mastering
                         </Typography>

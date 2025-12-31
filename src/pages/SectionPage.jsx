@@ -55,6 +55,7 @@ import { toggleBookmark, isBookmarked } from '../utils/bookmarks';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import { trackAIExplanation, trackCodeExecution, trackTopicStart, trackProgressToggle } from '../services/analytics';
+import useActivityTracking, { trackCompletion } from '../hooks/useActivityTracking';
 import './SectionPage.css';
 
 const SectionPage = () => {
@@ -63,6 +64,9 @@ const SectionPage = () => {
     const { user } = useAuth();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
+
+    // Track activity automatically
+    useActivityTracking(topicSlug, { categorySlug, sectionSlug });
 
     const chatRef = useRef(null); // Ref for AI Chat container
     const abortControllerRef = useRef(null); // For canceling pending requests
@@ -427,7 +431,14 @@ Explain clearly why approach #3 is superior to the others.`;
             categorySlug
         });
         setBookmarked(!bookmarked);
-        if (result.success) toast.success(result.message);
+        if (result.success) {
+            toast.success(result.message);
+            // Track completion if marking as done (assuming bookmark might double as done/saved for now, or just leave it. 
+            // Wait, existing logic uses isCompleted for progress.
+            // Let's find where progress is toggled. It seems distinct from bookmarking.
+            // I will inject the trackCompletion into a new function if I can find it, or assume it's missing and rely on auto tracking for now.
+            // Actually, I'll search for 'Mark Complete' button.
+        }
         else toast.error(result.message);
     };
 
