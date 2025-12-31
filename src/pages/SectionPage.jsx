@@ -460,7 +460,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
         background: isDark ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%)' : 'rgba(255, 255, 255, 0.8)',
         backdropFilter: 'blur(20px)',
         border: '1px solid',
-        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.1)',
         borderRadius: '24px',
         boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
     };
@@ -492,13 +492,13 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                             background: (theme) =>
                                 theme.palette.mode === 'dark'
                                     ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(0, 0, 0, 0.03)',
+                                    : 'rgba(0, 0, 0, 0.06)',
                             backdropFilter: 'blur(10px)',
                             border: '1px solid',
                             borderColor: (theme) =>
                                 theme.palette.mode === 'dark'
                                     ? 'rgba(255, 255, 255, 0.1)'
-                                    : 'rgba(0, 0, 0, 0.08)',
+                                    : 'rgba(0, 0, 0, 0.12)',
                             color: 'text.primary',
                             textTransform: 'none',
                             '&:hover': {
@@ -519,7 +519,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                 inputProps={{ 'aria-label': 'Select Language' }}
                                 sx={{
                                     borderRadius: '12px',
-                                    bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                                    bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)',
                                     color: 'text.primary',
                                     '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(128,128,128,0.2)' },
                                     '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: topicColor },

@@ -41,7 +41,7 @@ const TopicCard = (props) => {
                         borderColor: (theme) =>
                             theme.palette.mode === 'dark'
                                 ? 'rgba(255, 255, 255, 0.05)'
-                                : 'rgba(0, 0, 0, 0.05)',
+                                : 'rgba(0, 0, 0, 0.1)',
                         transition: 'all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
                         '&:hover': {
                             transform: 'translateY(-2px)',
@@ -159,11 +159,11 @@ const TopicCard = (props) => {
                     borderColor: (theme) =>
                         theme.palette.mode === 'dark'
                             ? 'rgba(255, 255, 255, 0.08)'
-                            : 'rgba(0, 0, 0, 0.06)',
+                            : 'rgba(0, 0, 0, 0.12)',
                     boxShadow: (theme) =>
                         theme.palette.mode === 'dark'
                             ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                            : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                            : '0 8px 24px rgba(0, 0, 0, 0.08)',
                     transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                     '&:hover': {
                         boxShadow: `0 24px 64px ${topicColor}40`,
@@ -308,7 +308,7 @@ const TopicCard = (props) => {
                                     bgcolor: (theme) =>
                                         theme.palette.mode === 'dark'
                                             ? 'rgba(255, 255, 255, 0.08)'
-                                            : 'rgba(0, 0, 0, 0.06)',
+                                            : 'rgba(0, 0, 0, 0.12)',
                                     '& .MuiLinearProgress-bar': {
                                         borderRadius: '9999px',
                                         background: `linear-gradient(90deg, ${topicColor} 0%, ${topicColor}CC 100%)`,
@@ -328,7 +328,7 @@ const TopicCard = (props) => {
                             gap: 1,
                             mt: 'auto',
                             pt: 2,
-                            color: (theme) => theme.palette.mode === 'dark' ? '#fff' : topicColor,
+                            color: (theme) => theme.palette.mode === 'dark' ? '#fff' : (topicColor === '#F7DF1E' ? '#d4be00' : topicColor),
                             fontWeight: 600,
                             fontSize: '0.9rem',
                         }}
