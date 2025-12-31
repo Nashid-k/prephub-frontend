@@ -1,11 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Editor from '@monaco-editor/react';
+import React, { useState, useRef, useEffect, Suspense, lazy } from 'react';
 import { compilerAPI } from '../services/api';
 import { Box, Button, Select, MenuItem, Typography, IconButton, Tooltip, CircularProgress, Chip, Stack } from '@mui/material';
 import { PlayArrow, CheckCircle, BugReport, Lightbulb, AutoFixHigh, ExpandMore, Code as CodeIcon } from '@mui/icons-material';
 import { trackCodeExecution } from '../services/analytics';
 import { useLanguage } from '../context/LanguageContext';
 import './CodeEditor.css';
+
+// Lazy load Monaco Editor to reduce initial bundle size (~2MB)
+const Editor = lazy(() => import('@monaco-editor/react'));
 
 const CodeEditor = ({
     defaultLanguage = null,
@@ -397,22 +399,28 @@ const CodeEditor = ({
 
             {/* Editor Area */}
             <Box className="editor-content" sx={{ height: `${editorHeightPercent}%`, position: 'relative' }}>
-                <Editor
-                    height="100%"
-                    language={language}
-                    value={code}
-                    onChange={(value) => onCodeChange(value || '')}
-                    theme="vs-dark"
-                    options={{
-                        minimap: { enabled: false },
-                        fontSize: 14,
-                        lineNumbers: 'on',
-                        roundedSelection: true,
-                        scrollBeyondLastLine: false,
-                        automaticLayout: true,
-                        padding: { top: 16 }
-                    }}
-                />
+                <Suspense fallback={
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                        <CircularProgress />
+                    </Box>
+                }>
+                    <Editor
+                        height="100%"
+                        language={language}
+                        value={code}
+                        onChange={(value) => onCodeChange(value || '')}
+                        theme="vs-dark"
+                        options={{
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            lineNumbers: 'on',
+                            roundedSelection: true,
+                            scrollBeyondLastLine: false,
+                            automaticLayout: true,
+                            padding: { top: 16 }
+                        }}
+                    />
+                </Suspense>
             </Box>
 
             {/* Resize Handle */}
