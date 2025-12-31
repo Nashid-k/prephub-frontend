@@ -34,6 +34,8 @@ import {
     Collapse,
     Grid,
     Select,
+    Grid,
+    Menu,
     MenuItem,
     InputLabel,
     MenuItem,
@@ -125,14 +127,25 @@ const SectionPage = () => {
         setSelectedLanguage(currentLanguage);
     }, [topicSlug]);
 
-    const handleLanguageChange = (event) => {
-        const newLang = event.target.value;
-        setSelectedLanguage(newLang);
+    // State for Language Menu
+    const [languageMenuAnchor, setLanguageMenuAnchor] = useState(null);
+
+    const handleLanguageMenuOpen = (event) => {
+        setLanguageMenuAnchor(event.currentTarget);
+    };
+
+    const handleLanguageMenuClose = () => {
+        setLanguageMenuAnchor(null);
+    };
+
+    const handleLanguageSelect = (lang) => {
+        setSelectedLanguage(lang);
+        setLanguageMenuAnchor(null);
         setLanguageChangeLoading(true);
 
         // Regenerate content with new language
         if (section && category) {
-            generateAIContent(section, category, newLang).finally(() => {
+            generateAIContent(section, category, lang).finally(() => {
                 setLanguageChangeLoading(false);
             });
         } else {
@@ -564,54 +577,71 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
 
                     <Box sx={{ display: 'flex', gap: 1 }}>
                         {showLanguageSwitcher && (
-                            <Button
-                                onClick={(e) => {
-                                    e.currentTarget.querySelector('select').click();
-                                }}
-                                sx={{
-                                    borderRadius: '9999px',
-                                    px: 3,
-                                    py: 1,
-                                    background: 'transparent',
-                                    border: '1px solid',
-                                    borderColor: 'rgba(128,128,128,0.2)',
-                                    color: 'text.primary',
-                                    textTransform: 'none',
-                                    '&:hover': {
-                                        background: `${topicColor}15`,
-                                        borderColor: topicColor
-                                    },
-                                    position: 'relative',
-                                    overflow: 'visible'
-                                }}
-                            >
-                                <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
-                                {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
-                                <KeyboardArrowDown sx={{ ml: 0.5 }} />
-                                <Select
-                                    value={selectedLanguage}
-                                    onChange={handleLanguageChange}
-                                    displayEmpty
-                                    inputProps={{ 'aria-label': 'Select Language' }}
-                                    sx={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        height: '100%',
-                                        opacity: 0,
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    <MenuItem value="javascript">JavaScript</MenuItem>
-                                    <MenuItem value="python">Python</MenuItem>
-                                    <MenuItem value="java">Java</MenuItem>
-                                    <MenuItem value="cpp">C++</MenuItem>
-                                    <MenuItem value="csharp">C#</MenuItem>
-                                    <MenuItem value="go">Go</MenuItem>
-                                    <MenuItem value="dart">Dart</MenuItem>
-                                </Select>
-                            </Button>
+                            { showLanguageSwitcher && (
+                                <>
+                                    <Button
+                                        onClick={handleLanguageMenuOpen}
+                                        sx={{
+                                            borderRadius: '9999px',
+                                            px: 3,
+                                            py: 1,
+                                            background: 'transparent',
+                                            border: '1px solid',
+                                            borderColor: 'rgba(128,128,128,0.2)',
+                                            color: 'text.primary',
+                                            textTransform: 'none',
+                                            '&:hover': {
+                                                background: `${topicColor}15`,
+                                                borderColor: topicColor
+                                            },
+                                            position: 'relative',
+                                            overflow: 'visible'
+                                        }}
+                                    >
+                                        <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
+                                        {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                                        <KeyboardArrowDown sx={{ ml: 0.5 }} />
+                                    </Button>
+                                    <Menu
+                                        anchorEl={languageMenuAnchor}
+                                        open={Boolean(languageMenuAnchor)}
+                                        onClose={handleLanguageMenuClose}
+                                        PaperProps={{
+                                            sx: {
+                                                mt: 1,
+                                                borderRadius: 2,
+                                                minWidth: 150,
+                                                ...glassSx
+                                            }
+                                        }}
+                                    >
+                                        {[
+                                            { code: 'javascript', label: 'JavaScript' },
+                                            { code: 'python', label: 'Python' },
+                                            { code: 'java', label: 'Java' },
+                                            { code: 'cpp', label: 'C++' },
+                                            { code: 'csharp', label: 'C#' },
+                                            { code: 'go', label: 'Go' },
+                                            { code: 'dart', label: 'Dart' }
+                                        ].map((lang) => (
+                                            <MenuItem
+                                                key={lang.code}
+                                                onClick={() => handleLanguageSelect(lang.code)}
+                                                selected={selectedLanguage === lang.code}
+                                                sx={{
+                                                    '&.Mui-selected': {
+                                                        bgcolor: `${topicColor}15`,
+                                                        color: topicColor,
+                                                        '&:hover': { bgcolor: `${topicColor}25` }
+                                                    }
+                                                }}
+                                            >
+                                                {lang.label}
+                                            </MenuItem>
+                                        ))}
+                                    </Menu>
+                                </>
+                            )}
                         )}
                         <Button
                             startIcon={<Psychology />}
