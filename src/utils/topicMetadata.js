@@ -40,6 +40,7 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'golang': '#00ADD8', // Golang cyan
         'go': '#00ADD8',
         'angular': '#DD0031', // Angular red
+        'java': '#F89820', // Java orange
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -87,6 +88,7 @@ export const getTopicImage = (topicSlug) => {
         'golang': '/images/golang.png',
         'go': '/images/golang.png',
         'angular': '/images/angular.png',
+        'java': '/images/java.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
