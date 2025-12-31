@@ -45,6 +45,10 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'c': '#A8B9CC',
         'csharp': '#68217A', // C# purple
         'c#': '#68217A',
+        'html-css-combined': '#E34F26', // HTML Orange base
+        'html & css combined': '#E34F26',
+        'html': '#E34F26',
+        'css': '#1572B6',
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -97,6 +101,10 @@ export const getTopicImage = (topicSlug) => {
         'c': '/images/c.png',
         'csharp': '/images/csharp.png',
         'c#': '/images/csharp.png',
+        'html-css-combined': '/images/topics/html-css.png',
+        'html & css combined': '/images/topics/html-css.png',
+        'html': '/images/topics/html-css.png',
+        'css': '/images/topics/html-css.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';

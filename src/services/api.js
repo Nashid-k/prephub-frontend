@@ -64,16 +64,17 @@ export const curriculumAPI = {
 };
 
 // AI API
+// AI API
 export const aiAPI = {
-  explainTopic: (topic, section, context = '') => 
-    api.post('/ai/explain', { topic, section, context }),
-  askQuestion: (question, context = {}) => 
-    api.post('/ai/ask', { question, context }),
+  explainTopic: (topic, section, context = '', language = 'javascript') => 
+    api.post('/ai/explain', { topic, section, context, language }),
+  askQuestion: (question, context = {}, language = 'javascript') => 
+    api.post('/ai/ask', { question, context, language }),
 
   generateInterviewQuestions: (topic, type = 'both', difficulty = 'medium') => 
     api.post('/ai/interview-questions', { topic, type, difficulty }),
-  generateQuiz: (topic, section, regenerate = false) => 
-    api.post('/ai/quiz', { topic, section, regenerate })
+  generateQuiz: (topic, section, regenerate = false, language = 'javascript') => 
+    api.post('/ai/quiz', { topic, section, regenerate, language })
 };
 
 // Compiler API

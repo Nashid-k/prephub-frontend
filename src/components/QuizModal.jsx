@@ -45,7 +45,7 @@ const OptionButton = styled(Box)(({ theme, state }) => ({ // state: 'default' | 
     }
 }));
 
-const QuizModal = ({ open, onClose, topic, section, isDark }) => {
+const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascript' }) => {
     const [loading, setLoading] = useState(true);
     const [quiz, setQuiz] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -73,7 +73,7 @@ const QuizModal = ({ open, onClose, topic, section, isDark }) => {
         setShowExplanation(false);
 
         try {
-            const response = await aiAPI.generateQuiz(topic, section, regenerate);
+            const response = await aiAPI.generateQuiz(topic, section, regenerate, language);
             if (response.data.success && response.data.quiz) {
                 setQuiz(response.data.quiz);
             } else {

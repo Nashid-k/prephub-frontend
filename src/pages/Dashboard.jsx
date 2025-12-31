@@ -61,6 +61,8 @@ const Dashboard = () => {
                 setLoading(true);
             }
 
+            const response = await curriculumAPI.getPersonalizedTopics();
+
             if (response.data.personalized) {
                 setIsPersonalized(true);
                 if (response.data.aiSuggestion) {
