@@ -32,6 +32,7 @@ import {
     Close as CloseIcon,
     Logout,
     School,
+    LocalCafe, // Add Coffee icon
 } from '@mui/icons-material';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -266,6 +267,34 @@ const Navbar = () => {
 
                             {/* Right Side Actions */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
+                                {/* Buy Me a Coffee */}
+                                <IconButton
+                                    component="a"
+                                    href="https://buymeacoffee.com/nashid"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    size="small"
+                                    sx={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: '50%',
+                                        bgcolor: (theme) =>
+                                            theme.palette.mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(0, 0, 0, 0.06)',
+                                        color: '#ffd100', // Coffee brand color (approx) or keep subtle
+                                        '&:hover': {
+                                            bgcolor: '#ffd100',
+                                            color: 'black',
+                                            transform: 'scale(1.1)',
+                                        },
+                                        transition: 'all 0.2s',
+                                    }}
+                                    title="Buy me a coffee"
+                                >
+                                    <LocalCafe fontSize="small" />
+                                </IconButton>
+
                                 {/* Search Button */}
                                 <IconButton
                                     onClick={() => setShowSearch(true)}
