@@ -30,6 +30,7 @@ export const getTopicColor = (topicSlug, isDark = true) => {
         'devops': '#7209B7', // Purple
         'devops-basics': '#7209B7',
         'engineering-practices': '#7209B7',
+        'python': '#306998', // Python blue
     };
     return colorMap[normalizedSlug] || '#5e5ce6'; // Default indigo
 };
@@ -67,6 +68,7 @@ export const getTopicImage = (topicSlug) => {
         'devops': '/images/topics/devops.png',
         'devops-basics': '/images/topics/devops.png',
         'engineering-practices': '/images/topics/devops.png',
+        'python': '/images/python.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';
