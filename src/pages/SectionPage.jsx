@@ -29,7 +29,6 @@ import {
     Tabs,
     Tab,
     Collapse,
-    Collapse,
     Grid,
     Select,
     MenuItem,
