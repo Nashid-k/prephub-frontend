@@ -558,57 +558,58 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                     >
                         Back to {category?.name || 'Category'}
                     </Button>
-                    {showLanguageSwitcher && (
-                        <Button
-                            onClick={(e) => {
-                                e.currentTarget.querySelector('select').click();
-                            }}
-                            sx={{
-                                borderRadius: '9999px',
-                                px: 3,
-                                py: 1,
-                                background: 'transparent',
-                                border: '1px solid',
-                                borderColor: 'rgba(128,128,128,0.2)',
-                                color: 'text.primary',
-                                textTransform: 'none',
-                                '&:hover': {
-                                    background: `${topicColor}15`,
-                                    borderColor: topicColor
-                                },
-                                position: 'relative',
-                                overflow: 'visible'
-                            }}
-                        >
-                            <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
-                            {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
-                            <KeyboardArrowDown sx={{ ml: 0.5 }} />
-                            <Select
-                                value={selectedLanguage}
-                                onChange={handleLanguageChange}
-                                displayEmpty
-                                inputProps={{ 'aria-label': 'Select Language' }}
+
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        {showLanguageSwitcher && (
+                            <Button
+                                onClick={(e) => {
+                                    e.currentTarget.querySelector('select').click();
+                                }}
                                 sx={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    opacity: 0,
-                                    cursor: 'pointer'
+                                    borderRadius: '9999px',
+                                    px: 3,
+                                    py: 1,
+                                    background: 'transparent',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(128,128,128,0.2)',
+                                    color: 'text.primary',
+                                    textTransform: 'none',
+                                    '&:hover': {
+                                        background: `${topicColor}15`,
+                                        borderColor: topicColor
+                                    },
+                                    position: 'relative',
+                                    overflow: 'visible'
                                 }}
                             >
-                                <MenuItem value="javascript">JavaScript</MenuItem>
-                                <MenuItem value="python">Python</MenuItem>
-                                <MenuItem value="java">Java</MenuItem>
-                                <MenuItem value="cpp">C++</MenuItem>
-                                <MenuItem value="csharp">C#</MenuItem>
-                                <MenuItem value="go">Go</MenuItem>
-                                <MenuItem value="dart">Dart</MenuItem>
-                            </Select>
-                        </Button>
-                    )}
-                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
+                                {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                                <KeyboardArrowDown sx={{ ml: 0.5 }} />
+                                <Select
+                                    value={selectedLanguage}
+                                    onChange={handleLanguageChange}
+                                    displayEmpty
+                                    inputProps={{ 'aria-label': 'Select Language' }}
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        width: '100%',
+                                        height: '100%',
+                                        opacity: 0,
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    <MenuItem value="javascript">JavaScript</MenuItem>
+                                    <MenuItem value="python">Python</MenuItem>
+                                    <MenuItem value="java">Java</MenuItem>
+                                    <MenuItem value="cpp">C++</MenuItem>
+                                    <MenuItem value="csharp">C#</MenuItem>
+                                    <MenuItem value="go">Go</MenuItem>
+                                    <MenuItem value="dart">Dart</MenuItem>
+                                </Select>
+                            </Button>
+                        )}
                         <Button
                             startIcon={<Psychology />}
                             onClick={() => setIsQuizOpen(true)}
@@ -832,7 +833,29 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                     </Box>
                                                     <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>Problem</Typography>
                                                     <div className="markdown-content">
-                                                        <ReactMarkdown>{problemContent || section.content}</ReactMarkdown>
+                                                        <ReactMarkdown
+                                                            components={{
+                                                                code({ node, inline, className, children, ...props }) {
+                                                                    const match = /language-(\w+)/.exec(className || '');
+                                                                    return !inline && match ? (
+                                                                        <SyntaxHighlighter
+                                                                            style={vscDarkPlus}
+                                                                            language={match[1]}
+                                                                            PreTag="div"
+                                                                            {...props}
+                                                                        >
+                                                                            {String(children).replace(/\n$/, '')}
+                                                                        </SyntaxHighlighter>
+                                                                    ) : (
+                                                                        <code className={className} {...props}>
+                                                                            {children}
+                                                                        </code>
+                                                                    );
+                                                                }
+                                                            }}
+                                                        >
+                                                            {problemContent || section.content}
+                                                        </ReactMarkdown>
                                                     </div>
                                                 </Box>
                                                 <Box sx={{ flex: 1, height: '100%', minWidth: 0, overflow: 'hidden' }}>
