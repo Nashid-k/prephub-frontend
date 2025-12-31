@@ -74,7 +74,7 @@ const SectionPage = () => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
-    // Helper to determine language
+    // Helper to determine language (kept for reference, but default is JavaScript)
     const getLanguageFromTopic = (slug) => {
         const s = slug?.toLowerCase() || '';
         if (s.includes('html') || s.includes('css')) return 'html'; // or 'xml'/'css' but 'html' is safe for general web
@@ -87,8 +87,8 @@ const SectionPage = () => {
         return 'javascript';
     };
 
-    // Explicitly check for html-css-combined
-    const currentLanguage = getLanguageFromTopic(topicSlug);
+    // Always default to JavaScript (users can switch if needed)
+    const defaultLanguage = 'javascript';
 
     // Track activity automatically
     useActivityTracking(topicSlug, { categorySlug, sectionSlug });
@@ -116,12 +116,15 @@ const SectionPage = () => {
     const [testCases, setTestCases] = useState(null);
     const [testCasesLoading, setTestCasesLoading] = useState(false);
 
-    // State for Language Switcher
-    const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
+    // State for Language Switcher - always defaults to JavaScript
+    const [selectedLanguage, setSelectedLanguage] = useState(defaultLanguage);
+    const [targetLanguage, setTargetLanguage] = useState(null); // Track target language during translation
 
-    // Update selectedLanguage when topic changes or initial load
+    // Keep language as JavaScript when topic changes (don't auto-switch)
+    // Users can manually switch if they prefer another language
     useEffect(() => {
-        setSelectedLanguage(currentLanguage);
+        // Only reset to JavaScript on initial load or topic change
+        setSelectedLanguage(defaultLanguage);
     }, [topicSlug]);
 
     // State for Language Menu
@@ -135,18 +138,82 @@ const SectionPage = () => {
         setLanguageMenuAnchor(null);
     };
 
-    const handleLanguageSelect = (lang) => {
-        setSelectedLanguage(lang);
+    // Extract code blocks from markdown content
+    const extractCodeBlocks = (markdown) => {
+        const codeBlockRegex = /```(\w+)\n([\s\S]*?)```/g;
+        const blocks = [];
+        let match;
+
+        while ((match = codeBlockRegex.exec(markdown)) !== null) {
+            blocks.push({
+                fullMatch: match[0],
+                language: match[1],
+                code: match[2],
+                index: match.index
+            });
+        }
+
+        return blocks;
+    };
+
+    const handleLanguageSelect = async (newLang) => {
+        if (newLang === selectedLanguage) return;
+
         setLanguageMenuAnchor(null);
+        setTargetLanguage(newLang); // Set target language for loading message
         setLanguageChangeLoading(true);
 
-        // Regenerate content with new language
-        if (section && category) {
-            generateAIContent(section, category, lang).finally(() => {
+        try {
+            // Extract code blocks from current content
+            const codeBlocks = extractCodeBlocks(aiContent);
+
+            if (codeBlocks.length === 0) {
+                // No code blocks, just change language marker
+                setSelectedLanguage(newLang);
                 setLanguageChangeLoading(false);
-            });
-        } else {
+                return;
+            }
+
+            console.log(`🔄 Translating ${codeBlocks.length} code blocks from ${selectedLanguage} to ${newLang}`);
+
+            // Translate only the code blocks via API
+            const response = await aiAPI.translateCode(
+                codeBlocks.map(b => b.code),
+                selectedLanguage,
+                newLang
+            );
+
+            // Replace code blocks in content (from end to start to maintain indices)
+            let newContent = aiContent;
+            const translated = response.data.translated;
+
+            for (let i = codeBlocks.length - 1; i >= 0; i--) {
+                const block = codeBlocks[i];
+                const newBlock = `\`\`\`${newLang}\n${translated[i]}\n\`\`\``;
+
+                newContent =
+                    newContent.substring(0, block.index) +
+                    newBlock +
+                    newContent.substring(block.index + block.fullMatch.length);
+            }
+
+            setAiContent(newContent);
+            setSelectedLanguage(newLang);
+
+            console.log(`✅ Language switched: ${selectedLanguage} → ${newLang} (explanations preserved)`);
+
+        } catch (error) {
+            console.error('Code translation failed:', error);
+            console.log('⚠️ Falling back to full content regeneration');
+
+            // Fallback: regenerate full content if translation fails
+            if (section && category) {
+                await generateAIContent(section, category, newLang);
+                setSelectedLanguage(newLang);
+            }
+        } finally {
             setLanguageChangeLoading(false);
+            setTargetLanguage(null); // Clear target language after translation
         }
     };
 
@@ -335,7 +402,7 @@ Provide:
             if (!testCases) promises.push(generateTestCases(sectionData));
             if (!problemContent) promises.push(generateProblemContent(sectionData));
         } else {
-            if (!aiContent) promises.push(generateAIContent(sectionData, categoryData, currentLanguage));
+            if (!aiContent) promises.push(generateAIContent(sectionData, categoryData, selectedLanguage));
         }
 
         await Promise.all(promises);
@@ -428,22 +495,27 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
         setContentLoading(true);
         try {
             const isBlind75 = categoryData?.group?.startsWith('Blind 75');
-            let prompt = '';
+            let context = '';
 
             if (isBlind75) {
-                prompt = `Provide 3 distinct solution approaches for the LeetCode problem "${sectionData.title}" in ${topicSlug === 'typescript' ? 'TypeScript' : 'JavaScript'}:
-                ...`; // Keeping logic same but function sig changed
-
-                // Actually, re-reading file, I need to match the existing content carefully.
-                // It's safer to just replace the signature and the aiAPI call.
+                // For Blind 75, we want specific problem solving focus
+                context = `Problem Solving Context. Category: ${categoryData?.name}. Provide 3 distinct solution approaches.`;
             } else {
-                const keyPointsContext = sectionData.keyPoints ? "\n\nCover ALL topics in detail" : "";
-                prompt = sectionData.description + keyPointsContext;
+                // For general learning, provide rich context
+                const categoryContext = categoryData ? `Category: ${categoryData.name}. ` : '';
+                const keyPointsContext = sectionData.keyPoints ? `\nCover these key points: ${sectionData.keyPoints.join(', ')}.` : "";
+
+                // Construct a context string that helps the AI classify
+                context = `${categoryContext}${sectionData.description || ''}${keyPointsContext}`;
             }
 
-            const response = await aiAPI.explainTopic(topicSlug, sectionData.title, prompt, lang);
+            // Use the human-readable topic name if available, otherwise slug
+            const topicName = topic?.name || topicSlug;
+
+            const response = await aiAPI.explainTopic(topicName, sectionData.title, context, lang);
             setAiContent(response.data.explanation);
         } catch (err) {
+            console.error(err);
             setAiContent('Failed to generate content.');
         } finally {
             setContentLoading(false);
@@ -724,7 +796,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                     <ListItem key={s.slug} disablePadding sx={{ mb: 1 }}>
                                         <ListItemButton
                                             selected={s.slug === sectionSlug}
-                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`, { replace: true })}
+                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
                                             sx={{
                                                 borderRadius: '16px',
                                                 border: '1px solid',
@@ -757,7 +829,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                             <Box sx={{ p: 2, display: 'flex', gap: 1, borderTop: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
                                 <Button
                                     disabled={!prevSection}
-                                    onClick={() => prevSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`, { replace: true })}
+                                    onClick={() => prevSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`)}
                                     fullWidth
                                     variant="outlined"
                                     startIcon={<ArrowBack />}
@@ -767,7 +839,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                 </Button>
                                 <Button
                                     disabled={!nextSection}
-                                    onClick={() => nextSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`, { replace: true })}
+                                    onClick={() => nextSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`)}
                                     fullWidth
                                     variant="contained"
                                     endIcon={<ArrowForward />}
@@ -986,10 +1058,16 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                     }}>
                         <CircularProgress size={60} sx={{ color: topicColor }} />
                         <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
-                            Generating {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)} Examples...
+                            {targetLanguage
+                                ? `Translating to ${targetLanguage.charAt(0).toUpperCase() + targetLanguage.slice(1)}...`
+                                : `Generating ${selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)} Examples...`
+                            }
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                            Please wait while AI creates optimized code snippets
+                            {targetLanguage
+                                ? 'Translating code examples while preserving explanations'
+                                : 'Please wait while AI creates optimized code snippets'
+                            }
                         </Typography>
                     </Box>
                 )}

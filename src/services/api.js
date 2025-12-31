@@ -64,7 +64,9 @@ export const aiAPI = {
   generateInterviewQuestions: (topic, type = 'both', difficulty = 'medium') => 
     api.post('/ai/interview-questions', { topic, type, difficulty }),
   generateQuiz: (topic, section, regenerate = false, language = 'javascript', content = '') => 
-    api.post('/ai/quiz', { topic, section, regenerate, language, content })
+    api.post('/ai/quiz', { topic, section, regenerate, language, content }),
+  translateCode: (codeBlocks, sourceLanguage, targetLanguage) =>
+    api.post('/ai/translate-code', { codeBlocks, sourceLanguage, targetLanguage })
 };
 
 export const compilerAPI = {

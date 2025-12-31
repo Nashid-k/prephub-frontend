@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -6,11 +6,9 @@ import {
     Typography,
     Button,
     Card,
-    CardContent,
     CardActionArea,
     Grid,
     useTheme as useMuiTheme,
-    Fade,
     CircularProgress,
     Chip
 } from '@mui/material';
@@ -25,20 +23,37 @@ import {
     Palette,
     Settings,
     CheckCircle,
-    Computer
+    Computer,
+    Javascript
 } from '@mui/icons-material';
+import axios from 'axios';
+import { generateSmartPath } from '../utils/SmartCurriculum';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const OnboardingModal = ({ open, onComplete, onSkip }) => {
     const theme = useMuiTheme();
     const [selectedPath, setSelectedPath] = useState(null);
     const [showLoading, setShowLoading] = useState(false);
+    const [allTopics, setAllTopics] = useState([]);
+    const [pathCounts, setPathCounts] = useState({});
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (open) {
             setShowLoading(false);
             setSelectedPath(null);
+            fetchTopics();
         }
     }, [open]);
+
+    const fetchTopics = async () => {
+        try {
+            const response = await axios.get(`${API_URL}/curriculum/topics`);
+            setAllTopics(response.data);
+        } catch (error) {
+            console.error('Failed to fetch topics:', error);
+        }
+    };
 
     const learningPaths = [
         {
@@ -47,7 +62,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Start from the very basics',
             icon: <School sx={{ fontSize: 40 }} />,
             color: '#34c759',
-            topicCount: 3,
             duration: '3-4 months',
             detail: 'HTML & CSS → JavaScript → React'
         },
@@ -57,9 +71,17 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'MongoDB, Express, React, Node.js',
             icon: <Code sx={{ fontSize: 40 }} />,
             color: '#0a84ff',
-            topicCount: 9,
             duration: '8-10 months',
             detail: 'Complete JavaScript stack'
+        },
+        {
+            id: 'mean-fullstack',
+            name: '🅰️ MEAN Full Stack',
+            description: 'MongoDB, Express, Angular, Node.js',
+            icon: <Javascript sx={{ fontSize: 40 }} />,
+            color: '#dd0031',
+            duration: '8-10 months',
+            detail: 'Full stack with Angular'
         },
         {
             id: 'python-fullstack',
@@ -67,7 +89,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Python, Django, React, PostgreSQL',
             icon: <Language sx={{ fontSize: 40 }} />,
             color: '#3c78d8',
-            topicCount: 6,
             duration: '6-8 months',
             detail: 'Python-powered development'
         },
@@ -77,7 +98,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Java, Angular, PostgreSQL',
             icon: <Coffee sx={{ fontSize: 40 }} />,
             color: '#ff9f0a',
-            topicCount: 5,
             duration: '5-7 months',
             detail: 'Enterprise development'
         },
@@ -87,7 +107,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Flutter & Dart cross-platform',
             icon: <PhoneAndroid sx={{ fontSize: 40 }} />,
             color: '#5ac8fa',
-            topicCount: 4,
             duration: '4-6 months',
             detail: 'iOS & Android with one codebase'
         },
@@ -97,7 +116,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'DSA, System Design, CS Fundamentals',
             icon: <EmojiEvents sx={{ fontSize: 40 }} />,
             color: '#ff375f',
-            topicCount: 6,
             duration: '3-6 months',
             detail: 'Crack FAANG interviews'
         },
@@ -107,7 +125,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Modern UI development',
             icon: <Palette sx={{ fontSize: 40 }} />,
             color: '#af52de',
-            topicCount: 6,
             duration: '5-7 months',
             detail: 'UI/UX engineering'
         },
@@ -117,7 +134,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Server-side development',
             icon: <Settings sx={{ fontSize: 40 }} />,
             color: '#ff9500',
-            topicCount: 6,
             duration: '5-7 months',
             detail: 'APIs & databases'
         },
@@ -127,7 +143,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Go for high-performance systems',
             icon: <Code sx={{ fontSize: 40 }} />,
             color: '#00add8',
-            topicCount: 5,
             duration: '4-6 months',
             detail: 'Microservices & concurrency'
         },
@@ -137,7 +152,6 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Microsoft enterprise stack',
             icon: <Computer sx={{ fontSize: 40 }} />,
             color: '#68217a',
-            topicCount: 4,
             duration: '4-5 months',
             detail: 'Enterprise .NET development'
         },
@@ -147,24 +161,58 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             description: 'Low-level C programming',
             icon: <Settings sx={{ fontSize: 40 }} />,
             color: '#a8b9cc',
-            topicCount: 3,
             duration: '4-6 months',
             detail: 'OS internals & performance'
         }
     ];
 
+    useEffect(() => {
+        if (allTopics.length > 0) {
+            const counts = {};
+            learningPaths.forEach(path => {
+                const smartPath = generateSmartPath(allTopics, path.id);
+                counts[path.id] = smartPath.length;
+            });
+            setPathCounts(counts);
+        }
+    }, [allTopics]);
+
     const handleSelectPath = (path) => {
         setSelectedPath(path);
     };
 
-    const handleContinue = () => {
+    const handleContinue = async () => {
         if (!selectedPath) return;
 
         setShowLoading(true);
 
+        try {
+            // Get the default topics for this path
+            const defaultTopics = generateSmartPath(allTopics, selectedPath.id);
+
+            // Call AI to structure them
+            const response = await axios.post(`${API_URL}/ai/structure-path`, {
+                topics: defaultTopics,
+                pathName: selectedPath.name
+            });
+
+            if (response.data.success && response.data.structure) {
+                // Save AI configuration
+                localStorage.setItem('prephub_ai_path_config', JSON.stringify({
+                    pathId: selectedPath.id,
+                    ...response.data.structure // orderedSlugs, learningStrategy
+                }));
+            }
+        } catch (error) {
+            console.error('AI Structure failed, falling back to default:', error);
+            // Clear any old config on failure to ensure fallback works
+            localStorage.removeItem('prephub_ai_path_config');
+        }
+
+        // Add a small delay for the animation if the API call was too fast
         setTimeout(() => {
             onComplete(selectedPath);
-        }, 2500);
+        }, 1500);
     };
 
     const handleSkipOnboarding = () => {
@@ -291,7 +339,7 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
                                                             </Typography>
                                                             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                                                                 <Chip
-                                                                    label={`${path.topicCount} topics`}
+                                                                    label={`${pathCounts[path.id] || 0} topics`}
                                                                     size="small"
                                                                     sx={{
                                                                         bgcolor: `${path.color}15`,

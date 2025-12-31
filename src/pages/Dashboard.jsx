@@ -27,6 +27,25 @@ const Dashboard = () => {
     const [aiSuggestion, setAiSuggestion] = useState(null);
     const [selectedPath, setSelectedPath] = useState('all');
     const [showOnboarding, setShowOnboarding] = useState(false);
+    const [aiStrategy, setAiStrategy] = useState(null);
+
+    useEffect(() => {
+        const aiConfigStr = localStorage.getItem('prephub_ai_path_config');
+        if (aiConfigStr && selectedPath !== 'all') {
+            try {
+                const config = JSON.parse(aiConfigStr);
+                if (config.pathId === selectedPath) {
+                    setAiStrategy(config.learningStrategy);
+                } else {
+                    setAiStrategy(null);
+                }
+            } catch (e) {
+                setAiStrategy(null);
+            }
+        } else {
+            setAiStrategy(null);
+        }
+    }, [selectedPath]);
 
     const learningPaths = {
         'new-beginner': {
@@ -122,6 +141,26 @@ const Dashboard = () => {
         let rawList = selectedPath === 'all'
             ? topics
             : generateSmartPath(topics, selectedPath);
+
+        // Apply AI Ordering if available
+        const aiConfigStr = localStorage.getItem('prephub_ai_path_config');
+        if (aiConfigStr && selectedPath !== 'all') {
+            try {
+                const aiConfig = JSON.parse(aiConfigStr);
+                if (aiConfig.pathId === selectedPath && aiConfig.orderedSlugs) {
+                    // Create a map for O(1) lookup of order
+                    const orderMap = new Map(aiConfig.orderedSlugs.map((slug, index) => [slug, index]));
+
+                    rawList = [...rawList].sort((a, b) => {
+                        const indexA = orderMap.has(a.slug) ? orderMap.get(a.slug) : 999;
+                        const indexB = orderMap.has(b.slug) ? orderMap.get(b.slug) : 999;
+                        return indexA - indexB;
+                    });
+                }
+            } catch (e) {
+                console.error('Failed to apply AI ordering:', e);
+            }
+        }
 
         const SIMPLIFY_GROUPS = [
             {
@@ -361,6 +400,48 @@ const Dashboard = () => {
                                     Master the foundations of computer science and software engineering with our structured learning paths.
                                 </Typography>
                             </motion.div>
+
+                            {/* AI Strategy Display */}
+                            {aiStrategy && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.15 }}
+                                >
+                                    <Box
+                                        sx={{
+                                            maxWidth: '700px',
+                                            mx: 'auto',
+                                            mb: 5,
+                                            p: 2.5,
+                                            borderRadius: '16px',
+                                            background: theme.palette.mode === 'dark'
+                                                ? 'rgba(10, 132, 255, 0.1)'
+                                                : 'rgba(10, 132, 255, 0.05)',
+                                            border: '1px solid',
+                                            borderColor: theme.palette.mode === 'dark'
+                                                ? 'rgba(10, 132, 255, 0.2)'
+                                                : 'rgba(10, 132, 255, 0.1)',
+                                            display: 'flex',
+                                            alignItems: 'start',
+                                            gap: 2,
+                                            textAlign: 'left'
+                                        }}
+                                    >
+                                        <Box sx={{ mt: 0.5 }}>
+                                            <Psychology fontSize="medium" sx={{ color: '#0a84ff' }} />
+                                        </Box>
+                                        <Box>
+                                            <Typography variant="subtitle2" sx={{ color: '#0a84ff', fontWeight: 700, mb: 0.5, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                                AI Learning Strategy
+                                            </Typography>
+                                            <Typography variant="body2" color="text.primary" sx={{ lineHeight: 1.6 }}>
+                                                {aiStrategy}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </motion.div>
+                            )}
                             {nextRecommendation && (
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}

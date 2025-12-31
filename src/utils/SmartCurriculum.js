@@ -32,6 +32,12 @@ const PATH_RULES = {
         mustHave: ['html-css-combined', 'javascript'],
         exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'angular', 'vue']
     },
+    'mean-fullstack': {
+        keywords: ['mongo', 'express', 'angular', 'node', 'javascript', 'html', 'css', 'typescript'], 
+        include: ['git'],
+        mustHave: ['html-css-combined', 'javascript', 'angular', 'nodejs', 'express', 'mongodb'],
+        exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'react', 'vue']
+    },
     'python-fullstack': {
         keywords: ['python', 'django', 'flask', 'fastapi', 'html', 'css', 'javascript', 'react', 'postgres', 'sql', 'algorithm', 'structure', 'system', 'design'],
         mustHave: ['html-css-combined', 'javascript', 'python'],
@@ -43,9 +49,9 @@ const PATH_RULES = {
         exclude: ['node', 'express', 'python', 'react', 'vue']
     },
     'flutter-mobile': {
-        keywords: ['flutter', 'dart', 'mobile', 'firebase', 'android', 'ios', 'algorithm', 'structure'],
+        keywords: ['flutter', 'dart', 'mobile', 'firebase', 'android', 'ios'],
         mustHave: ['dart', 'flutter'],
-        exclude: ['html-css-combined', 'react', 'angular', 'vue']
+        exclude: ['html-css-combined', 'react', 'angular', 'vue', 'algorithm', 'structure', 'system']
     },
     'interview-prep': {
         keywords: ['structure', 'algorithm', 'system', 'design', 'network', 'os', 'operating', 'blind', 'dsa', 'interview', 'code'],
