@@ -321,13 +321,21 @@ const CodeEditor = ({
     };
 
     return (
-        <Box className="code-editor glass" ref={containerRef} sx={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '600px', borderRadius: 4, overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+    return (
+        <Box className="code-editor glass" ref={containerRef} sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            minHeight: '600px',
+            borderRadius: 4,
+            overflow: 'hidden',
+            boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0,0,0,0.05)',
+            border: (theme) => theme.palette.mode === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.03)'
+        }}>
             {/* Toolbar */}
             <Box sx={{
                 p: 1.5,
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-                bgcolor: 'rgba(255,255,255,0.03)',
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
                 backdropFilter: 'blur(10px)',
                 display: 'flex',
                 alignItems: 'center',
@@ -341,9 +349,14 @@ const CodeEditor = ({
                         onChange={(e) => handleLanguageChange(e.target.value)}
                         size="small"
                         sx={{
-                            minWidth: 120,
+                            minWidth: 140,
                             borderRadius: '12px',
-                            '& .MuiSelect-select': { py: 0.75, fontSize: '0.875rem' }
+                            fontWeight: 600,
+                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.5)',
+                            border: 'none',
+                            '& .MuiSelect-select': { py: 1, fontSize: '0.875rem' },
+                            '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+                            '&:hover': { bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.8)' }
                         }}
                     >
                         {languages.map(lang => (
@@ -355,17 +368,17 @@ const CodeEditor = ({
                     {onAiHelp && (
                         <Stack direction="row" spacing={0.5}>
                             <Tooltip title="Explain Code">
-                                <IconButton size="small" onClick={() => onAiHelp('explain')} sx={{ color: 'var(--primary)', bgcolor: 'rgba(10, 132, 255, 0.1)' }}>
+                                <IconButton size="small" onClick={() => onAiHelp('explain')} sx={{ color: 'var(--primary)', bgcolor: 'rgba(10, 132, 255, 0.1)', '&:hover': { bgcolor: 'rgba(10, 132, 255, 0.2)' } }}>
                                     <Lightbulb fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Debug Code">
-                                <IconButton size="small" onClick={() => onAiHelp('debug')} sx={{ color: '#ef4444', bgcolor: 'rgba(239, 68, 68, 0.1)' }}>
+                                <IconButton size="small" onClick={() => onAiHelp('debug')} sx={{ color: '#ef4444', bgcolor: 'rgba(239, 68, 68, 0.1)', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.2)' } }}>
                                     <BugReport fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                             <Tooltip title="Optimize/Fix">
-                                <IconButton size="small" onClick={() => onAiHelp('optimize')} sx={{ color: '#8b5cf6', bgcolor: 'rgba(139, 92, 246, 0.1)' }}>
+                                <IconButton size="small" onClick={() => onAiHelp('optimize')} sx={{ color: '#8b5cf6', bgcolor: 'rgba(139, 92, 246, 0.1)', '&:hover': { bgcolor: 'rgba(139, 92, 246, 0.2)' } }}>
                                     <AutoFixHigh fontSize="small" />
                                 </IconButton>
                             </Tooltip>
@@ -378,12 +391,14 @@ const CodeEditor = ({
                         variant="contained"
                         onClick={handleRun}
                         disabled={isRunning || isSubmitting}
-                        startIcon={isRunning ? <CircularProgress size={16} /> : <PlayArrow />}
+                        startIcon={isRunning ? <CircularProgress size={16} color="inherit" /> : <PlayArrow />}
                         sx={{
                             borderRadius: '9999px',
                             textTransform: 'none',
                             boxShadow: 'none',
-                            px: 3
+                            px: 3,
+                            bgcolor: '#5e5ce6',
+                            '&:hover': { bgcolor: '#4b4acb', boxShadow: 'none' }
                         }}
                     >
                         {isRunning ? 'Running' : 'Run'}
@@ -394,7 +409,7 @@ const CodeEditor = ({
                             color="success"
                             onClick={handleSubmit}
                             disabled={isRunning || isSubmitting}
-                            startIcon={isSubmitting ? <CircularProgress size={16} /> : <CheckCircle />}
+                            startIcon={isSubmitting ? <CircularProgress size={16} color="inherit" /> : <CheckCircle />}
                             sx={{
                                 borderRadius: '9999px',
                                 textTransform: 'none',
@@ -409,7 +424,11 @@ const CodeEditor = ({
             </Box>
 
             {/* Editor Area */}
-            <Box className="editor-content" sx={{ height: `${editorHeightPercent}%`, position: 'relative' }}>
+            <Box className="editor-content" sx={{
+                height: `${editorHeightPercent}%`,
+                position: 'relative',
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : '#ffffff'
+            }}>
                 <Suspense fallback={
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                         <CircularProgress />
@@ -429,7 +448,8 @@ const CodeEditor = ({
                             roundedSelection: true,
                             scrollBeyondLastLine: false,
                             automaticLayout: true,
-                            padding: { top: 16 }
+                            padding: { top: 20 },
+                            fontFamily: "'JetBrains Mono', 'Fira Code', monospace"
                         }}
                     />
                 </Suspense>
@@ -440,37 +460,50 @@ const CodeEditor = ({
                 className={`resize-handle ${isDragging ? 'dragging' : ''}`}
                 onMouseDown={startResize}
                 sx={{
-                    height: '8px',
+                    height: '6px',
                     cursor: 'ns-resize',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: 'background.paper',
-                    borderTop: '1px solid',
-                    borderBottom: '1px solid',
-                    borderColor: 'divider',
-                    '&:hover': { bgcolor: 'action.hover' }
+                    bgcolor: 'transparent',
+                    transition: 'all 0.2s',
+                    '&:hover': { bgcolor: 'primary.main', height: '8px' },
+                    zIndex: 10
                 }}
             >
-                <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: 'text.disabled' }} />
+                <Box sx={{ width: 40, height: 3, borderRadius: 2, bgcolor: 'text.disabled', opacity: 0.3 }} />
             </Box>
 
             {/* Output Area */}
-            <Box className="editor-output" sx={{ height: `${100 - editorHeightPercent}%`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <Box sx={{ p: 1, px: 2, borderBottom: '1px solid', borderColor: 'divider', fontWeight: 600, fontSize: '0.875rem', color: 'text.secondary', bgcolor: 'rgba(255,255,255,0.02)' }}>
-                    Console / Test Results
+            <Box className="editor-output" sx={{
+                height: `${100 - editorHeightPercent}%`,
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1c1c1e' : '#f8fafc'
+            }}>
+                <Box sx={{
+                    p: 1.5,
+                    px: 3,
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                    color: 'text.secondary',
+                    textTransform: 'uppercase',
+                    letterSpacing: 1
+                }}>
+                    Console Output
                 </Box>
-                <Box sx={{ flex: 1, overflowY: 'auto', p: 2 }}>
+                <Box sx={{ flex: 1, overflowY: 'auto', p: 3, fontFamily: 'monospace' }}>
                     {error && (
-                        <Box sx={{ color: 'error.main', fontFamily: 'monospace', whiteSpace: 'pre-wrap', fontSize: '0.9rem' }}>
-                            {error}
+                        <Box sx={{ color: '#ff4d4f', whiteSpace: 'pre-wrap', fontSize: '0.9rem', p: 2, bgcolor: 'rgba(255, 77, 79, 0.1)', borderRadius: 2 }}>
+                            ✕ {error}
                         </Box>
                     )}
                     {renderTestResults()}
                     {!testResults && !error && !isRunning && !isSubmitting && (
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'text.disabled', gap: 1 }}>
-                            <CodeIcon sx={{ fontSize: 40, opacity: 0.5 }} />
-                            <Typography variant="body2">Run code to see output</Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'text.disabled', gap: 1.5, opacity: 0.6 }}>
+                            <CodeIcon sx={{ fontSize: 48 }} />
+                            <Typography variant="body2" sx={{ fontWeight: 500 }}>Ready to execute</Typography>
                         </Box>
                     )}
                 </Box>

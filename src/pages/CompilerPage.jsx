@@ -6,14 +6,14 @@ const CompilerPage = () => {
     return (
         <div className="compiler-page">
             <div className="compiler-container">
-                <div className="compiler-header glass fade-in">
-                    <h1 className="compiler-title">💻 Online Code Compiler</h1>
+                <div className="compiler-header">
+                    <h1 className="compiler-title">⚡ Interactive Compiler</h1>
                     <p className="compiler-subtitle">
-                        Practice coding in 40+ languages with instant execution
+                        Write, Run, and Debug in 40+ languages instantly.
                     </p>
                 </div>
 
-                <div className="compiler-editor fade-in">
+                <div className="compiler-editor-wrapper">
                     <CodeEditor />
                 </div>
             </div>

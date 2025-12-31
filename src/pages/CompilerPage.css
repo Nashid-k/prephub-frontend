@@ -1,46 +1,89 @@
 .compiler-page {
     min-height: 100vh;
-    padding: 100px 0 2rem;
+    padding-top: 80px;
+    /* Navbar height */
+    padding-bottom: 24px;
+    background: var(--bg-default);
+    display: flex;
+    flex-direction: column;
 }
 
 .compiler-container {
-    max-width: 1400px;
+    flex: 1;
+    max-width: 1600px;
+    width: 100%;
     margin: 0 auto;
     padding: 0 var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
 }
 
 .compiler-header {
     text-align: center;
-    padding: var(--spacing-xl);
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
+    animation: fadeIn 0.5s ease-out;
 }
 
 .compiler-title {
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 800;
-    margin-bottom: var(--spacing-md);
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    margin-bottom: var(--spacing-xs);
+    background: linear-gradient(135deg, #5e5ce6 0%, #d070ff 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    letter-spacing: -0.02em;
 }
 
 .compiler-subtitle {
-    font-size: 1.125rem;
+    font-size: 1.1rem;
     color: var(--text-secondary);
+    max-width: 600px;
+    margin: 0 auto;
 }
 
-.compiler-editor {
-    height: 700px;
-    animation-delay: 0.2s;
+.compiler-editor-wrapper {
+    flex: 1;
+    height: 100%;
+    min-height: 600px;
+    /* Ensure space */
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.1);
+    border-radius: 24px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 768px) {
     .compiler-page {
-        padding: 80px 0 1rem;
+        padding-top: 70px;
     }
 
-    .compiler-editor {
-        height: 600px;
+    .compiler-container {
+        padding: 0 var(--spacing-sm);
+    }
+
+    .compiler-editor-wrapper {
+        min-height: 70vh;
     }
 }
