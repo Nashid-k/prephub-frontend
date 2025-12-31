@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
 import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import CodeEditor from '../components/CodeEditor';
 import AIChat from '../components/AIChat';
 import QuizModal from '../components/QuizModal';
@@ -101,6 +103,7 @@ const SectionPage = () => {
     const [aiContent, setAiContent] = useState('');
     const [loading, setLoading] = useState(true);
     const [contentLoading, setContentLoading] = useState(false);
+    const [languageChangeLoading, setLanguageChangeLoading] = useState(false);
     const [activeTab, setActiveTab] = useState('learn');
     const [problemContent, setProblemContent] = useState('');
     const [isQuizOpen, setIsQuizOpen] = useState(false);
@@ -122,9 +125,15 @@ const SectionPage = () => {
     const handleLanguageChange = (event) => {
         const newLang = event.target.value;
         setSelectedLanguage(newLang);
+        setLanguageChangeLoading(true);
+
         // Regenerate content with new language
         if (section && category) {
-            generateAIContent(section, category, newLang);
+            generateAIContent(section, category, newLang).finally(() => {
+                setLanguageChangeLoading(false);
+            });
+        } else {
+            setLanguageChangeLoading(false);
         }
     };
 
@@ -550,19 +559,43 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                         Back to {category?.name || 'Category'}
                     </Button>
                     {showLanguageSwitcher && (
-                        <FormControl size="small" sx={{ minWidth: 120, mr: 2 }}>
+                        <Button
+                            onClick={(e) => {
+                                e.currentTarget.querySelector('select').click();
+                            }}
+                            sx={{
+                                borderRadius: '9999px',
+                                px: 3,
+                                py: 1,
+                                background: 'transparent',
+                                border: '1px solid',
+                                borderColor: 'rgba(128,128,128,0.2)',
+                                color: 'text.primary',
+                                textTransform: 'none',
+                                '&:hover': {
+                                    background: `${topicColor}15`,
+                                    borderColor: topicColor
+                                },
+                                position: 'relative',
+                                overflow: 'visible'
+                            }}
+                        >
+                            <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
+                            {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                            <KeyboardArrowDown sx={{ ml: 0.5 }} />
                             <Select
                                 value={selectedLanguage}
                                 onChange={handleLanguageChange}
                                 displayEmpty
                                 inputProps={{ 'aria-label': 'Select Language' }}
                                 sx={{
-                                    borderRadius: '12px',
-                                    bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)',
-                                    color: 'text.primary',
-                                    '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(128,128,128,0.2)' },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: topicColor },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: topicColor },
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    opacity: 0,
+                                    cursor: 'pointer'
                                 }}
                             >
                                 <MenuItem value="javascript">JavaScript</MenuItem>
@@ -573,7 +606,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                 <MenuItem value="go">Go</MenuItem>
                                 <MenuItem value="dart">Dart</MenuItem>
                             </Select>
-                        </FormControl>
+                        </Button>
                     )}
                     <Box sx={{ display: 'flex', gap: 1 }}>
                         <Button
@@ -762,7 +795,29 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                             </Button>
                                         </Box>
                                         <div className="markdown-content">
-                                            <ReactMarkdown>{aiContent}</ReactMarkdown>
+                                            <ReactMarkdown
+                                                components={{
+                                                    code({ node, inline, className, children, ...props }) {
+                                                        const match = /language-(\w+)/.exec(className || '');
+                                                        return !inline && match ? (
+                                                            <SyntaxHighlighter
+                                                                style={vscDarkPlus}
+                                                                language={match[1]}
+                                                                PreTag="div"
+                                                                {...props}
+                                                            >
+                                                                {String(children).replace(/\n$/, '')}
+                                                            </SyntaxHighlighter>
+                                                        ) : (
+                                                            <code className={className} {...props}>
+                                                                {children}
+                                                            </code>
+                                                        );
+                                                    }
+                                                }}
+                                            >
+                                                {aiContent}
+                                            </ReactMarkdown>
                                         </div>
                                     </Box>
                                 )}
