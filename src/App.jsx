@@ -21,6 +21,7 @@ const CSFundamentalsPage = React.lazy(() => import('./pages/CSFundamentalsPage')
 const SystemDesignPage = React.lazy(() => import('./pages/SystemDesignPage'));
 const EngineeringPracticesPage = React.lazy(() => import('./pages/EngineeringPracticesPage'));
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 import createAppTheme from './theme';
@@ -36,7 +37,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 function App() {
     return (
         <ThemeProvider>
-            <AppContent />
+            <LanguageProvider>
+                <AppContent />
+            </LanguageProvider>
         </ThemeProvider>
     );
 }

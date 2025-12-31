@@ -4,10 +4,11 @@ import { compilerAPI } from '../services/api';
 import { Box, Button, Select, MenuItem, Typography, IconButton, Tooltip, CircularProgress, Chip, Stack } from '@mui/material';
 import { PlayArrow, CheckCircle, BugReport, Lightbulb, AutoFixHigh, ExpandMore, Code as CodeIcon } from '@mui/icons-material';
 import { trackCodeExecution } from '../services/analytics';
+import { useLanguage } from '../context/LanguageContext';
 import './CodeEditor.css';
 
 const CodeEditor = ({
-    defaultLanguage = 'javascript',
+    defaultLanguage = null,
     code,
     onCodeChange,
     testCases = null,
@@ -15,10 +16,26 @@ const CodeEditor = ({
     onAiHelp,
     externalOutput
 }) => {
-    const [language, setLanguage] = useState(defaultLanguage);
+    const { selectedLanguage: globalLanguage, setSelectedLanguage } = useLanguage();
+    const [language, setLanguage] = useState(defaultLanguage || globalLanguage);
     const [testResults, setTestResults] = useState(null);
     const [isRunning, setIsRunning] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Sync with global language
+    useEffect(() => {
+        if (!defaultLanguage) {
+            setLanguage(globalLanguage);
+        }
+    }, [globalLanguage, defaultLanguage]);
+
+    // Update global language when local language changes
+    const handleLanguageChange = (newLang) => {
+        setLanguage(newLang);
+        if (!defaultLanguage) {
+            setSelectedLanguage(newLang);
+        }
+    };
 
     useEffect(() => {
         if (externalOutput) {
@@ -37,8 +54,11 @@ const CodeEditor = ({
         { value: 'java', label: 'Java' },
         { value: 'cpp', label: 'C++' },
         { value: 'c', label: 'C' },
+        { value: 'csharp', label: 'C#' },
         { value: 'go', label: 'Go' },
-        { value: 'rust', label: 'Rust' }
+        { value: 'dart', label: 'Dart' },
+        { value: 'rust', label: 'Rust' },
+        { value: 'kotlin', label: 'Kotlin' }
     ];
 
     const wrapCodeWithTests = (userCode, cases) => {
@@ -305,7 +325,7 @@ const CodeEditor = ({
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Select
                         value={language}
-                        onChange={(e) => setLanguage(e.target.value)}
+                        onChange={(e) => handleLanguageChange(e.target.value)}
                         size="small"
                         sx={{
                             minWidth: 120,
