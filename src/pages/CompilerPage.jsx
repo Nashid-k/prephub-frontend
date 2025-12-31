@@ -1,8 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import CodeEditor from '../components/CodeEditor';
 import './CompilerPage.css';
 
 const CompilerPage = () => {
+    const [code, setCode] = useState(`// Welcome to the Interactive Compiler
+// Write your code here and click Run to execute
+
+function greet(name) {
+    return \`Hello, \${name}!\`;
+}
+
+console.log(greet("World"));
+`);
+
     return (
         <div className="compiler-page">
             <div className="compiler-container">
@@ -14,7 +24,10 @@ const CompilerPage = () => {
                 </div>
 
                 <div className="compiler-editor-wrapper">
-                    <CodeEditor />
+                    <CodeEditor
+                        code={code}
+                        onCodeChange={setCode}
+                    />
                 </div>
             </div>
         </div>

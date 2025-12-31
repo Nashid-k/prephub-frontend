@@ -325,16 +325,15 @@ const CodeEditor = ({
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
-            minHeight: '600px',
-            borderRadius: 4,
+            borderRadius: 2, // Reduced from 4 (32px) to 2 (16px) for professional look
             overflow: 'hidden',
-            boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 8px 32px rgba(0,0,0,0.3)' : '0 8px 32px rgba(0,0,0,0.05)',
-            border: (theme) => theme.palette.mode === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.03)'
+            boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 8px 32px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.08)',
+            border: (theme) => theme.palette.mode === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'
         }}>
             {/* Toolbar */}
             <Box sx={{
                 p: 1.5,
-                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.04)',
                 backdropFilter: 'blur(10px)',
                 display: 'flex',
                 alignItems: 'center',
@@ -351,11 +350,11 @@ const CodeEditor = ({
                             minWidth: 140,
                             borderRadius: '12px',
                             fontWeight: 600,
-                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.5)',
+                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)',
                             border: 'none',
                             '& .MuiSelect-select': { py: 1, fontSize: '0.875rem' },
                             '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-                            '&:hover': { bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.8)' }
+                            '&:hover': { bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)' }
                         }}
                     >
                         {languages.map(lang => (
