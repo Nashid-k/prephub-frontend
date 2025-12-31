@@ -455,93 +455,93 @@ const CodeEditor = ({
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                         <CircularProgress />
                     </Box>
+                }>
+                    <Editor
+                        height="100%"
+                        language={language}
+                        value={code}
+                        onChange={(value) => onCodeChange(value || '')}
+                        onMount={(editor) => {
+                            editorRef.current = editor;
+                            setIsEditorReady(true);
+                        }}
+                        theme="vs-dark"
+                        options={{
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            lineNumbers: 'on',
+                            roundedSelection: true,
+                            scrollBeyondLastLine: false,
+                            automaticLayout: true,
+                            padding: { top: 20 },
+                            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                            wordWrap: 'on',
+                            lineHeight: 24
+                        }}
+                    />
+                </Suspense>
+            </Box>
+
+            {/* Resize Handle - More Visible */}
+            <Box
+                className={`resize-handle ${isDragging ? 'dragging' : ''}`}
+                onMouseDown={startResize}
+                sx={{
+                    height: '10px',
+                    cursor: 'ns-resize',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                    borderTop: '1px solid',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    transition: 'all 0.2s',
+                    '&:hover': {
+                        bgcolor: 'primary.main',
+                        '& > div': { bgcolor: 'white', opacity: 1 }
+                    },
+                    zIndex: 10
+                }}
+            >
+                <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: 'text.secondary', opacity: 0.5 }} />
+            </Box>
+
+            {/* Output Area */}
+            <Box className="editor-output" sx={{
+                height: `${100 - editorHeightPercent}%`,
+                minHeight: '150px', // Prevent complete collapse
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1c1c1e' : '#f8fafc'
+            }}>
+                <Box sx={{
+                    p: 1.5,
+                    px: 3,
+                    fontWeight: 600,
+                    fontSize: '0.8rem',
+                    color: 'text.secondary',
+                    textTransform: 'uppercase',
+                    letterSpacing: 1
                 }}>
-                <Editor
-                    height="100%"
-                    language={language}
-                    value={code}
-                    onChange={(value) => onCodeChange(value || '')}
-                    onMount={(editor) => {
-                        editorRef.current = editor;
-                        setIsEditorReady(true);
-                    }}
-                    theme="vs-dark"
-                    options={{
-                        minimap: { enabled: false },
-                        fontSize: 14,
-                        lineNumbers: 'on',
-                        roundedSelection: true,
-                        scrollBeyondLastLine: false,
-                        automaticLayout: true,
-                        padding: { top: 20 },
-                        fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-                        wordWrap: 'on',
-                        lineHeight: 24
-                    }}
-                />
-            </Suspense>
-        </Box>
-
-            {/* Resize Handle - More Visible */ }
-    <Box
-        className={`resize-handle ${isDragging ? 'dragging' : ''}`}
-        onMouseDown={startResize}
-        sx={{
-            height: '10px',
-            cursor: 'ns-resize',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
-            borderTop: '1px solid',
-            borderBottom: '1px solid',
-            borderColor: 'divider',
-            transition: 'all 0.2s',
-            '&:hover': {
-                bgcolor: 'primary.main',
-                '& > div': { bgcolor: 'white', opacity: 1 }
-            },
-            zIndex: 10
-        }}
-    >
-        <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: 'text.secondary', opacity: 0.5 }} />
-    </Box>
-
-    {/* Output Area */ }
-    <Box className="editor-output" sx={{
-        height: `${100 - editorHeightPercent}%`,
-        minHeight: '150px', // Prevent complete collapse
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-        bgcolor: (theme) => theme.palette.mode === 'dark' ? '#1c1c1e' : '#f8fafc'
-    }}>
-        <Box sx={{
-            p: 1.5,
-            px: 3,
-            fontWeight: 600,
-            fontSize: '0.8rem',
-            color: 'text.secondary',
-            textTransform: 'uppercase',
-            letterSpacing: 1
-        }}>
-            Console Output
-        </Box>
-        <Box sx={{ flex: 1, overflowY: 'auto', p: 3, fontFamily: 'monospace' }}>
-            {error && (
-                <Box sx={{ color: '#ff4d4f', whiteSpace: 'pre-wrap', fontSize: '0.9rem', p: 2, bgcolor: 'rgba(255, 77, 79, 0.1)', borderRadius: 2 }}>
-                    ✕ {error}
+                    Console Output
                 </Box>
-            )}
-            {renderTestResults()}
-            {!testResults && !error && !isRunning && !isSubmitting && (
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'text.disabled', gap: 1.5, opacity: 0.6 }}>
-                    <CodeIcon sx={{ fontSize: 48 }} />
-                    <Typography variant="body2" sx={{ fontWeight: 500 }}>Ready to execute</Typography>
+                <Box sx={{ flex: 1, overflowY: 'auto', p: 3, fontFamily: 'monospace' }}>
+                    {error && (
+                        <Box sx={{ color: '#ff4d4f', whiteSpace: 'pre-wrap', fontSize: '0.9rem', p: 2, bgcolor: 'rgba(255, 77, 79, 0.1)', borderRadius: 2 }}>
+                            ✕ {error}
+                        </Box>
+                    )}
+                    {renderTestResults()}
+                    {!testResults && !error && !isRunning && !isSubmitting && (
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'text.disabled', gap: 1.5, opacity: 0.6 }}>
+                            <CodeIcon sx={{ fontSize: 48 }} />
+                            <Typography variant="body2" sx={{ fontWeight: 500 }}>Ready to execute</Typography>
+                        </Box>
+                    )}
                 </Box>
-            )}
-        </Box>
-    </Box>
+            </Box>
         </Box >
     );
 };
