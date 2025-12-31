@@ -425,9 +425,11 @@ const CodeEditor = ({
             {/* Editor Area */}
             <Box className="editor-content" sx={{
                 height: `${editorHeightPercent}%`,
-                minHeight: '300px', // Prevent complete collapse
+                minHeight: '300px',
                 position: 'relative',
-                bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : '#ffffff'
+                bgcolor: '#1e1e1e', // Monaco dark theme background
+                display: 'flex',
+                flexDirection: 'column'
             }}>
                 <Suspense fallback={
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
@@ -449,7 +451,9 @@ const CodeEditor = ({
                             scrollBeyondLastLine: false,
                             automaticLayout: true,
                             padding: { top: 20 },
-                            fontFamily: "'JetBrains Mono', 'Fira Code', monospace"
+                            fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                            wordWrap: 'on',
+                            lineHeight: 24
                         }}
                     />
                 </Suspense>
