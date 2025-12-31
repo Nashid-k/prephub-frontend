@@ -29,7 +29,12 @@ import {
     Tabs,
     Tab,
     Collapse,
-    Grid
+    Collapse,
+    Grid,
+    Select,
+    MenuItem,
+    InputLabel,
+    FormControl
 } from '@mui/material';
 import {
     MenuBook,
@@ -105,6 +110,26 @@ const SectionPage = () => {
     const [solutionLoading, setSolutionLoading] = useState(false);
     const [testCases, setTestCases] = useState(null);
     const [testCasesLoading, setTestCasesLoading] = useState(false);
+
+    // State for Language Switcher
+    const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
+
+    // Update selectedLanguage when topic changes or initial load
+    useEffect(() => {
+        setSelectedLanguage(currentLanguage);
+    }, [topicSlug]);
+
+    const handleLanguageChange = (event) => {
+        const newLang = event.target.value;
+        setSelectedLanguage(newLang);
+        // Regenerate content with new language
+        if (section && category) {
+            generateAIContent(section, category, newLang);
+        }
+    };
+
+    // Determine if language switcher should be visible
+    const showLanguageSwitcher = ['algorithms', 'data-structures', 'dsa', 'blind-75', 'leetcode'].some(t => topicSlug.toLowerCase().includes(t) || category?.group?.toLowerCase().includes(t));
 
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [isCompleted, setIsCompleted] = useState(false);
@@ -486,6 +511,32 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                     >
                         Back to {category?.name || 'Category'}
                     </Button>
+                    {showLanguageSwitcher && (
+                        <FormControl size="small" sx={{ minWidth: 120, mr: 2 }}>
+                            <Select
+                                value={selectedLanguage}
+                                onChange={handleLanguageChange}
+                                displayEmpty
+                                inputProps={{ 'aria-label': 'Select Language' }}
+                                sx={{
+                                    borderRadius: '12px',
+                                    bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                                    color: 'text.primary',
+                                    '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(128,128,128,0.2)' },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: topicColor },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: topicColor },
+                                }}
+                            >
+                                <MenuItem value="javascript">JavaScript</MenuItem>
+                                <MenuItem value="python">Python</MenuItem>
+                                <MenuItem value="java">Java</MenuItem>
+                                <MenuItem value="cpp">C++</MenuItem>
+                                <MenuItem value="csharp">C#</MenuItem>
+                                <MenuItem value="go">Go</MenuItem>
+                                <MenuItem value="dart">Dart</MenuItem>
+                            </Select>
+                        </FormControl>
+                    )}
                     <Box sx={{ display: 'flex', gap: 1 }}>
                         <Button
                             startIcon={<Psychology />}
@@ -528,7 +579,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                     topic={topicSlug}
                     section={section.title}
                     isDark={isDark}
-                    language={currentLanguage}
+                    language={selectedLanguage}
                     content={activeTab === 'learn' ? aiContent : (section.description || section.content)} // Pass context
                 />
 
@@ -668,7 +719,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                     <Box>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
                                             <Typography variant="h5" sx={{ fontWeight: 700 }}>Learning Content</Typography>
-                                            <Button size="small" onClick={() => generateAIContent(section, category, currentLanguage)} sx={{ color: topicColor }}>
+                                            <Button size="small" onClick={() => generateAIContent(section, category, selectedLanguage)} sx={{ color: topicColor }}>
                                                 Regenerate
                                             </Button>
                                         </Box>
@@ -706,12 +757,12 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                         ) : (
                                             <Box sx={{ flex: 1, height: '100%', width: '100%', overflow: 'hidden' }}>
                                                 <CodeEditor
-                                                    defaultLanguage={currentLanguage}
+                                                    defaultLanguage={selectedLanguage}
                                                     code={editorCode}
                                                     onCodeChange={setEditorCode}
                                                     testCases={testCases}
                                                     problemTitle={section?.title || ''}
-                                                    onAiHelp={(type, code) => handleAiHelp(type, code, currentLanguage)}
+                                                    onAiHelp={(type, code) => handleAiHelp(type, code, selectedLanguage)}
                                                     externalOutput={aiOutput}
                                                 />
                                             </Box>
