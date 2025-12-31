@@ -325,7 +325,8 @@ const CodeEditor = ({
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
-            borderRadius: 2, // Reduced from 4 (32px) to 2 (16px) for professional look
+            minHeight: '600px', // Ensure editor is always visible
+            borderRadius: 2,
             overflow: 'hidden',
             boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 8px 32px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.08)',
             border: (theme) => theme.palette.mode === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'
@@ -424,6 +425,7 @@ const CodeEditor = ({
             {/* Editor Area */}
             <Box className="editor-content" sx={{
                 height: `${editorHeightPercent}%`,
+                minHeight: '300px', // Prevent complete collapse
                 position: 'relative',
                 bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.2)' : '#ffffff'
             }}>
@@ -453,28 +455,35 @@ const CodeEditor = ({
                 </Suspense>
             </Box>
 
-            {/* Resize Handle */}
+            {/* Resize Handle - More Visible */}
             <Box
                 className={`resize-handle ${isDragging ? 'dragging' : ''}`}
                 onMouseDown={startResize}
                 sx={{
-                    height: '6px',
+                    height: '10px',
                     cursor: 'ns-resize',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: 'transparent',
+                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)',
+                    borderTop: '1px solid',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
                     transition: 'all 0.2s',
-                    '&:hover': { bgcolor: 'primary.main', height: '8px' },
+                    '&:hover': {
+                        bgcolor: 'primary.main',
+                        '& > div': { bgcolor: 'white', opacity: 1 }
+                    },
                     zIndex: 10
                 }}
             >
-                <Box sx={{ width: 40, height: 3, borderRadius: 2, bgcolor: 'text.disabled', opacity: 0.3 }} />
+                <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: 'text.secondary', opacity: 0.5 }} />
             </Box>
 
             {/* Output Area */}
             <Box className="editor-output" sx={{
                 height: `${100 - editorHeightPercent}%`,
+                minHeight: '150px', // Prevent complete collapse
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
