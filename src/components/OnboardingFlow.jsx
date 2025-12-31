@@ -15,10 +15,6 @@ import {
 } from '@mui/material';
 import { CheckCircle, ArrowForward, Close } from '@mui/icons-material';
 
-/**
- * Onboarding Flow Component
- * Guides new users through getting started with PrepHub
- */
 const OnboardingFlow = ({ onComplete }) => {
     const [activeStep, setActiveStep] = useState(0);
     const [selectedGoal, setSelectedGoal] = useState(null);
@@ -52,7 +48,6 @@ const OnboardingFlow = ({ onComplete }) => {
 
     const handleNext = () => {
         if (activeStep === steps.length - 1) {
-            // Save preferences
             localStorage.setItem('prephub_onboarding', JSON.stringify({
                 goal: selectedGoal,
                 level: selectedLevel,
@@ -61,7 +56,6 @@ const OnboardingFlow = ({ onComplete }) => {
                 date: new Date().toISOString()
             }));
             onComplete && onComplete();
-            // Navigate to first selected topic or dashboard
             if (selectedTopics.length > 0) {
                 navigate(`/topic/${selectedTopics[0]}`);
             } else {
@@ -103,7 +97,7 @@ const OnboardingFlow = ({ onComplete }) => {
 
     const renderStepContent = () => {
         switch (activeStep) {
-            case 0: // Welcome
+            case 0:
                 return (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="h3" sx={{ mb: 2, fontWeight: 'bold' }}>
@@ -133,7 +127,7 @@ const OnboardingFlow = ({ onComplete }) => {
                     </Box>
                 );
 
-            case 1: // Goal
+            case 1:
                 return (
                     <Box sx={{ py: 3 }}>
                         <Typography variant="h5" sx={{ mb: 1, textAlign: 'center', fontWeight: 'bold' }}>
@@ -170,7 +164,7 @@ const OnboardingFlow = ({ onComplete }) => {
                     </Box>
                 );
 
-            case 2: // Level
+            case 2:
                 return (
                     <Box sx={{ py: 3 }}>
                         <Typography variant="h5" sx={{ mb: 1, textAlign: 'center', fontWeight: 'bold' }}>
@@ -209,7 +203,7 @@ const OnboardingFlow = ({ onComplete }) => {
                     </Box>
                 );
 
-            case 3: // Topics
+            case 3:
                 return (
                     <Box sx={{ py: 3 }}>
                         <Typography variant="h5" sx={{ mb: 1, textAlign: 'center', fontWeight: 'bold' }}>
@@ -240,7 +234,7 @@ const OnboardingFlow = ({ onComplete }) => {
                     </Box>
                 );
 
-            case 4: // Ready
+            case 4:
                 return (
                     <Box sx={{ textAlign: 'center', py: 4 }}>
                         <Typography variant="h3" sx={{ mb: 2 }}>🚀</Typography>

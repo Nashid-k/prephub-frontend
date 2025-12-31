@@ -23,7 +23,6 @@ import {
     Dashboard as DashboardIcon,
     Bookmark as BookmarkIcon,
     TrendingUp as ProgressIcon,
-    Code as CompilerIcon,
     Search as SearchIcon,
     LightMode,
     DarkMode,
@@ -50,7 +49,6 @@ const Navbar = () => {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
 
-    // Keyboard shortcut for search (Ctrl/Cmd + K)
     useEffect(() => {
         const handleKeyDown = (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -67,8 +65,7 @@ const Navbar = () => {
         { path: '/', label: 'Home', icon: <HomeIcon /> },
         { path: '/dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
         { path: '/bookmarks', label: 'Bookmarks', icon: <BookmarkIcon /> },
-        { path: '/progress', label: 'Progress', icon: <ProgressIcon /> },
-        { path: '/compiler', label: 'Compiler', icon: <CompilerIcon /> }
+        { path: '/progress', label: 'Progress', icon: <ProgressIcon /> }
     ];
 
     const handleDrawerToggle = () => {
@@ -134,7 +131,6 @@ const Navbar = () => {
 
     return (
         <>
-            {/* Floating Pill-Shaped Navbar */}
             <AppBar
                 position="sticky"
                 elevation={0}
@@ -146,7 +142,6 @@ const Navbar = () => {
             >
                 <Container maxWidth="xl">
                     <Box sx={{ py: 2 }}>
-                        {/* Main Pill Container */}
                         <Box
                             sx={{
                                 display: 'flex',
@@ -172,7 +167,6 @@ const Navbar = () => {
                                 transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                             }}
                         >
-                            {/* Logo */}
                             <Box
                                 component={Link}
                                 to="/"
@@ -212,7 +206,6 @@ const Navbar = () => {
                                 </Box>
                             </Box>
 
-                            {/* Desktop Navigation - Centered Pill Group */}
                             {!isMobile && (
                                 <Box
                                     sx={{
@@ -264,9 +257,7 @@ const Navbar = () => {
                                 </Box>
                             )}
 
-                            {/* Right Side Actions */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
-                                {/* Buy Me a Coffee */}
                                 <IconButton
                                     component="a"
                                     href="https://buymeacoffee.com/shadowishere"
@@ -294,7 +285,6 @@ const Navbar = () => {
                                     <LocalCafe fontSize="small" />
                                 </IconButton>
 
-                                {/* Search Button */}
                                 <IconButton
                                     onClick={() => setShowSearch(true)}
                                     size="small"
@@ -318,7 +308,6 @@ const Navbar = () => {
                                     <SearchIcon fontSize="small" />
                                 </IconButton>
 
-                                {/* Theme Toggle */}
                                 <IconButton
                                     onClick={toggleTheme}
                                     size="small"
@@ -342,7 +331,6 @@ const Navbar = () => {
                                     {theme === 'dark' ? <LightMode fontSize="small" /> : <DarkMode fontSize="small" />}
                                 </IconButton>
 
-                                {/* User Menu / Login */}
                                 {user ? (
                                     <>
                                         <IconButton
@@ -440,7 +428,6 @@ const Navbar = () => {
                                     </Button>
                                 )}
 
-                                {/* Mobile Menu Button */}
                                 {isMobile && (
                                     <IconButton
                                         onClick={handleDrawerToggle}
@@ -464,7 +451,6 @@ const Navbar = () => {
                 </Container>
             </AppBar>
 
-            {/* Mobile Drawer */}
             <Drawer
                 anchor="right"
                 open={mobileOpen}
@@ -482,7 +468,6 @@ const Navbar = () => {
                 {drawer}
             </Drawer >
 
-            {/* Search Modal */}
             {showSearch && <SearchBar onClose={() => setShowSearch(false)} />}
         </>
     );

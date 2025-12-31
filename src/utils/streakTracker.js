@@ -1,9 +1,3 @@
-/**
- * Study Streak Tracker
- * Tracks user's daily study streaks using localStorage
- * 100% client-side, no backend needed
- */
-
 const STORAGE_KEY = 'prephub_streak';
 
 export const getStreakData = () => {
@@ -37,7 +31,6 @@ export const updateStreak = () => {
     const today = new Date().toDateString();
     const lastVisit = data.lastVisit;
 
-    // Same day - no update needed
     if (lastVisit === today) {
         return data;
     }
@@ -49,7 +42,6 @@ export const updateStreak = () => {
     let updatedData;
 
     if (daysDiff === 1) {
-        // Consecutive day - increment streak
         updatedData = {
             ...data,
             currentStreak: data.currentStreak + 1,
@@ -59,7 +51,6 @@ export const updateStreak = () => {
             totalDays: data.totalDays + 1
         };
     } else if (daysDiff > 1) {
-        // Streak broken - reset to 1
         updatedData = {
             ...data,
             currentStreak: 1,
@@ -68,7 +59,6 @@ export const updateStreak = () => {
             totalDays: data.totalDays + 1
         };
     } else {
-        // Future date or error - don't update
         return data;
     }
 

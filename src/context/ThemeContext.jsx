@@ -9,7 +9,6 @@ export const ThemeProvider = ({ children }) => {
             return savedTheme;
         }
 
-        // Auto-detect system preference
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
         return prefersDark ? 'dark' : 'light';
     });

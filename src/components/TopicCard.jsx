@@ -24,7 +24,7 @@ const TopicCard = (props) => {
             >
                 <Card
                     component={Link}
-                    to={props.customLink || `/topic/${topic.slug}`}
+                    to={props.customLink || topic.customLink || `/topic/${topic.slug}`}
                     sx={{
                         textDecoration: 'none',
                         width: '100%',
@@ -50,7 +50,6 @@ const TopicCard = (props) => {
                         },
                     }}
                 >
-                    {/* Icon */}
                     <Box
                         sx={{
                             width: 64,
@@ -71,7 +70,6 @@ const TopicCard = (props) => {
                         />
                     </Box>
 
-                    {/* Content */}
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                         <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5, color: 'text.primary' }}>
                             {topic.name}
@@ -86,7 +84,6 @@ const TopicCard = (props) => {
                         </Typography>
                     </Box>
 
-                    {/* Stats & Action */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
                         {progress > 0 && (
                             <Box sx={{ width: 100, display: { xs: 'none', md: 'block' } }}>
@@ -129,7 +126,6 @@ const TopicCard = (props) => {
         );
     }
 
-    // Default Grid Variant
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -140,10 +136,10 @@ const TopicCard = (props) => {
         >
             <Card
                 component={Link}
-                to={props.customLink || `/topic/${topic.slug}`}
+                to={props.customLink || topic.customLink || `/topic/${topic.slug}`}
                 sx={{
                     textDecoration: 'none',
-                    height: '380px', // Fixed height instead of minHeight for uniform cards
+                    height: '380px',
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -177,7 +173,6 @@ const TopicCard = (props) => {
                     },
                 }}
             >
-                {/* Gradient Background Accent */}
                 <Box
                     sx={{
                         position: 'absolute',
@@ -192,7 +187,6 @@ const TopicCard = (props) => {
                 />
 
                 <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2, height: '100%', position: 'relative', zIndex: 1 }}>
-                    {/* Icon */}
                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                         <Box
                             className="topic-icon"
@@ -226,7 +220,6 @@ const TopicCard = (props) => {
                         </Box>
                     </Box>
 
-                    {/* Title */}
                     <Box sx={{ textAlign: 'center' }}>
                         <Typography
                             variant="h5"
@@ -239,7 +232,7 @@ const TopicCard = (props) => {
                                 WebkitLineClamp: 1,
                                 WebkitBoxOrient: 'vertical',
                                 overflow: 'hidden',
-                                height: '32px', // Fixed height for title line
+                                height: '32px',
                             }}
                         >
                             {topic.name}
@@ -253,7 +246,7 @@ const TopicCard = (props) => {
                                 WebkitLineClamp: 3,
                                 WebkitBoxOrient: 'vertical',
                                 overflow: 'hidden',
-                                height: '72px', // Fixed height: 1.6em * 3 lines roughly 72px? 1.6 * 14px * 3 = 67px. Let's make it safe.
+                                height: '72px',
                                 minHeight: '72px',
                             }}
                         >
@@ -261,7 +254,6 @@ const TopicCard = (props) => {
                         </Typography>
                     </Box>
 
-                    {/* Stats Row */}
                     <Box
                         sx={{
                             display: 'flex',
@@ -296,7 +288,6 @@ const TopicCard = (props) => {
                         )}
                     </Box>
 
-                    {/* Progress Bar */}
                     {progress > 0 && (
                         <Box>
                             <LinearProgress
@@ -319,7 +310,6 @@ const TopicCard = (props) => {
                         </Box>
                     )}
 
-                    {/* Action Button */}
                     <Box
                         sx={{
                             display: 'flex',
@@ -348,8 +338,6 @@ const TopicCard = (props) => {
     );
 };
 
-// Memoize with custom comparison to prevent re-renders
-// Only re-render if topic ID or progress actually changes
 export default React.memo(TopicCard, (prevProps, nextProps) => {
     return (
         prevProps.topic._id === nextProps.topic._id &&

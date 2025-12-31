@@ -25,7 +25,6 @@ export const trackEvent = (category, action, label = '', value = 0) => {
     }
 };
 
-// Custom Events
 export const trackCodeExecution = (language) => {
     trackEvent('Compiler', 'Execute Code', language);
 };

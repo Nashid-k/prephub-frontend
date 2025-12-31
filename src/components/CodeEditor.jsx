@@ -6,7 +6,6 @@ import { trackCodeExecution } from '../services/analytics';
 import { useLanguage } from '../context/LanguageContext';
 import './CodeEditor.css';
 
-// Lazy load Monaco Editor to reduce initial bundle size (~2MB)
 const Editor = lazy(() => import('@monaco-editor/react'));
 
 const CodeEditor = ({
@@ -23,17 +22,15 @@ const CodeEditor = ({
     const [testResults, setTestResults] = useState(null);
     const [isRunning, setIsRunning] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isEditorReady, setIsEditorReady] = useState(false); // Track Monaco loading
-    const editorRef = useRef(null); // For Monaco Editor disposal
+    const [isEditorReady, setIsEditorReady] = useState(false);
+    const editorRef = useRef(null);
 
-    // Sync with global language
     useEffect(() => {
         if (!defaultLanguage) {
             setLanguage(globalLanguage);
         }
     }, [globalLanguage, defaultLanguage]);
 
-    // Update global language when local language changes
     const handleLanguageChange = (newLang) => {
         setLanguage(newLang);
         if (!defaultLanguage) {
@@ -41,7 +38,6 @@ const CodeEditor = ({
         }
     };
 
-    // Dispose Monaco Editor on unmount to prevent memory leaks
     useEffect(() => {
         return () => {
             if (editorRef.current) {
@@ -78,14 +74,12 @@ const CodeEditor = ({
     const wrapCodeWithTests = (userCode, cases) => {
         if (!cases || cases.length === 0) return userCode;
 
-        // Extract function name from user code
         const functionMatch = userCode.match(/function\s+(\w+)\s*\(/);
         if (!functionMatch) return userCode;
 
         const functionName = functionMatch[1];
 
         let wrappedCode = userCode + '\n\n';
-        wrappedCode += '// Test execution wrapper\n';
         wrappedCode += 'const __testResults = [];\n';
 
         cases.forEach((testCase, index) => {
@@ -176,7 +170,6 @@ const CodeEditor = ({
         }
     };
 
-    // Resize Handlers
     const startResize = (e) => {
         setIsDragging(true);
         e.preventDefault();
@@ -237,7 +230,6 @@ const CodeEditor = ({
                         <AutoFixHigh fontSize="small" /> AI Analysis
                     </Box>
                     <Box sx={{ whiteSpace: 'pre-wrap' }}>
-                        {/* If it's a string, display it. if object, stringify */}
                         {typeof testResults.results === 'string' ? testResults.results : JSON.stringify(testResults.results, null, 2)}
                     </Box>
                 </Box>
@@ -252,7 +244,6 @@ const CodeEditor = ({
             );
         }
 
-        // Default: Run/Submit results (Expects Array)
         const { type, results } = testResults;
 
         if (!Array.isArray(results)) {
@@ -326,13 +317,12 @@ const CodeEditor = ({
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
-            minHeight: '600px', // Ensure editor is always visible
+            minHeight: '600px',
             borderRadius: 2,
             overflow: 'hidden',
             boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 8px 32px rgba(0,0,0,0.3)' : '0 4px 20px rgba(0,0,0,0.08)',
             border: (theme) => theme.palette.mode === 'dark' ? '1px solid rgba(255,255,255,0.05)' : '1px solid rgba(0,0,0,0.08)'
         }}>
-            {/* Toolbar */}
             <Box sx={{
                 p: 1.5,
                 bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(0,0,0,0.04)',
@@ -364,7 +354,6 @@ const CodeEditor = ({
                         ))}
                     </Select>
 
-                    {/* AI Tools */}
                     {onAiHelp && (
                         <Stack direction="row" spacing={0.5}>
                             <Tooltip title="Explain Code">
@@ -423,15 +412,14 @@ const CodeEditor = ({
                 </Stack>
             </Box>
 
-            {/* Editor Area */}
             <Box className="editor-content" sx={{
                 height: `${editorHeightPercent}%`,
                 minHeight: '300px',
                 position: 'relative',
-                bgcolor: '#1e1e1e', // Match snippet background
+                bgcolor: '#1e1e1e',
                 display: 'flex',
                 flexDirection: 'column',
-                border: '1px solid rgba(255,255,255,0.1)', // Subtle border instead of weird black box
+                border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '0 0 12px 12px',
                 overflow: 'hidden'
             }}>
@@ -465,11 +453,18 @@ const CodeEditor = ({
                         defaultValue={code}
                         onChange={(value) => onCodeChange(value || '')}
                         theme="prephub-dark"
+                        beforeMount={(monaco) => {
+                            monaco.editor.defineTheme('prephub-dark', {
+                                base: 'vs-dark',
+                                inherit: true,
+                                rules: [],
+                                colors: { 'editor.background': '#1e1e1e' }
+                            });
+                        }}
                         onMount={(editor, monaco) => {
                             editorRef.current = editor;
                             setIsEditorReady(true);
 
-                            // Define custom theme to match exact background
                             monaco.editor.defineTheme('prephub-dark', {
                                 base: 'vs-dark',
                                 inherit: true,
@@ -479,7 +474,6 @@ const CodeEditor = ({
                                 }
                             });
 
-                            // FORCE APPLY THEME
                             monaco.editor.setTheme('prephub-dark');
                         }}
                         options={{
@@ -502,7 +496,6 @@ const CodeEditor = ({
                 </Suspense>
             </Box>
 
-            {/* Resize Handle - More Visible */}
             <Box
                 className={`resize-handle ${isDragging ? 'dragging' : ''}`}
                 onMouseDown={startResize}
@@ -527,10 +520,9 @@ const CodeEditor = ({
                 <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: 'text.secondary', opacity: 0.5 }} />
             </Box>
 
-            {/* Output Area */}
             <Box className="editor-output" sx={{
                 height: `${100 - editorHeightPercent}%`,
-                minHeight: '150px', // Prevent complete collapse
+                minHeight: '150px',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
@@ -566,4 +558,4 @@ const CodeEditor = ({
     );
 };
 
-export default CodeEditor;
+export default React.memo(CodeEditor);

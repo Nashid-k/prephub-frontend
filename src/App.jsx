@@ -10,7 +10,7 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const TopicPage = React.lazy(() => import('./pages/TopicPage'));
 const CategoryPage = React.lazy(() => import('./pages/CategoryPage'));
 const SectionPage = React.lazy(() => import('./pages/SectionPage'));
-const CompilerPage = React.lazy(() => import('./pages/CompilerPage'));
+
 const ProgressPage = React.lazy(() => import('./pages/ProgressPage'));
 const BookmarksPage = React.lazy(() => import('./pages/BookmarksPage'));
 const LoginPage = React.lazy(() => import('./pages/LoginPage'));
@@ -116,7 +116,7 @@ function AppContent() {
                                             </ProtectedRoute>
                                         }
                                     />
-                                    <Route path="/compiler" element={<CompilerPage />} />
+
                                     <Route
                                         path="/bookmarks"
                                         element={

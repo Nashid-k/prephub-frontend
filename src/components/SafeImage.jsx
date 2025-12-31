@@ -1,11 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Skeleton } from '@mui/material';
 
-/**
- * SafeImage Component
- * Handles fallback for broken images, provides a loading state,
- * and implements native lazy-loading for better performance.
- */
 const SafeImage = ({
     src,
     alt,
@@ -52,5 +47,4 @@ const SafeImage = ({
     );
 };
 
-// Memoize to prevent unnecessary re-renders when parent updates
 export default React.memo(SafeImage);

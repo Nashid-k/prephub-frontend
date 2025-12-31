@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { getStreakData } from '../utils/streakTracker';
-import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
+import { getTopicImage } from '../utils/topicMetadata';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -16,11 +16,8 @@ const DashboardHeader = ({ user }) => {
     const [streak, setStreak] = useState({ currentStreak: 0, longestStreak: 0 });
 
     useEffect(() => {
-        // Fetch Streak
         const sData = getStreakData();
         if (sData) setStreak(sData);
-
-        // Fetch Recommendation
         fetchRecommendation();
     }, []);
 
@@ -28,18 +25,13 @@ const DashboardHeader = ({ user }) => {
         try {
             const token = localStorage.getItem('token');
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
-            // Using x-session-id handled by interceptor if configured, but here direct axios needs help if not using api service instance.
-            // Better to use the api service if possible, but for isolation let's use the same logic as RecCard for now, 
-            // OR use the imported api instance. 
-            // Let's rely on standard axios for now to avoid circular deps, assuming headers logic in api.js or handle manually.
-            // Actually, let's use the local storage session id manual check.
             if (!token) {
                 headers['x-session-id'] = localStorage.getItem('prephub_session_id');
             }
 
             const response = await axios.get(`${API_URL}/recommendations`, { headers });
             if (response.data && response.data.length > 0) {
-                setRecommendation(response.data[0]); // Just top 1
+                setRecommendation(response.data[0]);
             }
         } catch (err) {
             console.error('Failed to fetch recs', err);
@@ -65,7 +57,6 @@ const DashboardHeader = ({ user }) => {
     return (
         <Box sx={{ mb: 4, mt: 2 }}>
             <Grid container spacing={3} alignItems="stretch">
-                {/* Left: Stats & Welcome */}
                 <Grid item xs={12} md={5}>
                     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} style={{ height: '100%' }}>
                         <Paper sx={{ ...glassSx, background: isDark ? 'linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%)' : '#ffffff' }}>
@@ -108,7 +99,6 @@ const DashboardHeader = ({ user }) => {
                     </motion.div>
                 </Grid>
 
-                {/* Right: Recommendation Hero */}
                 <Grid item xs={12} md={7}>
                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }} style={{ height: '100%' }}>
                         <Paper sx={{ ...glassSx, position: 'relative', overflow: 'hidden' }}>
@@ -160,7 +150,6 @@ const DashboardHeader = ({ user }) => {
                                 )}
                             </Box>
 
-                            {/* Decorative Blob */}
                             <Box sx={{
                                 position: 'absolute', right: -50, bottom: -50, width: 200, height: 200,
                                 borderRadius: '50%', background: 'linear-gradient(45deg, #5e5ce6 0%, #0a84ff 100%)',

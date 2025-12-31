@@ -66,7 +66,7 @@ const TopicPage = () => {
         // Refetch when user returns to this page (e.g., after visiting category page)
         const handleVisibilityChange = () => {
             if (!document.hidden) {
-                console.log('TopicPage became visible, refreshing data...');
+                // Refresh topic data when component becomes visible
                 fetchAggregateData();
             }
         };

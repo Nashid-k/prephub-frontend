@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -24,14 +23,12 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
 
-        // Check if running on localhost to bypass login
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
         if (storedToken && storedUser) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
         } else if (isLocal) {
-            // Auto-login for local development
             const devUser = {
                 _id: 'dev-user-id',
                 name: 'Local Developer',
@@ -40,9 +37,6 @@ export const AuthProvider = ({ children }) => {
                 isDev: true
             };
             setUser(devUser);
-            // We don't necessarily need a real JWT for local UI testing 
-            // unless the local backend also requires it (which it usually does).
-            // But this bypasses the Front-end "Protected" checks.
         }
         setLoading(false);
     }, []);
@@ -61,7 +55,6 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(userData));
 
-            // Sync Local Bookmarks
             syncBookmarks(token);
 
             toast.success(`Welcome back, ${userData.name}!`);
@@ -89,9 +82,6 @@ export const AuthProvider = ({ children }) => {
                 { bookmarks: localBookmarks },
                 { headers: { Authorization: `Bearer ${authToken}` } }
             );
-
-            // Optional: Clear local bookmarks after sync or keep them as backup?
-            // For now, let's keep them but maybe we should rely on backend source of truth.
         } catch (error) {
             console.error('Bookmark Sync Error:', error);
         }

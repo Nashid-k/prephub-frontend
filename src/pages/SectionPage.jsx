@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
 import ReactMarkdown from 'react-markdown';
@@ -232,7 +232,7 @@ Provide:
 
 
 
-    const topicColor = getTopicColor(topicSlug, isDark);
+    const topicColor = useMemo(() => getTopicColor(topicSlug, isDark), [topicSlug, isDark]);
 
     // Close chat when clicking outside
     // Fix event listener leak by using useCallback

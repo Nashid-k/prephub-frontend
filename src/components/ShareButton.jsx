@@ -10,7 +10,6 @@ const ShareButton = ({ code, language = 'javascript' }) => {
             const compressed = LZString.compressToEncodedURIComponent(code);
             const shareUrl = `${window.location.origin}/share?code=${compressed}&lang=${language}`;
 
-            // Check URL length (browsers have ~2048 char limit)
             if (shareUrl.length > 2000) {
                 toast.error('Code is too long to share via URL. Try shortening it.');
                 return;

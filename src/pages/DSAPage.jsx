@@ -119,7 +119,7 @@ const DSAPage = () => {
 
                 <Grid container spacing={3}>
                     {topics.map((topic, index) => (
-                        <Grid item xs={12} sm={6} md={4} key={topic._id}>
+                        <Grid key={topic._id} size={{ xs: 12, sm: 6, md: 4 }}>
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}

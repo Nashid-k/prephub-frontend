@@ -18,7 +18,6 @@ const ProtectedRoute = ({ children }) => {
     const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
     if (!user && !isLocal) {
-        // Redirect to login page with state to redirect back after login
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 

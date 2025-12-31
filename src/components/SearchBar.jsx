@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
     Dialog,
@@ -29,7 +29,6 @@ const SearchBar = ({ onClose }) => {
     const [showResults, setShowResults] = useState(false);
     const navigate = useNavigate();
 
-    // Fetch suggestions for autocomplete
     useEffect(() => {
         const fetchSuggestions = async () => {
             if (query.length < 2) {
@@ -51,7 +50,6 @@ const SearchBar = ({ onClose }) => {
         return () => clearTimeout(debounce);
     }, [query]);
 
-    // Search function
     const handleSearch = async (e) => {
         e?.preventDefault();
 
@@ -86,7 +84,6 @@ const SearchBar = ({ onClose }) => {
         }
     };
 
-    // Navigate to result
     const handleResultClick = (result) => {
         if (result.type === 'topic') {
             navigate(`/topic/${result.slug}`);
@@ -98,7 +95,6 @@ const SearchBar = ({ onClose }) => {
         onClose?.();
     };
 
-    // Handle suggestion click
     const handleSuggestionClick = (suggestion) => {
         setQuery(suggestion.text);
         setSuggestions([]);
@@ -133,7 +129,6 @@ const SearchBar = ({ onClose }) => {
             }}
         >
             <Box sx={{ p: 4 }}>
-                {/* Header */}
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                     <Typography variant="h5" sx={{ fontWeight: 700 }}>
                         Search PrepHub
@@ -153,7 +148,6 @@ const SearchBar = ({ onClose }) => {
                     </IconButton>
                 </Box>
 
-                {/* Search Form */}
                 <Box component="form" onSubmit={handleSearch} sx={{ mb: 3 }}>
                     <TextField
                         fullWidth
@@ -191,7 +185,6 @@ const SearchBar = ({ onClose }) => {
                         sx={{ mb: 2 }}
                     />
 
-                    {/* Filters */}
                     <Box sx={{ display: 'flex', gap: 2 }}>
                         <Select
                             value={selectedDifficulty}
@@ -230,7 +223,6 @@ const SearchBar = ({ onClose }) => {
                     </Box>
                 </Box>
 
-                {/* Autocomplete Suggestions */}
                 {suggestions.length > 0 && !showResults && (
                     <Box sx={{ mb: 2 }}>
                         {suggestions.map((suggestion, index) => (
@@ -273,7 +265,6 @@ const SearchBar = ({ onClose }) => {
                     </Box>
                 )}
 
-                {/* Search Results */}
                 {showResults && results && (
                     <Box sx={{ maxHeight: '400px', overflowY: 'auto' }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
@@ -296,7 +287,6 @@ const SearchBar = ({ onClose }) => {
                             </Box>
                         ) : (
                             <>
-                                {/* Topics */}
                                 {results.topics?.length > 0 && (
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>
@@ -331,7 +321,6 @@ const SearchBar = ({ onClose }) => {
                                     </Box>
                                 )}
 
-                                {/* Categories */}
                                 {results.categories?.length > 0 && (
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>
@@ -369,7 +358,6 @@ const SearchBar = ({ onClose }) => {
                                     </Box>
                                 )}
 
-                                {/* Sections */}
                                 {results.sections?.length > 0 && (
                                     <Box>
                                         <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1.5 }}>

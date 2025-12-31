@@ -1,8 +1,6 @@
-// Bookmark utility functions using localStorage
 
 const BOOKMARKS_KEY = 'prephub_bookmarks';
 
-// Get all bookmarks
 export const getBookmarks = () => {
   try {
     const bookmarks = localStorage.getItem(BOOKMARKS_KEY);
@@ -13,18 +11,15 @@ export const getBookmarks = () => {
   }
 };
 
-// Add a bookmark
 export const addBookmark = (item) => {
   try {
     const bookmarks = getBookmarks();
     
-    // Check if already bookmarked
     const exists = bookmarks.some(b => b.id === item.id);
     if (exists) {
       return { success: false, message: 'Already bookmarked' };
     }
 
-    // Add bookmark with timestamp
     const newBookmark = {
       ...item,
       bookmarkedAt: new Date().toISOString()
@@ -40,7 +35,6 @@ export const addBookmark = (item) => {
   }
 };
 
-// Remove a bookmark
 export const removeBookmark = (itemId) => {
   try {
     const bookmarks = getBookmarks();
@@ -54,13 +48,11 @@ export const removeBookmark = (itemId) => {
   }
 };
 
-// Check if an item is bookmarked
 export const isBookmarked = (itemId) => {
   const bookmarks = getBookmarks();
   return bookmarks.some(b => b.id === itemId);
 };
 
-// Toggle bookmark (add if not exists, remove if exists)
 export const toggleBookmark = (item) => {
   if (isBookmarked(item.id)) {
     return removeBookmark(item.id);
@@ -69,7 +61,6 @@ export const toggleBookmark = (item) => {
   }
 };
 
-// Clear all bookmarks
 export const clearAllBookmarks = () => {
   try {
     localStorage.removeItem(BOOKMARKS_KEY);
@@ -80,18 +71,15 @@ export const clearAllBookmarks = () => {
   }
 };
 
-// Get bookmarks count
 export const getBookmarksCount = () => {
   return getBookmarks().length;
 };
 
-// Get bookmarks by type
 export const getBookmarksByType = (type) => {
   const bookmarks = getBookmarks();
   return bookmarks.filter(b => b.type === type);
 };
 
-// Export all functions
 export default {
   getBookmarks,
   addBookmark,

@@ -28,7 +28,6 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import { getStreakData } from '../utils/streakTracker';
 import StudyHeatmap from '../components/analytics/StudyHeatmap';
-import TimeSpentChart from '../components/analytics/TimeSpentChart';
 import WeakAreasCard from '../components/analytics/WeakAreasCard';
 
 const ProgressPage = () => {
@@ -83,13 +82,7 @@ const ProgressPage = () => {
     const streakData = getStreakData();
     const studyDates = streakData.studyDates || [];
 
-    // Prepare data for TimeSpentChart
-    const topicsForChart = topics
-        .filter(t => t.timeSpent > 0)
-        .map(t => ({
-            name: t.topicName,
-            timeSpent: t.timeSpent || 0
-        }));
+
 
     const stats = [
         {
@@ -251,37 +244,28 @@ const ProgressPage = () => {
                 <Box sx={{ mb: 8 }}>
                     <Typography variant="h4" sx={{ mb: 4, fontWeight: 700 }}>Analytics</Typography>
                     <Grid container spacing={3}>
-                        {/* Study Heatmap */}
-                        <Grid item xs={12} md={8}>
+                        {/* Study Heatmap - Full Width for Better Visibility */}
+                        <Grid item xs={12}>
                             <Paper sx={{
                                 p: 4,
                                 borderRadius: '24px',
-                                background: isDark ? 'rgba(30, 30, 30, 0.4)' : '#fff',
+                                background: isDark
+                                    ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%)'
+                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
                                 backdropFilter: 'blur(20px)',
                                 border: '1px solid',
                                 borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                                boxShadow: isDark
+                                    ? '0 8px 32px rgba(0, 0, 0, 0.3)'
+                                    : '0 8px 32px rgba(0, 0, 0, 0.08)',
                             }}>
                                 <StudyHeatmap studyDates={studyDates} />
                             </Paper>
                         </Grid>
 
-                        {/* Weak Areas */}
-                        <Grid item xs={12} md={4}>
-                            <WeakAreasCard topics={topics} />
-                        </Grid>
-
-                        {/* Time Spent Chart */}
+                        {/* Weak Areas - Full Width for Better Content Display */}
                         <Grid item xs={12}>
-                            <Paper sx={{
-                                p: 4,
-                                borderRadius: '24px',
-                                background: isDark ? 'rgba(30, 30, 30, 0.4)' : '#fff',
-                                backdropFilter: 'blur(20px)',
-                                border: '1px solid',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-                            }}>
-                                <TimeSpentChart topics={topicsForChart} />
-                            </Paper>
+                            <WeakAreasCard topics={topics} />
                         </Grid>
                     </Grid>
                 </Box>

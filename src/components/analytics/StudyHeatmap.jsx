@@ -1,97 +1,340 @@
-import React from 'react';
-import { Box, Typography, Tooltip } from '@mui/material';
-import { useTheme } from '../../context/ThemeContext';
+import React, { useMemo, useState } from 'react';
+import { Box, Typography, Tooltip, Chip, useTheme as useMuiTheme, IconButton } from '@mui/material';
+import { LocalFireDepartment, CalendarMonth, ChevronLeft, ChevronRight } from '@mui/icons-material';
 
 /**
- * GitHub-style activity heatmap showing study consistency
+ * Monthly activity heatmap showing study consistency
  * @param {Array} studyDates - Array of date strings when user studied
  */
 const StudyHeatmap = ({ studyDates = [] }) => {
-    const { theme } = useTheme();
-    const isDark = theme === 'dark';
+    const theme = useMuiTheme();
+    const isDark = theme.palette.mode === 'dark';
 
-    // Generate last 12 weeks (84 days)
-    const weeks = 12;
-    const days = weeks * 7;
-    const today = new Date();
-    const heatmapData = [];
+    // State for current viewing month/year
+    const [viewDate, setViewDate] = useState(new Date());
 
-    // Create date map for quick lookup
-    const dateMap = new Set(studyDates.map(d => new Date(d).toDateString()));
+    const { heatmapData, weekGroups, monthLabel, streakInfo, isCurrentMonth } = useMemo(() => {
+        const year = viewDate.getFullYear();
+        const month = viewDate.getMonth();
 
-    // Generate grid data
-    for (let i = days - 1; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-        const dateStr = date.toDateString();
-        heatmapData.push({
-            date: dateStr,
-            active: dateMap.has(dateStr),
-            dayOfWeek: date.getDay(),
-        });
-    }
+        // Get first and last day of the month
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
 
-    // Group by weeks
-    const weekGroups = [];
-    for (let i = 0; i < heatmapData.length; i += 7) {
-        weekGroups.push(heatmapData.slice(i, i + 7));
-    }
+        // Create date map for quick lookup
+        const dateMap = new Set(studyDates.map(d => new Date(d).toDateString()));
+
+        // Generate calendar data
+        const data = [];
+
+        // Get day of week for first day (0 = Sunday, 1 = Monday, etc.)
+        const startDayOfWeek = firstDay.getDay();
+
+        // Add empty cells for days before the month starts
+        for (let i = 0; i < startDayOfWeek; i++) {
+            data.push({
+                date: null,
+                dateStr: '',
+                active: false,
+                dayOfWeek: i,
+                isEmpty: true
+            });
+        }
+
+        // Add all days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const dateStr = date.toDateString();
+            data.push({
+                date: date,
+                dateStr: dateStr,
+                active: dateMap.has(dateStr),
+                dayOfWeek: date.getDay(),
+                isEmpty: false
+            });
+        }
+
+        // Group by weeks (7 days per week)
+        const groups = [];
+        for (let i = 0; i < data.length; i += 7) {
+            groups.push(data.slice(i, i + 7));
+        }
+
+        // Get month label
+        const label = firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        // Calculate streak (only for current month and past)
+        const today = new Date();
+        const todayStr = today.toDateString();
+        let currentStreak = 0;
+        let maxStreak = 0;
+        let tempStreak = 0;
+
+        // Only calculate if viewing current month or earlier
+        const now = new Date();
+        if (year <= now.getFullYear() && month <= now.getMonth()) {
+            // Count from most recent backwards
+            const allDates = [];
+            for (let i = 0; i <= 365; i++) {
+                const d = new Date(now);
+                d.setDate(d.getDate() - i);
+                allDates.push({
+                    dateStr: d.toDateString(),
+                    active: dateMap.has(d.toDateString())
+                });
+            }
+
+            for (let i = 0; i < allDates.length; i++) {
+                if (allDates[i].active) {
+                    tempStreak++;
+                    if (i === 0 || currentStreak > 0) {
+                        currentStreak = tempStreak;
+                    }
+                    maxStreak = Math.max(maxStreak, tempStreak);
+                } else {
+                    if (currentStreak === 0) {
+                        tempStreak = 0;
+                    }
+                }
+            }
+        }
+
+        const totalActiveDays = data.filter(d => d.active).length;
+
+        // Check if this is the current month
+        const isCurrent = year === now.getFullYear() && month === now.getMonth();
+
+        return {
+            heatmapData: data,
+            weekGroups: groups,
+            monthLabel: label,
+            streakInfo: { currentStreak, maxStreak, totalActiveDays },
+            isCurrentMonth: isCurrent
+        };
+    }, [studyDates, viewDate]);
 
     const getColor = (isActive) => {
         if (!isActive) {
-            return isDark ? '#1c1c1e' : '#ebedf0';
+            return isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
         }
-        return isDark ? '#30d158' : '#40c463';
+        return isDark
+            ? 'linear-gradient(135deg, #30d158 0%, #32d74b 100%)'
+            : 'linear-gradient(135deg, #34c759 0%, #30d158 100%)';
+    };
+
+    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const handlePreviousMonth = () => {
+        setViewDate(prevDate => {
+            const newDate = new Date(prevDate);
+            newDate.setMonth(newDate.getMonth() - 1);
+            return newDate;
+        });
+    };
+
+    const handleNextMonth = () => {
+        if (!isCurrentMonth) {
+            setViewDate(prevDate => {
+                const newDate = new Date(prevDate);
+                newDate.setMonth(newDate.getMonth() + 1);
+                return newDate;
+            });
+        }
     };
 
     return (
         <Box>
-            <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 'bold' }}>
-                Study Activity (Last {weeks} Weeks)
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 0.5, overflowX: 'auto' }}>
-                {weekGroups.map((week, weekIdx) => (
-                    <Box key={weekIdx} sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-                        {week.map((day, dayIdx) => (
-                            <Tooltip
-                                key={dayIdx}
-                                title={`${day.date}${day.active ? ' ✓' : ''}`}
-                                arrow
+            {/* Header with Stats */}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box
+                        sx={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: '12px',
+                            background: 'linear-gradient(135deg, #5e5ce620 0%, #5e5ce610 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            border: '1px solid',
+                            borderColor: '#5e5ce630',
+                        }}
+                    >
+                        <CalendarMonth sx={{ color: '#5e5ce6', fontSize: 24 }} />
+                    </Box>
+                    <Box>
+                        <Typography variant="h5" sx={{ fontWeight: 700, mb: 0.5 }}>
+                            Study Activity
+                        </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <IconButton
+                                size="small"
+                                onClick={handlePreviousMonth}
+                                sx={{
+                                    bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                    '&:hover': {
+                                        bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                    },
+                                }}
                             >
-                                <Box
-                                    sx={{
-                                        width: 12,
-                                        height: 12,
-                                        borderRadius: 0.5,
-                                        background: getColor(day.active),
-                                        cursor: 'pointer',
-                                        transition: 'transform 0.2s',
-                                        '&:hover': {
-                                            transform: 'scale(1.2)',
-                                        },
-                                    }}
-                                />
-                            </Tooltip>
+                                <ChevronLeft sx={{ fontSize: 18 }} />
+                            </IconButton>
+                            <Typography variant="body2" color="text.secondary" sx={{ minWidth: 140, textAlign: 'center', fontWeight: 600 }}>
+                                {monthLabel}
+                            </Typography>
+                            <IconButton
+                                size="small"
+                                onClick={handleNextMonth}
+                                disabled={isCurrentMonth}
+                                sx={{
+                                    bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                    '&:hover': {
+                                        bgcolor: isCurrentMonth ? 'transparent' : (isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'),
+                                    },
+                                    '&.Mui-disabled': {
+                                        opacity: 0.3,
+                                    },
+                                }}
+                            >
+                                <ChevronRight sx={{ fontSize: 18 }} />
+                            </IconButton>
+                        </Box>
+                    </Box>
+                </Box>
+
+                {/* Stats Chips */}
+                <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Chip
+                        icon={<LocalFireDepartment sx={{ fontSize: 18 }} />}
+                        label={`${streakInfo.currentStreak} day streak`}
+                        sx={{
+                            bgcolor: streakInfo.currentStreak > 0 ? '#ff9f0a20' : 'rgba(128,128,128,0.1)',
+                            color: streakInfo.currentStreak > 0 ? '#ff9f0a' : 'text.secondary',
+                            fontWeight: 700,
+                            borderRadius: '12px',
+                            height: 36,
+                            '& .MuiChip-icon': {
+                                color: streakInfo.currentStreak > 0 ? '#ff9f0a' : 'text.secondary',
+                            }
+                        }}
+                    />
+                    <Chip
+                        label={`${streakInfo.totalActiveDays} days this month`}
+                        sx={{
+                            bgcolor: '#5e5ce620',
+                            color: '#5e5ce6',
+                            fontWeight: 700,
+                            borderRadius: '12px',
+                            height: 36,
+                        }}
+                    />
+                </Box>
+            </Box>
+
+            {/* Heatmap Grid */}
+            <Box sx={{ overflowX: 'auto', pb: 2 }}>
+                <Box sx={{ minWidth: 400 }}>
+                    {/* Day of Week Headers */}
+                    <Box sx={{ display: 'flex', gap: '3px', mb: 2 }}>
+                        {dayLabels.map((day, idx) => (
+                            <Box key={idx} sx={{ flex: 1, textAlign: 'center', minWidth: 40 }}>
+                                <Typography variant="caption" sx={{ fontSize: '0.75rem', color: 'text.secondary', fontWeight: 600 }}>
+                                    {day}
+                                </Typography>
+                            </Box>
                         ))}
                     </Box>
-                ))}
+
+                    {/* Heatmap Cells */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                        {weekGroups.map((week, weekIdx) => (
+                            <Box key={weekIdx} sx={{ display: 'flex', gap: '3px' }}>
+                                {week.map((day, dayIdx) => {
+                                    if (day.isEmpty) {
+                                        return <Box key={dayIdx} sx={{ flex: 1, minWidth: 40, height: 40 }} />;
+                                    }
+
+                                    return (
+                                        <Tooltip
+                                            key={dayIdx}
+                                            title={
+                                                <Box sx={{ textAlign: 'center', py: 0.5 }}>
+                                                    <Typography variant="caption" sx={{ fontWeight: 600, display: 'block' }}>
+                                                        {day.date.toLocaleDateString('en-US', {
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            year: 'numeric'
+                                                        })}
+                                                    </Typography>
+                                                    <Typography variant="caption" sx={{ fontSize: '0.7rem', opacity: 0.8 }}>
+                                                        {day.active ? '✓ Studied' : 'No activity'}
+                                                    </Typography>
+                                                </Box>
+                                            }
+                                            arrow
+                                            placement="top"
+                                        >
+                                            <Box
+                                                sx={{
+                                                    flex: 1,
+                                                    minWidth: 40,
+                                                    height: 40,
+                                                    borderRadius: '8px',
+                                                    background: getColor(day.active),
+                                                    border: '1px solid',
+                                                    borderColor: day.active
+                                                        ? (isDark ? 'rgba(48, 209, 88, 0.3)' : 'rgba(52, 199, 89, 0.3)')
+                                                        : 'transparent',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                                                    boxShadow: day.active ? '0 2px 8px rgba(48, 209, 88, 0.2)' : 'none',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    '&:hover': {
+                                                        transform: 'scale(1.1)',
+                                                        boxShadow: day.active
+                                                            ? '0 4px 12px rgba(48, 209, 88, 0.4)'
+                                                            : '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                        zIndex: 10,
+                                                    },
+                                                }}
+                                            >
+                                                <Typography variant="caption" sx={{ fontWeight: 600, fontSize: '0.75rem' }}>
+                                                    {day.date.getDate()}
+                                                </Typography>
+                                            </Box>
+                                        </Tooltip>
+                                    );
+                                })}
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
-                <Typography variant="caption" color="text.secondary">
+
+            {/* Legend */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mt: 3, justifyContent: 'flex-end' }}>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                     Less
                 </Typography>
                 {[false, true].map((active, idx) => (
                     <Box
                         key={idx}
                         sx={{
-                            width: 12,
-                            height: 12,
-                            borderRadius: 0.5,
+                            width: 20,
+                            height: 20,
+                            borderRadius: '4px',
                             background: getColor(active),
+                            border: '1px solid',
+                            borderColor: active
+                                ? (isDark ? 'rgba(48, 209, 88, 0.3)' : 'rgba(52, 199, 89, 0.3)')
+                                : 'transparent',
                         }}
                     />
                 ))}
-                <Typography variant="caption" color="text.secondary">
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 500 }}>
                     More
                 </Typography>
             </Box>

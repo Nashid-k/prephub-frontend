@@ -18,13 +18,11 @@ export const SUPPORTED_LANGUAGES = [
 
 export const LanguageProvider = ({ children }) => {
     const [selectedLanguage, setSelectedLanguage] = useState(() => {
-        // Load from localStorage or default to JavaScript
         const saved = localStorage.getItem('prephub_preferred_language');
         return saved || 'javascript';
     });
 
     useEffect(() => {
-        // Save to localStorage whenever language changes
         localStorage.setItem('prephub_preferred_language', selectedLanguage);
     }, [selectedLanguage]);
 

@@ -13,8 +13,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-// Styled Option Button with better visual feedback
-const OptionButton = styled(Box)(({ theme, state }) => ({ // state: 'default' | 'correct' | 'wrong' | 'disabled'
+const OptionButton = styled(Box)(({ theme, state }) => ({
     padding: '16px 20px',
     borderRadius: '16px',
     border: '2px solid',
@@ -50,16 +49,13 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
     const [quiz, setQuiz] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [score, setScore] = useState(0);
-    const [selectedOption, setSelectedOption] = useState(null); // Index of selected option
+    const [selectedOption, setSelectedOption] = useState(null);
     const [showExplanation, setShowExplanation] = useState(false);
     const [quizCompleted, setQuizCompleted] = useState(false);
     const [error, setError] = useState(null);
 
-    // Initial Fetch
     useEffect(() => {
         if (open && topic && section) {
-            // Only fetch if empty to avoid reset on re-open unless desired
-            // Actually, usually modals reset on open. Let's keep it fresh.
             fetchQuiz(false, true);
         }
     }, [open, topic, section]);
@@ -80,9 +76,7 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
             const response = await aiAPI.generateQuiz(topic, section, regenerate, language, content);
             if (response.data.success && response.data.quiz) {
                 if (regenerate && !reset) {
-                    // Append new questions
                     setQuiz(prev => [...prev, ...response.data.quiz]);
-                    // Don't reset index, user continues
                 } else {
                     setQuiz(response.data.quiz);
                 }
@@ -98,12 +92,11 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
     };
 
     const handleOptionSelect = (index) => {
-        if (selectedOption !== null) return; // Prevent changing answer
+        if (selectedOption !== null) return;
 
         setSelectedOption(index);
         setShowExplanation(true);
 
-        // Adjust index for appended quizzes? No, currentQuestion handles it via currentIndex
         if (index === quiz[currentIndex].correctIndex) {
             setScore(prev => prev + 1);
         }
@@ -120,17 +113,10 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
     };
 
     const handleClose = () => {
-        if (quizCompleted) {
-            onClose(); // Just close if done
-        } else {
-            // Confirm closure if mid-quiz? No, simplifies UX just to close.
-            onClose();
-        }
+        onClose();
     };
 
     const currentQuestion = quiz[currentIndex];
-
-    // Colors
     const primaryColor = '#5e5ce6';
 
     return (
@@ -208,7 +194,6 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
                     ) : (
                         <Fade in={true} key={currentIndex}>
                             <Box>
-                                {/* Progress Header */}
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4, alignItems: 'center' }}>
                                     <Typography variant="subtitle2" sx={{ fontWeight: 600, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 1 }}>
                                         Question {currentIndex + 1} / {quiz.length}
@@ -226,12 +211,10 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
                                     </Box>
                                 </Box>
 
-                                {/* Question */}
                                 <Typography variant="h5" sx={{ fontWeight: 700, mb: 4, lineHeight: 1.4 }}>
                                     {currentQuestion.question}
                                 </Typography>
 
-                                {/* Options */}
                                 <Box>
                                     {currentQuestion.options.map((option, idx) => {
                                         let state = 'default';
@@ -263,7 +246,6 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
                                     })}
                                 </Box>
 
-                                {/* Explanation / Next Button */}
                                 {showExplanation && (
                                     <Fade in={true}>
                                         <Box sx={{ mt: 3, p: 2, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', borderRadius: '16px', borderLeft: `4px solid ${primaryColor}` }}>

@@ -1,13 +1,8 @@
-/**
- * Safe localStorage operations with quota handling
- */
-
 export const safeSetLocalStorage = (key, value) => {
     try {
         const str = JSON.stringify(value);
-        // Check size (rough estimation: 1 char ≈ 2 bytes in UTF-16)
         const sizeInBytes = str.length * 2;
-        const maxSize = 4 * 1024 * 1024; // 4MB limit (conservative)
+        const maxSize = 4 * 1024 * 1024;
         
         if (sizeInBytes > maxSize) {
             console.warn(`Data too large for localStorage (${Math.round(sizeInBytes / 1024 / 1024)}MB), skipping cache`);
@@ -18,31 +13,28 @@ export const safeSetLocalStorage = (key, value) => {
         return true;
     } catch (e) {
         if (e.name === 'QuotaExceededError' || e.code === 22) {
-            console.error('localStorage quota exceeded, clearing old data');
+            console.error('localStorage quota exceeded');
             
-            // Clear old section caches (keep only recent 5)
             try {
                 const sectionKeys = Object.keys(localStorage)
                     .filter(k => k.startsWith('prephub_section_'))
                     .sort((a, b) => {
                         const aTime = localStorage.getItem(`${a}_timestamp`) || '0';
                         const bTime = localStorage.getItem(`${b}_timestamp`) || '0';
-                        return aTime - bTime; // Oldest first
+                        return aTime - bTime;
                     });
                 
-                // Remove oldest entries except last 5
                 const keysToRemove = sectionKeys.slice(0, Math.max(0, sectionKeys.length - 5));
                 keysToRemove.forEach(k => {
                     localStorage.removeItem(k);
                     localStorage.removeItem(`${k}_timestamp`);
                 });
                 
-                // Try again after cleanup
                 localStorage.setItem(key, JSON.stringify(value));
                 localStorage.setItem(`${key}_timestamp`, Date.now().toString());
                 return true;
             } catch (e2) {
-                console.error('Failed even after cleanup:', e2);
+                console.error('Failed after cleanup:', e2);
                 return false;
             }
         }

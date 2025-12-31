@@ -8,7 +8,6 @@ const StreakBadge = ({ variant = 'full' }) => {
     const [streakData, setStreakData] = useState(null);
 
     useEffect(() => {
-        // Update streak on mount
         const updated = updateStreak();
         setStreakData(updated);
     }, []);

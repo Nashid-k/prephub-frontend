@@ -52,7 +52,6 @@ const RecommendationCard = ({ isDark }) => {
                 }}
             >
                 <CardContent sx={{ p: 4 }}>
-                    {/* Header */}
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
                         <Box
                             sx={{
@@ -74,7 +73,6 @@ const RecommendationCard = ({ isDark }) => {
                         </Box>
                     </Box>
 
-                    {/* Recommendations List */}
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {recommendations.map((rec, index) => {
                             const topicColor = getTopicColor(rec.slug, isDark);
@@ -101,7 +99,6 @@ const RecommendationCard = ({ isDark }) => {
                                         },
                                     }}
                                 >
-                                    {/* Topic Icon */}
                                     <Box
                                         sx={{
                                             width: 48,
@@ -126,7 +123,6 @@ const RecommendationCard = ({ isDark }) => {
                                         />
                                     </Box>
 
-                                    {/* Content */}
                                     <Box sx={{ flex: 1, minWidth: 0 }}>
                                         <Typography
                                             variant="body1"
@@ -151,7 +147,6 @@ const RecommendationCard = ({ isDark }) => {
                         })}
                     </Box>
 
-                    {/* View All Button */}
                     <Button
                         component={Link}
                         to="/dashboard"
