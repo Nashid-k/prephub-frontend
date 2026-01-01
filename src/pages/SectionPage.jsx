@@ -518,20 +518,21 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
             const isBlind75 = categoryData?.group?.startsWith('Blind 75');
             let context = '';
 
-            if (isBlind75) {
-                // For Blind 75, we want specific problem solving focus
-                context = `Problem Solving Context. Category: ${categoryData?.name}. Provide 3 distinct solution approaches.`;
-            } else {
-                // For general learning, provide rich context
-                const categoryContext = categoryData ? `Category: ${categoryData.name}. ` : '';
-                const keyPointsContext = sectionData.keyPoints ? `\nCover these key points: ${sectionData.keyPoints.join(', ')}.` : "";
-
-                // Construct a context string that helps the AI classify
-                context = `${categoryContext}${sectionData.description || ''}${keyPointsContext}`;
-            }
-
             // Use the human-readable topic name if available, otherwise slug
             const topicName = topic?.name || topicSlug;
+
+            // Construct a context string that helps the AI classify
+            const groupContext = categoryData?.group ? `Group: ${categoryData.group}. ` : '';
+            const categoryContext = categoryData ? `Category: ${categoryData.name}. ` : '';
+
+            if (isBlind75) {
+                // For Blind 75, we want specific problem solving focus
+                context = `${groupContext}${categoryContext}Problem Solving Context. Provide 3 distinct solution approaches.`;
+            } else {
+                // For general learning, provide rich context
+                const keyPointsContext = sectionData.keyPoints ? `\nCover these key points: ${sectionData.keyPoints.join(', ')}.` : "";
+                context = `${groupContext}${categoryContext}${sectionData.description || ''}${keyPointsContext}`;
+            }
 
             const response = await aiAPI.explainTopic(topicName, sectionData.title, context, lang);
             setAiContent(response.data.explanation);
@@ -827,31 +828,59 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                             </Box>
 
                             <List sx={{ overflowY: 'auto', flex: 1, px: 2 }}>
-                                {allSections.map((s, idx) => (
-                                    <ListItem key={s.slug} disablePadding sx={{ mb: 1 }}>
-                                        <ListItemButton
-                                            selected={s.slug === sectionSlug}
-                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
-                                            sx={{
-                                                bgcolor: `${topicColor}15`,
-                                                color: topicColor,
-                                                borderColor: `${topicColor}30`,
-                                                '&:hover': { bgcolor: `${topicColor}25` },
-                                                '&:not(.Mui-selected):hover': {
-                                                    bgcolor: 'action.hover',
-                                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-                                                }
-                                            }}
-                                        >
-                                            <Typography variant="body2" sx={{ fontWeight: s.slug === sectionSlug ? 700 : 500 }}>
-                                                {String(idx + 1).padStart(2, '0')}. {s.title}
-                                            </Typography>
-                                            {s.slug === sectionSlug && (
-                                                <PlayArrow sx={{ ml: 'auto', fontSize: 16 }} />
+                                {allSections.map((s, idx) => {
+                                    const currentGroup = s.category?.group;
+                                    const prevGroup = idx > 0 ? allSections[idx - 1].category?.group : null;
+                                    const showHeader = currentGroup && currentGroup !== prevGroup;
+
+                                    return (
+                                        <React.Fragment key={s.slug}>
+                                            {showHeader && (
+                                                <Typography variant="subtitle2" sx={{
+                                                    px: 2,
+                                                    py: 1.5,
+                                                    color: topicColor,
+                                                    fontWeight: 800,
+                                                    fontSize: '0.75rem',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: 1,
+                                                    opacity: 0.8,
+                                                    marginTop: idx > 0 ? 1 : 0
+                                                }}>
+                                                    {currentGroup}
+                                                </Typography>
                                             )}
-                                        </ListItemButton>
-                                    </ListItem>
-                                ))}
+                                            <ListItem disablePadding sx={{ mb: 1 }}>
+                                                <ListItemButton
+                                                    selected={s.slug === sectionSlug}
+                                                    onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
+                                                    sx={{
+                                                        bgcolor: s.slug === sectionSlug ? `${topicColor}15` : 'transparent',
+                                                        color: s.slug === sectionSlug ? topicColor : 'text.primary',
+                                                        borderLeft: s.slug === sectionSlug ? `3px solid ${topicColor}` : '3px solid transparent',
+                                                        borderRadius: '0 12px 12px 0',
+                                                        ml: 1,
+                                                        mr: 1,
+                                                        '&:hover': { bgcolor: `${topicColor}25` },
+                                                        '&:not(.Mui-selected):hover': {
+                                                            bgcolor: 'action.hover',
+                                                            borderRadius: '12px',
+                                                            ml: 1,
+                                                            borderLeft: 'none'
+                                                        }
+                                                    }}
+                                                >
+                                                    <Typography variant="body2" sx={{ fontWeight: s.slug === sectionSlug ? 700 : 500 }}>
+                                                        {String(idx + 1).padStart(2, '0')}. {s.title}
+                                                    </Typography>
+                                                    {s.slug === sectionSlug && (
+                                                        <PlayArrow sx={{ ml: 'auto', fontSize: 16 }} />
+                                                    )}
+                                                </ListItemButton>
+                                            </ListItem>
+                                        </React.Fragment>
+                                    );
+                                })}
                             </List>
 
                             {/* Nav Buttons at bottom of sidebar */}
