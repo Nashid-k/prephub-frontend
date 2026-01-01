@@ -105,6 +105,12 @@ export const getTopicImage = (topicSlug) => {
         'html & css combined': '/images/topics/html-css.png',
         'html': '/images/topics/html-css.png',
         'css': '/images/topics/html-css.png',
+        'machine-learning': '/images/topics/machine-learning.png',
+        'machine learning': '/images/topics/machine-learning.png',
+        'ml': '/images/topics/machine-learning.png',
+        'data-analyst': '/images/topics/data-analyst.png',
+        'data analyst': '/images/topics/data-analyst.png',
+        'data-analysis': '/images/topics/data-analyst.png',
     };
 
     return imageMap[normalizedSlug] || '/images/topics/dsa.svg';

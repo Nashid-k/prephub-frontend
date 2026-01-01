@@ -24,98 +24,98 @@ const PATH_RULES = {
     'new-beginner': {
         experienceLevels: {
             '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'react'],
-            '1-3_years': ['typescript', 'react', 'nextjs', 'dsa'],
-            '3-5_years': ['system-design', 'security', 'performance']
+            '1-3_years': ['typescript', 'react', 'nextjs', 'data-structures'],
+            '3-5_years': ['system-design', 'algorithms', 'blind-75'] // Advanced Algo for senior roles/interviews
         },
         mustHave: ['html-css-combined', 'javascript', 'git-version-control']
     },
     'mern-fullstack': {
         experienceLevels: {
             '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'react', 'nodejs', 'express', 'mongodb'],
-            '1-3_years': ['typescript', 'nextjs', 'dsa', 'algorithms', 'testing', 'redis-caching'],
-            '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'advanced-security', 'performance', 'aws-cloud']
+            '1-3_years': ['typescript', 'nextjs', 'data-structures', 'algorithms', 'testing', 'redis-caching'],
+            '3-5_years': ['system-design', 'distributed-systems', 'blind-75', 'microservices', 'advanced-security', 'performance', 'aws-cloud']
         },
-        mustHave: ['html-css-combined', 'javascript', 'dsa', 'mern-stack']
+        mustHave: ['html-css-combined', 'javascript', 'data-structures', 'mern-stack']
     },
     'mean-fullstack': {
         experienceLevels: {
             '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'angular', 'nodejs', 'express', 'mongodb'],
-            '1-3_years': ['typescript', 'rxjs', 'dsa', 'algorithms', 'testing'],
-            '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'performance', 'aws-cloud']
+            '1-3_years': ['typescript', 'rxjs', 'data-structures', 'algorithms', 'testing'],
+            '3-5_years': ['system-design', 'distributed-systems', 'blind-75', 'microservices', 'performance', 'aws-cloud']
         },
         mustHave: ['html-css-combined', 'javascript', 'angular', 'nodejs'] 
     },
     'python-fullstack': {
         experienceLevels: {
-            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'python', 'django', 'sql'],
-            '1-3_years': ['react', 'flask', 'fastapi', 'dsa', 'algorithms', 'docker'],
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'python', 'django', 'postgresql'],
+            '1-3_years': ['react', 'data-structures', 'algorithms', 'blind-75'], // Strong DSA needed for Backend/Python roles
             '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'aws-cloud']
         },
-        mustHave: ['python', 'django', 'javascript']
+        mustHave: ['python', 'django', 'javascript', 'algorithms']
     },
     'java-enterprise': {
         experienceLevels: {
-            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'java', 'spring-boot', 'sql'],
-            '1-3_years': ['angular', 'hibernate', 'dsa', 'algorithms', 'docker', 'junit'],
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'java', 'postgresql'],
+            '1-3_years': ['angular', 'data-structures', 'algorithms', 'blind-75', 'hibernate', 'docker', 'junit'],
             '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'aws-cloud']
         },
-        mustHave: ['java', 'spring-boot', 'sql']
+        mustHave: ['java', 'postgresql', 'algorithms']
     },
     'flutter-mobile': {
         experienceLevels: {
             '0-1_year': ['git-version-control', 'dart', 'flutter', 'firebase'],
-            '1-3_years': ['state-management', 'native-integrations', 'dsa', 'algorithms', 'testing'],
+            '1-3_years': ['state-management', 'native-integrations', 'data-structures', 'algorithms', 'testing'],
             '3-5_years': ['system-design', 'mobile-architecture', 'ci-cd', 'performance', 'aws-cloud']
         },
-        mustHave: ['dart', 'flutter', 'dsa']
+        mustHave: ['dart', 'flutter', 'data-structures']
     },
     'frontend-specialist': {
         experienceLevels: {
             '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'react', 'tailwind'],
-            '1-3_years': ['typescript', 'nextjs', 'vue', 'testing', 'accessibility', 'state-management'],
-            '3-5_years': ['system-design', 'web-performance', 'micro-frontends', 'security', 'aws-cloud']
+            '1-3_years': ['typescript', 'nextjs', 'vue', 'testing', 'accessibility', 'data-structures'], // DS for UI State mastery
+            '3-5_years': ['system-design', 'algorithms', 'web-performance', 'micro-frontends', 'security', 'aws-cloud'] // Algo for optimization
         },
         mustHave: ['html-css-combined', 'javascript', 'react']
     },
     'backend-specialist': {
         experienceLevels: {
-            '0-1_year': ['git-version-control', 'javascript', 'nodejs', 'express', 'sql', 'mongodb'],
-            '1-3_years': ['typescript', 'postgres', 'redis', 'docker', 'dsa', 'testing'],
+            '0-1_year': ['git-version-control', 'javascript', 'nodejs', 'express', 'postgresql', 'mongodb'],
+            '1-3_years': ['typescript', 'data-structures', 'algorithms', 'blind-75', 'redis', 'docker', 'testing'],
             '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'kubernetes', 'aws-cloud']
         },
-        mustHave: ['nodejs', 'sql', 'api-design']
+        mustHave: ['nodejs', 'postgresql', 'algorithms']
     },
     'golang-backend': {
         experienceLevels: {
-            '0-1_year': ['git-version-control', 'golang', 'sql', 'docker'],
-            '1-3_years': ['grpc', 'microservices', 'dsa', 'concurrency', 'postgres'],
+            '0-1_year': ['git-version-control', 'golang', 'postgresql', 'docker'],
+            '1-3_years': ['grpc', 'microservices', 'data-structures', 'algorithms', 'blind-75', 'concurrency'],
             '3-5_years': ['system-design', 'distributed-systems', 'kubernetes', 'aws-cloud']
         },
-        mustHave: ['golang', 'sql']
+        mustHave: ['golang', 'postgresql', 'algorithms']
     },
     'csharp-dotnet': {
         experienceLevels: {
-            '0-1_year': ['git-version-control', 'csharp', 'dotnet', 'sql', 'html-css-combined'],
-            '1-3_years': ['entity-framework', 'dsa', 'azure', 'testing', 'microservices'],
+            '0-1_year': ['git-version-control', 'csharp', 'dotnet', 'postgresql', 'html-css-combined'],
+            '1-3_years': ['entity-framework', 'data-structures', 'algorithms', 'blind-75', 'testing', 'microservices'],
             '3-5_years': ['system-design', 'distributed-systems', 'cloud-architecture', 'performance', 'aws-cloud']
         },
-        mustHave: ['csharp', 'dotnet']
+        mustHave: ['csharp', 'dotnet', 'algorithms']
     },
     'machine-learning-engineer': {
         experienceLevels: {
-            '0-1_year': ['git-version-control', 'python', 'sql', 'statistics', 'pandas', 'numpy'],
-            '1-3_years': ['machine-learning', 'data-analyst', 'algorithms', 'data-visualization', 'docker'],
-            '3-5_years': ['deep-learning', 'distributed-systems', 'aws-cloud', 'mlops', 'system-design']
+            '0-1_year': ['git-version-control', 'python', 'postgresql', 'data-structures'], // DS critical for data manipulations
+            '1-3_years': ['machine-learning', 'data-analyst', 'algorithms', 'docker'],
+            '3-5_years': ['system-design', 'distributed-systems', 'aws-cloud', 'blind-75'] // Blind 75 for top-tier AI interviews
         },
-        mustHave: ['python', 'machine-learning', 'math']
+        mustHave: ['python', 'machine-learning', 'algorithms']
     },
     'data-analyst': {
         experienceLevels: {
-            '0-1_year': ['git-version-control', 'python', 'sql', 'excel-advanced', 'statistics'],
-            '1-3_years': ['data-analyst', 'pandas', 'visualization-libs', 'tableau-powerbi'],
-            '3-5_years': ['machine-learning', 'big-data', 'aws-cloud', 'data-modeling']
+            '0-1_year': ['git-version-control', 'python', 'postgresql'],
+            '1-3_years': ['data-analyst', 'machine-learning', 'data-structures'],
+            '3-5_years': ['aws-cloud', 'algorithms'] // Algos for advanced optimization later
         },
-        mustHave: ['python', 'sql', 'data-analyst']
+        mustHave: ['python', 'data-analyst']
     },
     'aws-cloud-architect': {
         experienceLevels: {

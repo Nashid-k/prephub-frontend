@@ -139,7 +139,8 @@ const TopicCard = (props) => {
                 to={props.customLink || topic.customLink || `/topic/${topic.slug}`}
                 sx={{
                     textDecoration: 'none',
-                    height: '380px',
+                    height: '100%',
+                    minHeight: '340px',
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -341,6 +342,8 @@ const TopicCard = (props) => {
 export default React.memo(TopicCard, (prevProps, nextProps) => {
     return (
         prevProps.topic._id === nextProps.topic._id &&
-        prevProps.progress === nextProps.progress
+        prevProps.progress === nextProps.progress &&
+        prevProps.topic.categoryCount === nextProps.topic.categoryCount &&
+        prevProps.topic.sectionCount === nextProps.topic.sectionCount
     );
 });

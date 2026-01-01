@@ -9,7 +9,7 @@ import { getTopicImage } from '../utils/topicMetadata';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-const DashboardHeader = ({ user }) => {
+const DashboardHeader = ({ user, onManagePath }) => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
     const [recommendation, setRecommendation] = useState(null);
@@ -73,6 +73,26 @@ const DashboardHeader = ({ user }) => {
                                             Ready to continue your journey?
                                         </Typography>
                                     </Box>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                                    <Button
+                                        onClick={() => onManagePath(2)}
+                                        variant="outlined"
+                                        size="small"
+                                        startIcon={<Psychology />}
+                                        sx={{ borderRadius: '12px', borderColor: 'divider', textTransform: 'none' }}
+                                    >
+                                        Adjust Difficulty
+                                    </Button>
+                                    <Button
+                                        onClick={() => onManagePath(1)}
+                                        variant="text"
+                                        size="small"
+                                        sx={{ borderRadius: '12px', textTransform: 'none', color: 'text.secondary' }}
+                                    >
+                                        Change Path
+                                    </Button>
                                 </Box>
 
                                 <Box sx={{

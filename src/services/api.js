@@ -39,12 +39,12 @@ api.interceptors.request.use(
 );
 
 export const curriculumAPI = {
-  getAllTopics: () => api.get('/curriculum/topics'),
-  getPersonalizedTopics: () => api.get('/curriculum/topics/personalized'),
+  getAllTopics: (params = {}) => api.get('/curriculum/topics', { params }),
+  getPersonalizedTopics: (params = {}) => api.get('/curriculum/topics/personalized', { params }),
   getTopicBySlug: (slug) => api.get(`/curriculum/topics/${slug}`),
   getSectionBySlug: (topicSlug, sectionSlug) => 
     api.get(`/curriculum/sections/${topicSlug}/${sectionSlug}`),
-  getTopicAggregate: (slug) => api.get(`/curriculum/aggregate/topic/${slug}`),
+  getTopicAggregate: (slug, params = {}) => api.get(`/curriculum/aggregate/topic/${slug}`, { params }),
   getCategoryAggregate: (topicSlug, categorySlug) =>
     api.get(`/curriculum/aggregate/category/${topicSlug}/${categorySlug}`),
   getSectionAggregate: (topicSlug, sectionSlug) =>

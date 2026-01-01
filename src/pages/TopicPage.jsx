@@ -46,22 +46,11 @@ const TopicPage = () => {
     const [expandedCategory, setExpandedCategory] = useState(null);
     const [progressMap, setProgressMap] = useState({});
     const [progressStats, setProgressStats] = useState({ totalSections: 0, completedSections: 0, percentage: 0 });
+    const [bookmarks, setBookmarks] = useState(new Set()); // Added bookmarks state
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // 1. Load from cache first for instant visual
-        const cacheKey = `prephub_topic_agg_${slug}`;
-        const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
-            try {
-                const data = JSON.parse(cachedData);
-                applyAggregateData(data);
-                setLoading(false);
-            } catch (e) {
-                console.error('Failed to parse cached topic data');
-            }
-        }
-
+        // Fetch data (handles cache internally)
         fetchAggregateData();
 
         // Refetch when user returns to this page (e.g., after visiting category page)
@@ -92,16 +81,34 @@ const TopicPage = () => {
     const fetchAggregateData = async () => {
         try {
             const cacheKey = `prephub_topic_agg_${slug}`;
-            if (!localStorage.getItem(cacheKey)) {
-                setLoading(true);
+            // 1. Get User Experience Level (needed for API call)
+            let experienceLevel = '0-1_year'; // Default to beginner
+            try {
+                const configStr = localStorage.getItem('prephub_ai_path_config');
+                if (configStr) {
+                    const config = JSON.parse(configStr);
+                    if (config.experienceLevelId) {
+                        experienceLevel = config.experienceLevelId;
+                    }
+                }
+            } catch (e) {
+                console.error('Error parsing experience config for fetchAggregateData', e);
             }
 
-            const response = await curriculumAPI.getTopicAggregate(slug);
+            if (!localStorage.getItem(cacheKey)) {
+                console.log(`[Frontend] Fetching ${slug} for level: ${experienceLevel}`);
+                setLoading(true); // Keep original loading behavior
+            }
+
+            // Fetch fresh data with experience level param
+            const response = await curriculumAPI.getTopicAggregate(slug, { experienceLevel });
             const data = response.data;
+
+            console.log(`[Frontend] Received ${data.categories.length} categories from API`);
 
             applyAggregateData(data);
 
-            // 2. Save to cache
+            // Save to cache
             localStorage.setItem(cacheKey, JSON.stringify(data));
         } catch (err) {
             console.error('Error fetching topic aggregate:', err);
@@ -116,7 +123,73 @@ const TopicPage = () => {
     const groupedCategories = useMemo(() => {
         if (!categories.length) return [];
 
+        // 1. Get User Experience Level
+        let experienceLevel = '0-1_year'; // Default to beginner
+        try {
+            const configStr = localStorage.getItem('prephub_ai_path_config');
+            if (configStr) {
+                const config = JSON.parse(configStr);
+                if (config.experienceLevelId) {
+                    experienceLevel = config.experienceLevelId;
+                }
+            }
+        } catch (e) {
+            console.error('Error parsing experience config', e);
+        }
+
+        // 2. Define Exclusion Rules
+        const shouldShowCategory = (category) => {
+            const group = (category.group || '').toLowerCase();
+            const name = (category.name || '').toLowerCase();
+
+            // ALWAYS SHOW basic/fundamental stuff
+            if (group.includes('basic') || group.includes('fundament') || group.includes('setup')) return true;
+
+            // CHECK AI CONFIG for specific hide keywords first!
+            let aiHideKeywords = [];
+            try {
+                const configStr = localStorage.getItem('prephub_ai_path_config');
+                if (configStr) {
+                    const config = JSON.parse(configStr);
+                    if (config.hideKeywords && Array.isArray(config.hideKeywords)) {
+                        aiHideKeywords = config.hideKeywords.map(k => k.toLowerCase());
+                    }
+                }
+            } catch (e) {
+                console.error('Error parsing AI config', e);
+            }
+
+            // If AI provided rules, use them!
+            if (aiHideKeywords.length > 0) {
+                // SAFETY NET: If beginner, force-add "advanced" to the AI's list to be sure
+                if (experienceLevel === '0-1_year' && !aiHideKeywords.includes('advanced')) {
+                    aiHideKeywords.push('advanced');
+                    aiHideKeywords.push('internals');
+                    aiHideKeywords.push('architecture');
+                }
+
+                // If any keyword matches, hide it
+                const shouldHide = aiHideKeywords.some(keyword => group.includes(keyword) || name.includes(keyword));
+                return !shouldHide;
+            }
+
+            // Fallback Heuristics (Only if AI completely missing)
+            if (experienceLevel === '0-1_year') {
+                const text = (group + ' ' + name);
+                if (text.includes('advance')) return false;
+                if (text.includes('architecture')) return false;
+                if (text.includes('meta')) return false;
+                if (text.includes('internal')) return false;
+                return true;
+            }
+
+            return true;
+        };
+
         const grouped = categories.reduce((acc, category) => {
+            // Apply Filter
+            if (!shouldShowCategory(category)) return acc;
+
             const group = category.group || 'General Modules';
             if (!acc[group]) acc[group] = [];
             acc[group].push(category);
@@ -162,7 +235,13 @@ const TopicPage = () => {
 
     // Calculate progress based on sections, not categories
     const { totalSections, completedSections, percentage: overallProgress } = progressStats;
-    const totalCategories = categories.length;
+
+    // Use the filtered count for display, so user sees "45 Categories" instead of "68"
+    const totalCategories = useMemo(() => {
+        return groupedCategories.reduce((acc, [_, groupCats]) => acc + groupCats.length, 0);
+    }, [groupedCategories]);
+
+    // const totalCategories = categories.length; // OLD: Raw count
     const completedCategories = categories.filter(cat => progressMap[cat.slug]).length;
 
     if (loading) {
@@ -386,50 +465,62 @@ const TopicPage = () => {
 
                 {/* Dynamic Grouping Layout */}
                 <Box>
-                    {groupedCategories.map(([groupName, groupCategories]) => (
-                        <Box key={groupName} sx={{ mb: 6 }}>
-                            {/* Group Header - Hide if it's the only group and named 'General Modules' */}
-                            {!(groupedCategories.length === 1 && groupName === 'General Modules') && (
-                                <Typography
-                                    variant="h5"
-                                    sx={{
-                                        fontWeight: 700,
-                                        mb: 3,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 2,
-                                        color: isDark ? 'text.primary' : 'text.secondary',
-                                        opacity: 0.9
-                                    }}
-                                >
-                                    <span style={{
-                                        width: 8,
-                                        height: 24,
-                                        backgroundColor: topicColor,
-                                        borderRadius: 4,
-                                        display: 'inline-block'
-                                    }} />
-                                    {groupName}
-                                </Typography>
-                            )}
+                    {(() => {
+                        let globalIndex = 0;
+                        return groupedCategories.map(([groupName, groupCategories]) => (
+                            <Box key={groupName} sx={{ mb: 6 }}>
+                                {/* Group Header - Hide if it's the only group and named 'General Modules' */}
+                                {!(groupedCategories.length === 1 && groupName === 'General Modules') && (
+                                    <Typography
+                                        variant="h5"
+                                        sx={{
+                                            fontWeight: 700,
+                                            mb: 3,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 2,
+                                            color: isDark ? 'text.primary' : 'text.secondary',
+                                            opacity: 0.9
+                                        }}
+                                    >
+                                        <span style={{
+                                            width: 8,
+                                            height: 24,
+                                            backgroundColor: topicColor,
+                                            borderRadius: 4,
+                                            display: 'inline-block'
+                                        }} />
+                                        {groupName}
+                                    </Typography>
+                                )}
 
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                {groupCategories.map((category, index) => (
-                                    <CategoryCard
-                                        key={category._id}
-                                        category={category}
-                                        topic={{ ...topic, color: topicColor }}
-                                        index={index}
-                                        isCompleted={progressMap[category.slug] || false}
-                                        isBookmarked={isBookmarked(category._id)}
-                                        onToggleStatus={(e) => handleToggleCategory(e, category)}
-                                        onToggleBookmark={(e) => handleCategoryBookmark(e, category)}
-                                        onClick={() => navigate(`/topic/${topic.slug}/category/${category.slug}`)}
-                                    />
-                                ))}
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    {groupCategories.map((category) => {
+                                        const currentIndex = globalIndex++;
+                                        return (
+                                            <CategoryCard
+                                                key={category._id}
+                                                category={category}
+                                                topic={{ ...topic, color: topicColor }}
+                                                index={currentIndex}
+                                                isCompleted={progressMap[category.slug]}
+                                                isBookmarked={bookmarks.has(category._id)}
+                                                onToggleStatus={(e) => {
+                                                    e.stopPropagation();
+                                                    handleToggleCategory(category.slug);
+                                                }}
+                                                onToggleBookmark={(e) => {
+                                                    e.stopPropagation();
+                                                    handleToggleBookmark(category._id);
+                                                }}
+                                                onClick={() => navigate(`/topic/${topic.slug}/${category.slug}`)}
+                                            />
+                                        );
+                                    })}
+                                </Box>
                             </Box>
-                        </Box>
-                    ))}
+                        ));
+                    })()}
 
                     {/* Empty State */}
                     {categories.length === 0 && (

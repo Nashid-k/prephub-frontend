@@ -26,8 +26,10 @@ const Dashboard = () => {
     const [isPersonalized, setIsPersonalized] = useState(false);
     const [aiSuggestion, setAiSuggestion] = useState(null);
     const [selectedPath, setSelectedPath] = useState('all');
+    const [experienceLevel, setExperienceLevel] = useState('0-1_year');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [aiStrategy, setAiStrategy] = useState(null);
+    const [onboardingStep, setOnboardingStep] = useState(1); // New state for modal entry point
 
     useEffect(() => {
         const aiConfigStr = localStorage.getItem('prephub_ai_path_config');
@@ -36,14 +38,20 @@ const Dashboard = () => {
                 const config = JSON.parse(aiConfigStr);
                 if (config.pathId === selectedPath) {
                     setAiStrategy(config.learningStrategy);
+                    if (config.experienceLevelId) {
+                        setExperienceLevel(config.experienceLevelId);
+                    }
                 } else {
                     setAiStrategy(null);
+                    setExperienceLevel('0-1_year');
                 }
             } catch (e) {
                 setAiStrategy(null);
+                setExperienceLevel('0-1_year');
             }
         } else {
             setAiStrategy(null);
+            setExperienceLevel('0-1_year');
         }
     }, [selectedPath]);
 
@@ -55,6 +63,10 @@ const Dashboard = () => {
         'mern-fullstack': {
             name: '💻 MERN Full Stack',
             description: 'MongoDB, Express, React, Node.js'
+        },
+        'mean-fullstack': {
+            name: '🅰️ MEAN Full Stack',
+            description: 'MongoDB, Express, Angular, Node.js'
         },
         'python-fullstack': {
             name: '🐍 Python Full Stack',
@@ -92,13 +104,17 @@ const Dashboard = () => {
             name: '⚡ Systems Programming',
             description: 'Low-level C programming'
         },
-        'data-science': {
-            name: '📊 Data Science & AI',
-            description: 'Python, ML, and Analytics'
+        'machine-learning-engineer': {
+            name: '🤖 ML Engineer',
+            description: 'AI, Deep Learning & MLOps'
         },
-        'game-development': {
-            name: '🎮 Game Development',
-            description: 'Unity, Unreal, and C#'
+        'data-analyst': {
+            name: '📊 Data Analyst',
+            description: 'SQL, Python, Visualization'
+        },
+        'aws-cloud-architect': {
+            name: '☁️ Cloud Architect',
+            description: 'AWS, Security & DevOps'
         },
         'all': {
             name: '📚 Show All Topics',
@@ -119,16 +135,66 @@ const Dashboard = () => {
 
     const handleOnboardingComplete = (pathData) => {
         setSelectedPath(pathData.id);
+        if (pathData.experienceLevel) {
+            setExperienceLevel(pathData.experienceLevel.id);
+        }
         localStorage.setItem('prephub_learning_path', pathData.id);
         localStorage.setItem('prephub_onboarding_completed', 'true');
         setShowOnboarding(false);
     };
+
+    const fetchTopics = async () => {
+        try {
+            if (!localStorage.getItem('prephub_topics')) {
+                setLoading(true);
+            }
+            const params = { experienceLevel };
+            const response = isPersonalized
+                ? await curriculumAPI.getPersonalizedTopics(params)
+                : await curriculumAPI.getAllTopics(params);
+
+            if (response.data.success) {
+                if (response.data.personalized) {
+                    setIsPersonalized(true);
+                    if (response.data.aiSuggestion) {
+                        setAiSuggestion(response.data.aiSuggestion);
+                    }
+                }
+                const newTopics = response.data.topics;
+                // Exclude legacy or clutter items if needed, or rely on backend
+                const HIDDEN_SLUGS = [
+                    'html-css-basics', 'aws-cloud', 'system-design', 'testing-qa', 'devops-basics', 'mobile-dev', 'security-basics',
+                    'networking-basics', 'os-concepts', 'git-github'
+                ];
+                // Exclude hidden slugs
+                const visibleTopics = newTopics.filter(t => !HIDDEN_SLUGS.includes(t.slug));
+
+                setTopics(visibleTopics);
+                localStorage.setItem('prephub_topics', JSON.stringify(visibleTopics));
+            }
+        } catch (err) {
+            console.error('Failed to fetch topics:', err);
+            setError('Failed to load curriculum');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Re-trigger fetch when experience or personalization changes
+    useEffect(() => {
+        fetchTopics();
+    }, [experienceLevel, isPersonalized]);
 
     const handleOnboardingSkip = () => {
         setSelectedPath('all');
         localStorage.setItem('prephub_learning_path', 'all');
         localStorage.setItem('prephub_onboarding_completed', 'true');
         setShowOnboarding(false);
+    };
+
+    const openOnboarding = (step = 1) => {
+        setOnboardingStep(step);
+        setShowOnboarding(true);
     };
 
     const handlePathChange = (event) => {
@@ -140,7 +206,7 @@ const Dashboard = () => {
     const filteredTopics = useMemo(() => {
         let rawList = selectedPath === 'all'
             ? topics
-            : generateSmartPath(topics, selectedPath);
+            : generateSmartPath(topics, selectedPath, experienceLevel);
 
         // Apply AI Ordering if available
         const aiConfigStr = localStorage.getItem('prephub_ai_path_config');
@@ -169,7 +235,7 @@ const Dashboard = () => {
                 description: 'Master Algorithms, Data Structures and the Blind 75 list.',
                 slug: 'algorithms',
                 customLink: '/dsa',
-                contains: ['algorithms', 'data-structures', 'blind-75']
+                contains: ['algorithms', 'data-structures', 'blind-75', 'dsa-algorithms', 'dsa-datastructures']
             },
             {
                 _id: 'sys-design-agg',
@@ -207,7 +273,10 @@ const Dashboard = () => {
                     processedList.push({
                         ...groupDef,
                         isGroup: true,
-                        categoryCount: rawList.filter(t => groupDef.contains.includes(t.slug)).length
+                        // Sum the categoryCount of all topics in this group
+                        categoryCount: rawList
+                            .filter(t => groupDef.contains.includes(t.slug))
+                            .reduce((sum, t) => sum + (t.categoryCount || 0), 0)
                     });
                     handledGroups.add(groupDef._id);
                 }
@@ -217,7 +286,7 @@ const Dashboard = () => {
         }
 
         return processedList;
-    }, [topics, selectedPath]);
+    }, [topics, selectedPath, experienceLevel]);
 
     useEffect(() => {
         const hasSeenTour = localStorage.getItem('hasSeenTour');
@@ -231,58 +300,7 @@ const Dashboard = () => {
         localStorage.setItem('hasSeenTour', 'true');
     };
 
-    useEffect(() => {
-        const cachedTopics = localStorage.getItem('prephub_topics');
-        if (cachedTopics) {
-            try {
-                setTopics(JSON.parse(cachedTopics));
-                setLoading(false);
-            } catch (e) {
-                console.error('Failed to parse cached topics');
-            }
-        }
-        fetchTopics();
-    }, []);
 
-    const fetchTopics = async () => {
-        try {
-            if (!localStorage.getItem('prephub_topics')) {
-                setLoading(true);
-            }
-            const response = await curriculumAPI.getPersonalizedTopics();
-            if (response.data.personalized) {
-                setIsPersonalized(true);
-                if (response.data.aiSuggestion) {
-                    setAiSuggestion(response.data.aiSuggestion);
-                }
-            } else {
-                setIsPersonalized(false);
-            }
-            const newTopics = response.data.topics;
-            const HIDDEN_SLUGS = [
-                'blind-75', 'algorithms', 'dsa', 'data-structures',
-                'operating-systems', 'networking',
-                'system-design', 'api-design', 'caching-performance', 'reliability-observability', 'security-engineering', 'concurrency-async',
-                'devops-basics', 'code-quality', 'testing-strategy', 'product-thinking'
-            ];
-            const CORE_GROUPS = [
-                'algorithms-data-structures',
-                'cs-fundamentals',
-                'system-design-architecture',
-                'engineering-practices'
-            ];
-            setTopics(newTopics);
-            localStorage.setItem('prephub_topics', JSON.stringify(newTopics));
-            setError(null);
-        } catch (err) {
-            console.error('Error fetching topics:', err);
-            if (!localStorage.getItem('prephub_topics')) {
-                setError('Failed to load topics. Please try again.');
-            }
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const nextRecommendation = useMemo(() => {
         if (!selectedPath || selectedPath === 'all') return null;
