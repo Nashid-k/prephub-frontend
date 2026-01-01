@@ -546,12 +546,10 @@ const TopicPage = () => {
                                                 isCompleted={progressMap[category.slug]}
                                                 isBookmarked={bookmarks.has(category._id)}
                                                 onToggleStatus={(e) => {
-                                                    e.stopPropagation();
-                                                    handleToggleCategory(category.slug);
+                                                    handleToggleCategory(e, category);
                                                 }}
                                                 onToggleBookmark={(e) => {
-                                                    e.stopPropagation();
-                                                    handleToggleBookmark(category._id);
+                                                    handleCategoryBookmark(e, category);
                                                 }}
                                                 onClick={() => navigate(`/topic/${topic.slug}/category/${category.slug}`)}
                                             />
