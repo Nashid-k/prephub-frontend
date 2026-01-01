@@ -1,10 +1,15 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
-import ReactMarkdown from 'react-markdown';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import CodeEditor from '../components/CodeEditor';
+
+// Lazy load heavy components for better performance
+const ReactMarkdown = React.lazy(() => import('react-markdown'));
+const SyntaxHighlighter = React.lazy(() =>
+    import('react-syntax-highlighter').then(module => ({
+        default: module.Prism
+    }))
+);
+const CodeEditor = React.lazy(() => import('../components/CodeEditor'));
 import AIChat from '../components/AIChat';
 import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -1044,29 +1049,33 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                     </Typography>
                                                 </Box>
                                             ) : aiContent ? (
-                                                <ReactMarkdown
-                                                    components={{
-                                                        code({ node, inline, className, children, ...props }) {
-                                                            const match = /language-(\w+)/.exec(className || '');
-                                                            return !inline && match ? (
-                                                                <SyntaxHighlighter
-                                                                    style={vscDarkPlus}
-                                                                    language={match[1]}
-                                                                    PreTag="div"
-                                                                    {...props}
-                                                                >
-                                                                    {String(children).replace(/\n$/, '')}
-                                                                </SyntaxHighlighter>
-                                                            ) : (
-                                                                <code className={className} {...props}>
-                                                                    {children}
-                                                                </code>
-                                                            );
-                                                        }
-                                                    }}
-                                                >
-                                                    {aiContent}
-                                                </ReactMarkdown>
+                                                <Suspense fallback={<ContentSkeleton />}>
+                                                    <ReactMarkdown
+                                                        components={{
+                                                            code({ node, inline, className, children, ...props }) {
+                                                                const match = /language-(\w+)/.exec(className || '');
+                                                                return !inline && match ? (
+                                                                    <Suspense fallback={<EditorSkeleton />}>
+                                                                        <SyntaxHighlighter
+                                                                            style={vscDarkPlus}
+                                                                            language={match[1]}
+                                                                            PreTag="div"
+                                                                            {...props}
+                                                                        >
+                                                                            {String(children).replace(/\n$/, '')}
+                                                                        </SyntaxHighlighter>
+                                                                    </Suspense>
+                                                                ) : (
+                                                                    <code className={className} {...props}>
+                                                                        {children}
+                                                                    </code>
+                                                                );
+                                                            }
+                                                        }}
+                                                    >
+                                                        {aiContent}
+                                                    </ReactMarkdown>
+                                                </Suspense>
                                             ) : (
                                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
                                                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
