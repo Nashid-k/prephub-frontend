@@ -434,10 +434,12 @@ Provide:
         const promises = [];
         if (isBlind75) {
             setActiveTab('practice');
-            if (!testCases) promises.push(generateTestCases(sectionData));
-            if (!problemContent) promises.push(generateProblemContent(sectionData));
+            // Always regenerate for fresh content on navigation
+            promises.push(generateTestCases(sectionData));
+            promises.push(generateProblemContent(sectionData));
         } else {
-            if (!aiContent) promises.push(generateAIContent(sectionData, categoryData, selectedLanguage));
+            // Always regenerate AI content on navigation to ensure it matches the current section
+            promises.push(generateAIContent(sectionData, categoryData, selectedLanguage));
         }
 
         await Promise.all(promises);
