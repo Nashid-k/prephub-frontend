@@ -7,38 +7,24 @@ import { registerSW } from 'virtual:pwa-register';
 // Register Service Worker
 registerSW({ immediate: true });
 
-// Initialize highlight.js globally
-if (typeof window !== 'undefined' && window.hljs) {
-    window.hljs.configure({
-        languages: ['javascript', 'typescript', 'json', 'html', 'css', 'python', 'java', 'cpp', 'bash']
-    });
+// Highlight.js logic removed in favor of component-based highlighting in pages
 
-    // Auto-highlight on DOM changes
-    const observer = new MutationObserver(() => {
-        document.querySelectorAll('pre code:not(.hljs)').forEach((block) => {
-            if (block.dataset.highlighted !== 'yes') {
-                window.hljs.highlightElement(block);
-            }
-        });
-    });
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-
-    // Initial highlight
-    setTimeout(() => {
-        document.querySelectorAll('pre code').forEach((block) => {
-            if (block.dataset.highlighted !== 'yes') {
-                window.hljs.highlightElement(block);
-            }
-        });
-    }, 100);
-}
+// Create a client
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 1000 * 60 * 5, // 5 minutes
+            refetchOnWindowFocus: false, // Prevent refetching on window focus
+        },
+    },
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <App />
+        <QueryClientProvider client={queryClient}>
+            <App />
+        </QueryClientProvider>
     </React.StrictMode>
 );

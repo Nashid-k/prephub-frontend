@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
+import { useSectionAggregate } from '../hooks/useCurriculum';
 import AIChat from '../components/AIChat';
 import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { ContentSkeleton, EditorSkeleton } from '../components/SkeletonLoader';
-import { vscDarkPlus, coinPalette } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Drawer } from '@mui/material';
 import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
@@ -102,7 +103,7 @@ const SectionPage = () => {
     useActivityTracking(topicSlug, { categorySlug, sectionSlug });
 
     const chatRef = useRef(null); // Ref for AI Chat container
-    const abortControllerRef = useRef(null); // For canceling pending requests
+
     const currentRequestRef = useRef(null); // Track current request to prevent race conditions
 
     const [section, setSection] = useState(null);
@@ -330,58 +331,40 @@ Provide:
         };
     }, [handleClickOutside]);
 
-    useEffect(() => {
-        let isMounted = true;
-        abortControllerRef.current = new AbortController();
+    // Intelligent Caching with React Query
+    const {
+        data: sectionData,
+        isLoading: sectionLoading,
+        error: sectionError
+    } = useSectionAggregate(topicSlug, sectionSlug);
 
-        // Reset content to show loading state immediately when navigating
+    // Sync Loading State
+    useEffect(() => {
+        // Only show loading if we have no data at all (initial load)
+        // If we have cached data (keepPreviousData), we don't show full loader
+        setLoading(sectionLoading && !sectionData);
+    }, [sectionLoading, sectionData]);
+
+    // Sync Data to State
+    useEffect(() => {
+        if (sectionData && sectionData.section?.slug === sectionSlug) {
+            // Only apply if the data matches current section (avoids stale previousData application)
+            applyAggregateData(sectionData);
+            trackTopicStart(topicSlug);
+
+            // Reset AI content content when switching sections
+            // We can detect switch by comparing IDs or just blindly resetting if needed
+            // But doing it here might flicker. 
+            // Better to rely on applyAggregateData setting main content.
+        }
+    }, [sectionData, topicSlug, sectionSlug]);
+
+    // Reset ephemeral content on slug change (optional, but good for UX)
+    useEffect(() => {
         setAiContent('');
         setProblemContent('');
         setTestCases(null);
-        // Do NOT reset section immediately to null if you want to keep the frame, 
-        // but resetting it forces a "loading" spinner which might be what the user wants 
-        // if they say "loading content not changing".
-        // Let's reset it to ensure the fresh data is perceived.
-        setSection(null);
-        setLoading(true);
-
-        const loadData = async () => {
-            // 1. Load from cache first for instant UI
-            const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
-            const cachedData = localStorage.getItem(cacheKey);
-            let cachedLoaded = false;
-
-            if (cachedData && isMounted) {
-                try {
-                    const data = JSON.parse(cachedData);
-                    // Check if cached data matches current slug to avoid stale data from collision
-                    if (data.section?.slug === sectionSlug) {
-                        await applyAggregateData(data);
-                        if (isMounted) {
-                            setLoading(false);
-                            cachedLoaded = true;
-                        }
-                    }
-                } catch (e) {
-                    console.error('Failed to parse cached section data');
-                }
-            }
-
-            if (isMounted && !cachedLoaded) {
-                fetchAggregateData();
-            } else if (isMounted && cachedLoaded) {
-                // Silent refresh in background
-                fetchAggregateData(true);
-            }
-        };
-
-        loadData();
-
-        return () => {
-            isMounted = false;
-            abortControllerRef.current?.abort();
-        };
-    }, [topicSlug, categorySlug, sectionSlug]); // categorySlug needed for proper re-loading
+    }, [topicSlug, sectionSlug]);
 
     const applyAggregateData = async (data) => {
         const { section: sectionData, topic: topicData, category: categoryData, siblingSections, allTopicSections, userProgress } = data;
@@ -473,30 +456,7 @@ Provide:
         }
     }, [aiContent, activeTab]);
 
-    const fetchAggregateData = async (silent = false) => {
-        try {
-            const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
-            if (!silent) {
-                setLoading(true);
-            }
 
-            const response = await curriculumAPI.getSectionAggregate(topicSlug, sectionSlug);
-            const data = response.data;
-
-            await applyAggregateData(data);
-
-            // 2. Save to cache
-            localStorage.setItem(cacheKey, JSON.stringify(data));
-
-            trackTopicStart(topicSlug);
-        } catch (err) {
-            console.error('Error fetching section aggregate:', err);
-        } finally {
-            if (!silent) {
-                setLoading(false);
-            }
-        }
-    };
 
     const generateProblemContent = async (sectionData) => {
         setContentLoading(true);

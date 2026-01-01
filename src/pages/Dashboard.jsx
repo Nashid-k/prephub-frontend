@@ -10,6 +10,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import Walkthrough from '../components/Walkthrough';
 import OnboardingModal from '../components/OnboardingModal';
 import { useAuth } from '../context/AuthContext';
+import { useTopics } from '../hooks/useCurriculum';
 import axios from 'axios';
 import { getStreakData } from '../utils/streakTracker';
 import './Dashboard.css';
@@ -18,10 +19,9 @@ import { generateSmartPath, getNextRecommendation } from '../utils/SmartCurricul
 const Dashboard = () => {
     const { user } = useAuth();
     const theme = useMuiTheme();
-    const [topics, setTopics] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [stats, setStats] = useState(null);
+
+    // UI State
     const [runTour, setRunTour] = useState(false);
     const [isPersonalized, setIsPersonalized] = useState(false);
     const [aiSuggestion, setAiSuggestion] = useState(null);
@@ -29,7 +29,29 @@ const Dashboard = () => {
     const [experienceLevel, setExperienceLevel] = useState('0-1_year');
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [aiStrategy, setAiStrategy] = useState(null);
-    const [onboardingStep, setOnboardingStep] = useState(1); // New state for modal entry point
+    const [onboardingStep, setOnboardingStep] = useState(1);
+
+    // React Query for Topics
+    const {
+        data: topicsData,
+        isLoading: topicsLoading,
+        error: topicsError,
+        refetch: refetchTopics
+    } = useTopics({ experienceLevel, isPersonalized });
+
+    const topics = topicsData?.topics || [];
+    const loading = topicsLoading;
+    const error = topicsError ? 'Failed to load curriculum' : null;
+
+    // Handle personalization signal from API (if any)
+    useEffect(() => {
+        if (topicsData?.personalized) {
+            setIsPersonalized(true);
+        }
+        if (topicsData?.aiSuggestion) {
+            setAiSuggestion(topicsData.aiSuggestion);
+        }
+    }, [topicsData]);
 
     useEffect(() => {
         const aiConfigStr = localStorage.getItem('prephub_ai_path_config');
@@ -143,48 +165,19 @@ const Dashboard = () => {
         setShowOnboarding(false);
     };
 
-    const fetchTopics = async () => {
-        try {
-            if (!localStorage.getItem('prephub_topics')) {
-                setLoading(true);
-            }
-            const params = { experienceLevel };
-            const response = isPersonalized
-                ? await curriculumAPI.getPersonalizedTopics(params)
-                : await curriculumAPI.getAllTopics(params);
+    // Exclude hidden slugs (Client-side filtering still useful)
+    const HIDDEN_SLUGS = [
+        'html-css-basics', 'testing-qa', 'mobile-dev', 'security-basics',
+        'networking-basics', 'os-concepts', 'git-github'
+    ];
 
-            if (response.data.success) {
-                if (response.data.personalized) {
-                    setIsPersonalized(true);
-                    if (response.data.aiSuggestion) {
-                        setAiSuggestion(response.data.aiSuggestion);
-                    }
-                }
-                const newTopics = response.data.topics;
-                // Exclude legacy or clutter items if needed, or rely on backend
-                // Only hide truly deprecated/duplicate topics
-                const HIDDEN_SLUGS = [
-                    'html-css-basics', 'testing-qa', 'mobile-dev', 'security-basics',
-                    'networking-basics', 'os-concepts', 'git-github'
-                ];
-                // Exclude hidden slugs
-                const visibleTopics = newTopics.filter(t => !HIDDEN_SLUGS.includes(t.slug));
+    // Memoize the filtering logic
+    const cleanTopics = useMemo(() => {
+        return topics.filter(t => !HIDDEN_SLUGS.includes(t.slug));
+    }, [topics]);
 
-                setTopics(visibleTopics);
-                localStorage.setItem('prephub_topics', JSON.stringify(visibleTopics));
-            }
-        } catch (err) {
-            console.error('Failed to fetch topics:', err);
-            setError('Failed to load curriculum');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Re-trigger fetch when experience or personalization changes
-    useEffect(() => {
-        fetchTopics();
-    }, [experienceLevel, isPersonalized]);
+    // Update fetchTopics ref to use refetch from React Query
+    const fetchTopics = refetchTopics;
 
     const handleOnboardingSkip = () => {
         setSelectedPath('all');
@@ -206,8 +199,8 @@ const Dashboard = () => {
 
     const filteredTopics = useMemo(() => {
         let rawList = selectedPath === 'all'
-            ? topics
-            : generateSmartPath(topics, selectedPath, experienceLevel);
+            ? cleanTopics
+            : generateSmartPath(cleanTopics, selectedPath, experienceLevel);
 
         // Apply AI Ordering if available
         const aiConfigStr = localStorage.getItem('prephub_ai_path_config');

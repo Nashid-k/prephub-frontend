@@ -150,24 +150,7 @@ const LEARNING_PATHS = [
         duration: '4-6 months',
         detail: 'Concurrency & Microservices'
     },
-    {
-        id: 'machine-learning-engineer',
-        name: 'ML Engineer',
-        description: 'From Mathematics to Deep Learning models.',
-        icon: <Psychology sx={{ fontSize: 32 }} />,
-        color: '#FF2D55',
-        duration: '6-8 months',
-        detail: 'AI & Data Science'
-    },
-    {
-        id: 'data-analyst',
-        name: 'Data Analyst',
-        description: 'Uncover insights with Python, SQL, and Visualization.',
-        icon: <Analytics sx={{ fontSize: 32 }} />,
-        color: '#FF9500',
-        duration: '4-6 months',
-        detail: 'Data-Driven Decision Making'
-    },
+
     {
         id: 'aws-cloud-architect',
         name: 'Cloud Architect',

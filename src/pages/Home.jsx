@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
     Container,
@@ -32,7 +32,12 @@ import {
     Speed,
     EmojiEvents,
     LocalFireDepartment,
+    AutoAwesome,
+    FlashOn,
+    LaptopMac,
+    Timeline
 } from '@mui/icons-material';
+import OnboardingModal from '../components/OnboardingModal';
 import { progressAPI } from '../services/api';
 import { getBookmarks } from '../utils/bookmarks';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
@@ -44,10 +49,12 @@ const Home = () => {
     const { user } = useAuth();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
+    const navigate = useNavigate();
     const [progress, setProgress] = useState(null);
     const [recentBookmarks, setRecentBookmarks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ topics: 0, sections: 0, active: 0 });
+    const [showOnboarding, setShowOnboarding] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -93,34 +100,48 @@ const Home = () => {
 
     const features = [
         {
-            icon: <Psychology sx={{ fontSize: 40 }} />,
-            title: 'AI-Powered Learning',
-            description: 'Smart explanations with code examples using Gemini AI',
+            icon: <AutoAwesome sx={{ fontSize: 40 }} />,
+            title: 'AI-Powered Tutor',
+            description: 'Context-aware explanations generated in real-time for any topic.',
             color: '#5e5ce6',
             gradient: 'linear-gradient(135deg, #5e5ce6 0%, #7d7bf0 100%)',
         },
         {
-            icon: <GpsFixed sx={{ fontSize: 40 }} />,
-            title: 'Blind 75 Problems',
-            description: 'Master essential LeetCode interview problems',
+            icon: <FlashOn sx={{ fontSize: 40 }} />,
+            title: 'Instant Performance',
+            description: 'Navigate seamlessly with our new Intelligent Caching engine.',
             color: '#30d158',
             gradient: 'linear-gradient(135deg, #30d158 0%, #32d74b 100%)',
         },
         {
-            icon: <TrendingUp sx={{ fontSize: 40 }} />,
-            title: 'Progress Analytics',
-            description: 'Track mastery with detailed insights & heatmaps',
+            icon: <LaptopMac sx={{ fontSize: 40 }} />,
+            title: 'Interactive Editor',
+            description: 'Write, run, and test code in 10+ languages directly in browser.',
             color: '#ff9f0a',
             gradient: 'linear-gradient(135deg, #ff9f0a 0%, #ff9500 100%)',
         },
         {
-            icon: <AutoStories sx={{ fontSize: 40 }} />,
-            title: 'Structured Curriculum',
-            description: '120+ sections across 8+ core technologies',
+            icon: <Timeline sx={{ fontSize: 40 }} />,
+            title: 'Smart Curriculum',
+            description: 'Personalized learning paths tailored to your experience level.',
             color: '#5ac8fa',
             gradient: 'linear-gradient(135deg, #5ac8fa 0%, #64d2ff 100%)',
         },
     ];
+
+    const handleStartLearning = () => {
+        if (hasActivity) {
+            navigate('/dashboard');
+        } else {
+            setShowOnboarding(true);
+        }
+    };
+
+    const handleOnboardingComplete = (data) => {
+        console.log('Onboarding complete:', data);
+        setShowOnboarding(false);
+        navigate('/dashboard');
+    };
 
     const platformStats = [
         { icon: <Widgets />, label: 'Topics', value: stats.topics, color: '#5e5ce6' },
@@ -288,8 +309,7 @@ const Home = () => {
                             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ justifyContent: 'center', mb: 6 }}>
                                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                     <Button
-                                        component={Link}
-                                        to="/dashboard"
+                                        onClick={handleStartLearning}
                                         variant="contained"
                                         size="large"
                                         startIcon={<RocketLaunch />}
@@ -308,7 +328,7 @@ const Home = () => {
                                             transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                         }}
                                     >
-                                        {hasActivity ? 'Continue Learning' : 'Start Learning'}
+                                        {hasActivity ? 'Continue Learning' : 'Start My Journey'}
                                     </Button>
                                 </motion.div>
                                 {!hasActivity && (
@@ -927,7 +947,18 @@ const Home = () => {
                     ))}
                 </Grid>
             </Container>
-        </Box>
+
+
+            {/* Onboarding Modal */}
+            <OnboardingModal
+                open={showOnboarding}
+                onComplete={handleOnboardingComplete}
+                onSkip={() => {
+                    setShowOnboarding(false);
+                    navigate('/dashboard');
+                }}
+            />
+        </Box >
     );
 };
 
