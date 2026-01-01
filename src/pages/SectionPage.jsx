@@ -14,6 +14,7 @@ import AIChat from '../components/AIChat';
 import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { ContentSkeleton, EditorSkeleton } from '../components/SkeletonLoader';
+import { vscDarkPlus, coinPalette } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Drawer } from '@mui/material';
 import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
