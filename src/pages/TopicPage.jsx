@@ -513,7 +513,7 @@ const TopicPage = () => {
                                                     e.stopPropagation();
                                                     handleToggleBookmark(category._id);
                                                 }}
-                                                onClick={() => navigate(`/topic/${topic.slug}/${category.slug}`)}
+                                                onClick={() => navigate(`/topic/${topic.slug}/category/${category.slug}`)}
                                             />
                                         );
                                     })}

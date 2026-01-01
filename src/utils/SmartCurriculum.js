@@ -87,17 +87,17 @@ const PATH_RULES = {
     },
     'golang-backend': {
         experienceLevels: {
-            '0-1_year': ['git-version-control', 'golang', 'postgresql', 'docker'],
-            '1-3_years': ['grpc', 'microservices', 'data-structures', 'algorithms', 'blind-75', 'concurrency'],
-            '3-5_years': ['system-design', 'distributed-systems', 'kubernetes', 'aws-cloud']
+            '0-1_year': ['git-version-control', 'golang', 'postgresql'],
+            '1-3_years': ['data-structures', 'algorithms', 'blind-75'],
+            '3-5_years': ['system-design', 'distributed-systems', 'aws-cloud']
         },
         mustHave: ['golang', 'postgresql', 'algorithms']
     },
     'csharp-dotnet': {
         experienceLevels: {
-            '0-1_year': ['git-version-control', 'csharp', 'dotnet', 'postgresql', 'html-css-combined'],
-            '1-3_years': ['entity-framework', 'data-structures', 'algorithms', 'blind-75', 'testing', 'microservices'],
-            '3-5_years': ['system-design', 'distributed-systems', 'cloud-architecture', 'performance', 'aws-cloud']
+            '0-1_year': ['git-version-control', 'csharp', 'dotnet', 'postgresql'],
+            '1-3_years': ['data-structures', 'algorithms', 'blind-75'],
+            '3-5_years': ['system-design', 'distributed-systems', 'aws-cloud']
         },
         mustHave: ['csharp', 'dotnet', 'algorithms']
     },

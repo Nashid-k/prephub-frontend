@@ -162,8 +162,9 @@ const Dashboard = () => {
                 }
                 const newTopics = response.data.topics;
                 // Exclude legacy or clutter items if needed, or rely on backend
+                // Only hide truly deprecated/duplicate topics
                 const HIDDEN_SLUGS = [
-                    'html-css-basics', 'aws-cloud', 'system-design', 'testing-qa', 'devops-basics', 'mobile-dev', 'security-basics',
+                    'html-css-basics', 'testing-qa', 'mobile-dev', 'security-basics',
                     'networking-basics', 'os-concepts', 'git-github'
                 ];
                 // Exclude hidden slugs
