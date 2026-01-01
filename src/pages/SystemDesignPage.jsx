@@ -52,7 +52,7 @@ const SystemDesignPage = () => {
         return (
             <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
                 <Container maxWidth="xl">
-                    <LoadingSpinner message="Loading System Design modules..." />
+                    <LoadingSpinner message="Architecting System Design path..." />
                 </Container>
             </Box>
         );

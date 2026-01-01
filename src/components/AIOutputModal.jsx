@@ -26,6 +26,7 @@ const AIOutputModal = ({ open, onClose, type, response, loading }) => {
                 return {
                     icon: <Lightbulb />,
                     title: 'Code Explanation',
+                    loadingText: 'Generating clear explanation...',
                     color: '#0a84ff',
                     bgcolor: 'rgba(10, 132, 255, 0.1)'
                 };
@@ -33,6 +34,7 @@ const AIOutputModal = ({ open, onClose, type, response, loading }) => {
                 return {
                     icon: <BugReport />,
                     title: 'Debug Analysis',
+                    loadingText: 'Hunting for bugs & issues...',
                     color: '#ef4444',
                     bgcolor: 'rgba(239, 68, 68, 0.1)'
                 };
@@ -40,6 +42,7 @@ const AIOutputModal = ({ open, onClose, type, response, loading }) => {
                 return {
                     icon: <AutoFixHigh />,
                     title: 'Optimization Suggestions',
+                    loadingText: 'Improving time & space complexity...',
                     color: '#8b5cf6',
                     bgcolor: 'rgba(139, 92, 246, 0.1)'
                 };
@@ -47,6 +50,7 @@ const AIOutputModal = ({ open, onClose, type, response, loading }) => {
                 return {
                     icon: <Lightbulb />,
                     title: 'AI Assistant',
+                    loadingText: 'AI is thinking...',
                     color: '#0a84ff',
                     bgcolor: 'rgba(10, 132, 255, 0.1)'
                 };
@@ -107,7 +111,7 @@ const AIOutputModal = ({ open, onClose, type, response, loading }) => {
                     }}>
                         <CircularProgress size={40} sx={{ color: config.color }} />
                         <Typography variant="body2" color="text.secondary">
-                            Analyzing your code...
+                            {config.loadingText}
                         </Typography>
                     </Box>
                 ) : (

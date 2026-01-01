@@ -306,7 +306,7 @@ const Dashboard = () => {
         return (
             <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
                 <Container maxWidth="xl">
-                    <LoadingSpinner message="Loading curriculum..." />
+                    <LoadingSpinner message="Personalizing your dashboard..." />
                 </Container>
             </Box>
         );

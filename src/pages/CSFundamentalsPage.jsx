@@ -45,7 +45,7 @@ const CSFundamentalsPage = () => {
         return (
             <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
                 <Container maxWidth="xl">
-                    <LoadingSpinner message="Loading CS Fundamentals..." />
+                    <LoadingSpinner message="Initializing CS Fundamentals..." />
                 </Container>
             </Box>
         );

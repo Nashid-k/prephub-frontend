@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
 import { useSectionAggregate } from '../hooks/useCurriculum';
@@ -335,6 +336,7 @@ Provide:
     const {
         data: sectionData,
         isLoading: sectionLoading,
+        isFetching,
         error: sectionError
     } = useSectionAggregate(topicSlug, sectionSlug);
 
@@ -625,599 +627,642 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
             background: isDark ? 'linear-gradient(180deg, #09090b 0%, #18181b 100%)' : '#f8fafc',
             color: 'text.primary',
         }}>
+            {/* Top Loading Bar for Background Fetching */}
+            {isFetching && !loading && (
+                <LinearProgress
+                    sx={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        zIndex: 9999,
+                        height: 3,
+                        bgcolor: 'transparent',
+                        '& .MuiLinearProgress-bar': {
+                            background: `linear-gradient(90deg, ${topicColor} 0%, ${topicColor}CC 100%)`
+                        }
+                    }}
+                />
+            )}
+
             <Container maxWidth={false} sx={{ px: activeTab === 'practice' ? 0 : { xs: 2, md: 4 }, transition: 'padding 0.3s' }}>
-                {/* Header / Breadcrumb */}
-                <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Button
-                        startIcon={<ArrowBack />}
-                        onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}`)}
-                        sx={{
-                            borderRadius: '9999px',
-                            px: 3,
-                            py: 1,
-                            background: (theme) =>
-                                theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.05)'
-                                    : 'rgba(0, 0, 0, 0.06)',
-                            backdropFilter: 'blur(10px)',
-                            border: '1px solid',
-                            borderColor: (theme) =>
-                                theme.palette.mode === 'dark'
-                                    ? 'rgba(255, 255, 255, 0.1)'
-                                    : 'rgba(0, 0, 0, 0.12)',
-                            color: 'text.primary',
-                            textTransform: 'none',
-                            '&:hover': {
-                                background: `${topicColor}20`,
-                                borderColor: topicColor,
-                                color: topicColor
-                            },
-                        }}
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={sectionSlug}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
                     >
-                        Back to {category?.name || 'Category'}
-                    </Button>
+                        {/* Header / Breadcrumb */}
+                        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Button
+                                startIcon={<ArrowBack />}
+                                onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}`)}
+                                sx={{
+                                    borderRadius: '9999px',
+                                    px: 3,
+                                    py: 1,
+                                    background: (theme) =>
+                                        theme.palette.mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.05)'
+                                            : 'rgba(0, 0, 0, 0.06)',
+                                    backdropFilter: 'blur(10px)',
+                                    border: '1px solid',
+                                    borderColor: (theme) =>
+                                        theme.palette.mode === 'dark'
+                                            ? 'rgba(255, 255, 255, 0.1)'
+                                            : 'rgba(0, 0, 0, 0.12)',
+                                    color: 'text.primary',
+                                    textTransform: 'none',
+                                    '&:hover': {
+                                        background: `${topicColor}20`,
+                                        borderColor: topicColor,
+                                        color: topicColor
+                                    },
+                                }}
+                            >
+                                Back to {category?.name || 'Category'}
+                            </Button>
 
-                    {/* Mobile Sidebar Toggle */}
-                    <IconButton
-                        onClick={() => setMobileOpen(true)}
-                        sx={{
-                            display: { xs: 'flex', md: 'none' },
-                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-                            borderRadius: '12px',
-                            ml: 1
-                        }}
-                    >
-                        <ListIcon />
-                    </IconButton>
+                            {/* Mobile Sidebar Toggle */}
+                            <IconButton
+                                onClick={() => setMobileOpen(true)}
+                                sx={{
+                                    display: { xs: 'flex', md: 'none' },
+                                    bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                                    borderRadius: '12px',
+                                    ml: 1
+                                }}
+                            >
+                                <ListIcon />
+                            </IconButton>
 
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                        {showLanguageSwitcher && (
-                            <>
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                {showLanguageSwitcher && (
+                                    <>
+                                        <Button
+                                            onClick={handleLanguageMenuOpen}
+                                            sx={{
+                                                borderRadius: '9999px',
+                                                px: 3,
+                                                py: 1,
+                                                background: 'transparent',
+                                                border: '1px solid',
+                                                borderColor: 'rgba(128,128,128,0.2)',
+                                                color: 'text.primary',
+                                                textTransform: 'none',
+                                                '&:hover': {
+                                                    background: `${topicColor}15`,
+                                                    borderColor: topicColor
+                                                },
+                                                position: 'relative',
+                                                overflow: 'visible'
+                                            }}
+                                        >
+                                            <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
+                                            {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
+                                            <KeyboardArrowDown sx={{ ml: 0.5 }} />
+                                        </Button>
+                                        <Menu
+                                            anchorEl={languageMenuAnchor}
+                                            open={Boolean(languageMenuAnchor)}
+                                            onClose={handleLanguageMenuClose}
+                                            PaperProps={{
+                                                sx: {
+                                                    mt: 1,
+                                                    borderRadius: 2,
+                                                    minWidth: 150,
+                                                    ...glassSx
+                                                }
+                                            }}
+                                        >
+                                            {[
+                                                { code: 'javascript', label: 'JavaScript' },
+                                                { code: 'python', label: 'Python' },
+                                                { code: 'java', label: 'Java' },
+                                                { code: 'cpp', label: 'C++' },
+                                                { code: 'csharp', label: 'C#' },
+                                                { code: 'go', label: 'Go' },
+                                                { code: 'dart', label: 'Dart' }
+                                            ].map((lang) => (
+                                                <MenuItem
+                                                    key={lang.code}
+                                                    onClick={() => handleLanguageSelect(lang.code)}
+                                                    selected={selectedLanguage === lang.code}
+                                                    sx={{
+                                                        '&.Mui-selected': {
+                                                            bgcolor: `${topicColor}15`,
+                                                            color: topicColor,
+                                                            '&:hover': { bgcolor: `${topicColor}25` }
+                                                        }
+                                                    }}
+                                                >
+                                                    {lang.label}
+                                                </MenuItem>
+                                            ))}
+                                        </Menu>
+                                    </>
+                                )}
                                 <Button
-                                    onClick={handleLanguageMenuOpen}
+                                    startIcon={<Psychology />}
+                                    onClick={() => setIsQuizOpen(true)}
                                     sx={{
+                                        display: { xs: 'none', sm: 'flex' },
                                         borderRadius: '9999px',
                                         px: 3,
                                         py: 1,
-                                        background: 'transparent',
+                                        background: bookmarked ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' : 'transparent',
                                         border: '1px solid',
                                         borderColor: 'rgba(128,128,128,0.2)',
                                         color: 'text.primary',
                                         textTransform: 'none',
                                         '&:hover': {
-                                            background: `${topicColor}15`,
-                                            borderColor: topicColor
-                                        },
-                                        position: 'relative',
-                                        overflow: 'visible'
-                                    }}
-                                >
-                                    <Code sx={{ mr: 1, fontSize: '1.1rem' }} />
-                                    {selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)}
-                                    <KeyboardArrowDown sx={{ ml: 0.5 }} />
-                                </Button>
-                                <Menu
-                                    anchorEl={languageMenuAnchor}
-                                    open={Boolean(languageMenuAnchor)}
-                                    onClose={handleLanguageMenuClose}
-                                    PaperProps={{
-                                        sx: {
-                                            mt: 1,
-                                            borderRadius: 2,
-                                            minWidth: 150,
-                                            ...glassSx
+                                            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                            borderColor: topicColor,
                                         }
                                     }}
                                 >
-                                    {[
-                                        { code: 'javascript', label: 'JavaScript' },
-                                        { code: 'python', label: 'Python' },
-                                        { code: 'java', label: 'Java' },
-                                        { code: 'cpp', label: 'C++' },
-                                        { code: 'csharp', label: 'C#' },
-                                        { code: 'go', label: 'Go' },
-                                        { code: 'dart', label: 'Dart' }
-                                    ].map((lang) => (
-                                        <MenuItem
-                                            key={lang.code}
-                                            onClick={() => handleLanguageSelect(lang.code)}
-                                            selected={selectedLanguage === lang.code}
-                                            sx={{
-                                                '&.Mui-selected': {
-                                                    bgcolor: `${topicColor}15`,
-                                                    color: topicColor,
-                                                    '&:hover': { bgcolor: `${topicColor}25` }
-                                                }
-                                            }}
-                                        >
-                                            {lang.label}
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
-                            </>
-                        )}
-                        <Button
-                            startIcon={<Psychology />}
-                            onClick={() => setIsQuizOpen(true)}
-                            sx={{
-                                display: { xs: 'none', sm: 'flex' },
-                                borderRadius: '9999px',
-                                px: 3,
-                                py: 1,
-                                background: bookmarked ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' : 'transparent',
-                                border: '1px solid',
-                                borderColor: 'rgba(128,128,128,0.2)',
-                                color: 'text.primary',
-                                textTransform: 'none',
-                                '&:hover': {
-                                    background: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                                    borderColor: topicColor,
-                                }
-                            }}
-                        >
-                            Take Quiz
-                        </Button>
-                        <IconButton
-                            onClick={handleToggleBookmark}
-                            sx={{
-                                color: bookmarked ? topicColor : 'text.secondary',
-                                bgcolor: bookmarked ? `${topicColor}15` : 'transparent',
-                                border: '1px solid',
-                                borderColor: bookmarked ? `${topicColor}40` : 'rgba(128,128,128,0.2)',
-                            }}
-                        >
-                            {bookmarked ? <Bookmark /> : <BookmarkBorder />}
-                        </IconButton>
-                    </Box>
-                </Box>
-
-                <QuizModal
-                    open={isQuizOpen}
-                    onClose={() => setIsQuizOpen(false)}
-                    topic={topicSlug}
-                    section={section.title}
-                    isDark={isDark}
-                    language={selectedLanguage}
-                    content={activeTab === 'learn' ? aiContent : (section.description || section.content)} // Pass context
-                />
-
-                <Box sx={{
-                    height: 'calc(100vh - 140px)', // Adjust based on navbar/header
-                    display: 'flex',
-                    gap: 3,
-                    overflow: 'hidden'
-                }}>
-                    {/* Sidebar */}
-                    <Box sx={{
-                        width: activeTab === 'practice' ? 0 : { md: 280, lg: 320 },
-                        flexShrink: 0,
-                        display: { xs: 'none', md: activeTab === 'practice' ? 'none' : 'flex' }, // Hide on mobile for now or handle via drawer
-                        flexDirection: 'column',
-                        height: '100%',
-                        transition: 'width 0.3s ease'
-                    }}>
-                        <Card sx={{ ...glassSx, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                            <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
-                                <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
-                                    {category?.group && <span style={{ opacity: 0.7 }}>{category.group} / </span>}
-                                    {category?.name || 'CATEGORY'}
-                                </Typography>
-                                <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, lineHeight: 1.2 }}>
-                                    {section.title}
-                                </Typography>
-                                <Chip
-                                    label={section.difficulty || 'General'}
-                                    size="small"
+                                    Take Quiz
+                                </Button>
+                                <IconButton
+                                    onClick={handleToggleBookmark}
                                     sx={{
-                                        mt: 1,
-                                        bgcolor: `${topicColor}15`,
-                                        color: topicColor,
-                                        fontWeight: 700,
-                                        fontSize: '0.7rem'
+                                        color: bookmarked ? topicColor : 'text.secondary',
+                                        bgcolor: bookmarked ? `${topicColor}15` : 'transparent',
+                                        border: '1px solid',
+                                        borderColor: bookmarked ? `${topicColor}40` : 'rgba(128,128,128,0.2)',
                                     }}
-                                />
-                            </Box>
-
-                            <List sx={{ overflowY: 'auto', flex: 1, px: 2 }}>
-                                {allSections.map((s, idx) => {
-                                    const currentGroup = s.category?.group;
-                                    const prevGroup = idx > 0 ? allSections[idx - 1].category?.group : null;
-                                    const showHeader = currentGroup && currentGroup !== prevGroup;
-
-                                    return (
-                                        <React.Fragment key={s.slug}>
-                                            {showHeader && (
-                                                <Typography variant="subtitle2" sx={{
-                                                    px: 2,
-                                                    py: 1.5,
-                                                    color: topicColor,
-                                                    fontWeight: 800,
-                                                    fontSize: '0.75rem',
-                                                    textTransform: 'uppercase',
-                                                    letterSpacing: 1,
-                                                    opacity: 0.8,
-                                                    marginTop: idx > 0 ? 1 : 0
-                                                }}>
-                                                    {currentGroup}
-                                                </Typography>
-                                            )}
-                                            <ListItem disablePadding sx={{ mb: 1 }}>
-                                                <ListItemButton
-                                                    selected={s.slug === sectionSlug}
-                                                    onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
-                                                    sx={{
-                                                        bgcolor: s.slug === sectionSlug ? `${topicColor}15` : 'transparent',
-                                                        color: s.slug === sectionSlug ? topicColor : 'text.primary',
-                                                        borderLeft: s.slug === sectionSlug ? `3px solid ${topicColor}` : '3px solid transparent',
-                                                        borderRadius: '0 12px 12px 0',
-                                                        ml: 1,
-                                                        mr: 1,
-                                                        '&:hover': { bgcolor: `${topicColor}25` },
-                                                        '&:not(.Mui-selected):hover': {
-                                                            bgcolor: 'action.hover',
-                                                            borderRadius: '12px',
-                                                            ml: 1,
-                                                            borderLeft: 'none'
-                                                        }
-                                                    }}
-                                                >
-                                                    <Typography variant="body2" sx={{ fontWeight: s.slug === sectionSlug ? 700 : 500 }}>
-                                                        {String(idx + 1).padStart(2, '0')}. {s.title}
-                                                    </Typography>
-                                                    {s.slug === sectionSlug && (
-                                                        <PlayArrow sx={{ ml: 'auto', fontSize: 16 }} />
-                                                    )}
-                                                </ListItemButton>
-                                            </ListItem>
-                                        </React.Fragment>
-                                    );
-                                })}
-                            </List>
-
-                            {/* Nav Buttons at bottom of sidebar */}
-                            <Box sx={{ p: 2, display: 'flex', gap: 1, borderTop: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
-                                <Button
-                                    disabled={!prevSection}
-                                    onClick={() => prevSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`)}
-                                    fullWidth
-                                    variant="outlined"
-                                    startIcon={<ArrowBack />}
-                                    sx={{ borderRadius: '12px', borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}
                                 >
-                                    Prev
-                                </Button>
-                                <Button
-                                    disabled={!nextSection}
-                                    onClick={() => nextSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`)}
-                                    fullWidth
-                                    variant="contained"
-                                    endIcon={<ArrowForward />}
-                                    sx={{ borderRadius: '12px', bgcolor: topicColor, '&:hover': { bgcolor: topicColor } }}
-                                >
-                                    Next
-                                </Button>
+                                    {bookmarked ? <Bookmark /> : <BookmarkBorder />}
+                                </IconButton>
                             </Box>
-                        </Card>
-                    </Box>
-
-                    {/* Mobile Drawer */}
-                    <Drawer
-                        anchor="left"
-                        open={mobileOpen}
-                        onClose={() => setMobileOpen(false)}
-                        PaperProps={{
-                            sx: { width: 300, bgcolor: 'background.default' }
-                        }}
-                    >
-                        <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
-                            <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
-                                {category?.group && <span style={{ opacity: 0.7 }}>{category.group} / </span>}
-                                {category?.name || 'CATEGORY'}
-                            </Typography>
-                            <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, lineHeight: 1.2 }}>
-                                {section.title}
-                            </Typography>
                         </Box>
-                        <List sx={{ overflowY: 'auto', flex: 1, px: 2, mt: 2 }}>
-                            {allSections.map((s, idx) => (
-                                <ListItem key={s.slug} disablePadding sx={{ mb: 1 }}>
-                                    <ListItemButton
-                                        selected={s.slug === sectionSlug}
-                                        onClick={() => {
-                                            navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`);
-                                            setMobileOpen(false);
-                                        }}
-                                        sx={{
-                                            borderRadius: '12px',
-                                            mb: 0.5,
-                                            '&.Mui-selected': {
+
+                        <QuizModal
+                            open={isQuizOpen}
+                            onClose={() => setIsQuizOpen(false)}
+                            topic={topicSlug}
+                            section={section.title}
+                            isDark={isDark}
+                            language={selectedLanguage}
+                            content={activeTab === 'learn' ? aiContent : (section.description || section.content)} // Pass context
+                        />
+
+                        <Box sx={{
+                            height: 'calc(100vh - 140px)', // Adjust based on navbar/header
+                            display: 'flex',
+                            gap: 3,
+                            overflow: 'hidden'
+                        }}>
+                            {/* Sidebar */}
+                            <Box sx={{
+                                width: activeTab === 'practice' ? 0 : { md: 280, lg: 320 },
+                                flexShrink: 0,
+                                display: { xs: 'none', md: activeTab === 'practice' ? 'none' : 'flex' }, // Hide on mobile for now or handle via drawer
+                                flexDirection: 'column',
+                                height: '100%',
+                                transition: 'width 0.3s ease'
+                            }}>
+                                <Card sx={{ ...glassSx, height: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                    <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                                        <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+                                            {category?.group && <span style={{ opacity: 0.7 }}>{category.group} / </span>}
+                                            {category?.name || 'CATEGORY'}
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, lineHeight: 1.2 }}>
+                                            {section.title}
+                                        </Typography>
+                                        <Chip
+                                            label={section.difficulty || 'General'}
+                                            size="small"
+                                            sx={{
+                                                mt: 1,
                                                 bgcolor: `${topicColor}15`,
                                                 color: topicColor,
-                                                borderLeft: `3px solid ${topicColor}`,
-                                                '&:hover': { bgcolor: `${topicColor}25` }
-                                            }
-                                        }}
-                                    >
-                                        <ListItemIcon sx={{ minWidth: 32 }}>
-                                            {s.slug === sectionSlug ? <PlayArrow sx={{ fontSize: 18, color: topicColor }} /> :
-                                                progressMap?.[s.slug] ? <CheckCircle sx={{ fontSize: 18, color: '#30d158' }} /> :
-                                                    <RadioButtonUnchecked sx={{ fontSize: 18, color: 'text.disabled' }} />}
-                                        </ListItemIcon>
-                                        <ListItemText
-                                            primary={s.title}
-                                            primaryTypographyProps={{
-                                                fontSize: '0.9rem',
-                                                fontWeight: s.slug === sectionSlug ? 600 : 400
+                                                fontWeight: 700,
+                                                fontSize: '0.7rem'
                                             }}
                                         />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
-                        </List>
-                    </Drawer>
-
-                    {/* Main Content */}
-                    <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
-                        {/* Custom Tab Header */}
-
-
-                        <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
-                            {[
-                                { id: 'learn', label: 'Learn Concept', icon: <MenuBook /> },
-                                { id: 'practice', label: 'Practice', icon: <Code /> }
-                            ].map((tab) => {
-                                const isActive = activeTab === tab.id;
-                                return (
-                                    <Button
-                                        key={tab.id}
-                                        onClick={() => setActiveTab(tab.id)}
-                                        startIcon={tab.icon}
-                                        sx={{
-                                            borderRadius: '9999px',
-                                            px: 3,
-                                            bgcolor: isActive ? topicColor : 'transparent',
-                                            color: isActive ? '#fff' : 'text.secondary',
-                                            border: isActive ? 'none' : '1px solid',
-                                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                                            '&:hover': {
-                                                bgcolor: isActive ? topicColor : `${topicColor}15`
-                                            }
-                                        }}
-                                    >
-                                        {tab.label}
-                                    </Button>
-                                )
-                            })}
-                        </Box>
-
-                        <Card sx={{ ...glassSx, flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ p: activeTab === 'practice' ? 0 : 4, overflowY: activeTab === 'practice' ? 'hidden' : 'auto', flex: 1, height: '100%' }}>
-                                {activeTab === 'learn' && (
-                                    <Box>
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
-                                            <Typography variant="h5" sx={{ fontWeight: 700 }}>Learning Content</Typography>
-                                            <Button size="small" onClick={() => generateAIContent(section, category, selectedLanguage)} sx={{ color: topicColor }}>
-                                                Regenerate
-                                            </Button>
-                                        </Box>
-                                        <div className="markdown-content">
-                                            {contentLoading || languageChangeLoading ? (
-                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 8 }}>
-                                                    <CircularProgress sx={{ color: topicColor, mb: 2 }} />
-                                                    <Typography variant="body2" color="text.secondary">
-                                                        {languageChangeLoading
-                                                            ? `Translating to ${targetLanguage?.charAt(0).toUpperCase() + targetLanguage?.slice(1)}...`
-                                                            : 'Generating learning content...'}
-                                                    </Typography>
-                                                </Box>
-                                            ) : aiContent ? (
-                                                <Suspense fallback={<ContentSkeleton />}>
-                                                    <ReactMarkdown
-                                                        components={{
-                                                            code({ node, inline, className, children, ...props }) {
-                                                                const match = /language-(\w+)/.exec(className || '');
-                                                                return !inline && match ? (
-                                                                    <Suspense fallback={<EditorSkeleton />}>
-                                                                        <SyntaxHighlighter
-                                                                            style={vscDarkPlus}
-                                                                            language={match[1]}
-                                                                            PreTag="div"
-                                                                            {...props}
-                                                                        >
-                                                                            {String(children).replace(/\n$/, '')}
-                                                                        </SyntaxHighlighter>
-                                                                    </Suspense>
-                                                                ) : (
-                                                                    <code className={className} {...props}>
-                                                                        {children}
-                                                                    </code>
-                                                                );
-                                                            }
-                                                        }}
-                                                    >
-                                                        {aiContent}
-                                                    </ReactMarkdown>
-                                                </Suspense>
-                                            ) : (
-                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
-                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                                                        No content available
-                                                    </Typography>
-                                                    <Button
-                                                        variant="outlined"
-                                                        size="small"
-                                                        onClick={() => generateAIContent(section, category, selectedLanguage)}
-                                                        sx={{ color: topicColor, borderColor: topicColor }}
-                                                    >
-                                                        Generate Content
-                                                    </Button>
-                                                </Box>
-                                            )}
-                                        </div>
                                     </Box>
-                                )}
 
-                                {activeTab === 'practice' && (
-                                    <Box sx={{ display: 'flex', height: '100%', width: '100%', gap: 0 }}>
-                                        {category?.group?.startsWith('Blind 75') ? (
-                                            <>
-                                                <Box sx={{ width: '300px', height: '100%', overflowY: 'auto', borderRight: '1px solid', borderColor: 'divider', p: 3, flexShrink: 0, position: 'relative' }}>
-                                                    <Box sx={{ position: 'absolute', top: 0, right: 0, p: 2, opacity: 0.05, pointerEvents: 'none' }}>
-                                                        <SafeImage src={getTopicImage(topicSlug)} alt="" style={{ width: 100 }} />
-                                                    </Box>
-                                                    <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>Problem</Typography>
-                                                    <div className="markdown-content">
-                                                        <ReactMarkdown
-                                                            components={{
-                                                                code({ node, inline, className, children, ...props }) {
-                                                                    const match = /language-(\w+)/.exec(className || '');
-                                                                    return !inline && match ? (
-                                                                        <SyntaxHighlighter
-                                                                            style={vscDarkPlus}
-                                                                            language={match[1]}
-                                                                            PreTag="div"
-                                                                            {...props}
-                                                                        >
-                                                                            {String(children).replace(/\n$/, '')}
-                                                                        </SyntaxHighlighter>
-                                                                    ) : (
-                                                                        <code className={className} {...props}>
-                                                                            {children}
-                                                                        </code>
-                                                                    );
+                                    <List sx={{ overflowY: 'auto', flex: 1, px: 2 }}>
+                                        {allSections.map((s, idx) => {
+                                            const currentGroup = s.category?.group;
+                                            const prevGroup = idx > 0 ? allSections[idx - 1].category?.group : null;
+                                            const showHeader = currentGroup && currentGroup !== prevGroup;
+
+                                            return (
+                                                <React.Fragment key={s.slug}>
+                                                    {showHeader && (
+                                                        <Typography variant="subtitle2" sx={{
+                                                            px: 2,
+                                                            py: 1.5,
+                                                            color: topicColor,
+                                                            fontWeight: 800,
+                                                            fontSize: '0.75rem',
+                                                            textTransform: 'uppercase',
+                                                            letterSpacing: 1,
+                                                            opacity: 0.8,
+                                                            marginTop: idx > 0 ? 1 : 0
+                                                        }}>
+                                                            {currentGroup}
+                                                        </Typography>
+                                                    )}
+                                                    <ListItem disablePadding sx={{ mb: 1 }}>
+                                                        <ListItemButton
+                                                            selected={s.slug === sectionSlug}
+                                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
+                                                            sx={{
+                                                                bgcolor: s.slug === sectionSlug ? `${topicColor}15` : 'transparent',
+                                                                color: s.slug === sectionSlug ? topicColor : 'text.primary',
+                                                                borderLeft: s.slug === sectionSlug ? `3px solid ${topicColor}` : '3px solid transparent',
+                                                                borderRadius: '0 12px 12px 0',
+                                                                ml: 1,
+                                                                mr: 1,
+                                                                '&:hover': { bgcolor: `${topicColor}25` },
+                                                                '&:not(.Mui-selected):hover': {
+                                                                    bgcolor: 'action.hover',
+                                                                    borderRadius: '12px',
+                                                                    ml: 1,
+                                                                    borderLeft: 'none'
                                                                 }
                                                             }}
                                                         >
-                                                            {problemContent || section.content}
-                                                        </ReactMarkdown>
-                                                    </div>
-                                                </Box>
-                                                <Box sx={{ flex: 1, height: '100%', minWidth: 0, overflow: 'hidden' }}>
-                                                    <CodeEditor
-                                                        defaultLanguage={topicSlug === 'typescript' ? 'typescript' : 'javascript'}
-                                                        code={editorCode}
-                                                        onCodeChange={setEditorCode}
-                                                        testCases={testCases}
-                                                        problemTitle={section?.title || ''}
-                                                        onAiHelp={handleAiHelp}
-                                                        externalOutput={aiOutput}
-                                                    />
-                                                </Box>
-                                            </>
-                                        ) : (
-                                            <Box sx={{ flex: 1, height: '100%', width: '100%', overflow: 'hidden' }}>
-                                                <CodeEditor
-                                                    defaultLanguage={selectedLanguage}
-                                                    code={editorCode}
-                                                    onCodeChange={setEditorCode}
-                                                    testCases={testCases}
-                                                    problemTitle={section?.title || ''}
-                                                    onAiHelp={(type, code) => handleAiHelp(type, code, selectedLanguage)}
-                                                    externalOutput={aiOutput}
+                                                            <Typography variant="body2" sx={{ fontWeight: s.slug === sectionSlug ? 700 : 500 }}>
+                                                                {String(idx + 1).padStart(2, '0')}. {s.title}
+                                                            </Typography>
+                                                            {s.slug === sectionSlug && (
+                                                                <PlayArrow sx={{ ml: 'auto', fontSize: 16 }} />
+                                                            )}
+                                                        </ListItemButton>
+                                                    </ListItem>
+                                                </React.Fragment>
+                                            );
+                                        })}
+                                    </List>
+
+                                    {/* Nav Buttons at bottom of sidebar */}
+                                    <Box sx={{ p: 2, display: 'flex', gap: 1, borderTop: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                                        <Button
+                                            disabled={!prevSection}
+                                            onClick={() => prevSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`)}
+                                            fullWidth
+                                            variant="outlined"
+                                            startIcon={<ArrowBack />}
+                                            sx={{ borderRadius: '12px', borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)' }}
+                                        >
+                                            Prev
+                                        </Button>
+                                        <Button
+                                            disabled={!nextSection}
+                                            onClick={() => nextSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`)}
+                                            fullWidth
+                                            variant="contained"
+                                            endIcon={<ArrowForward />}
+                                            sx={{
+                                                borderRadius: '12px',
+                                                bgcolor: topicColor,
+                                                color: theme.palette.getContrastText(topicColor),
+                                                '&:hover': { bgcolor: topicColor }
+                                            }}
+                                        >
+                                            Next
+                                        </Button>
+                                    </Box>
+                                </Card>
+                            </Box>
+
+                            {/* Mobile Drawer */}
+                            <Drawer
+                                anchor="left"
+                                open={mobileOpen}
+                                onClose={() => setMobileOpen(false)}
+                                PaperProps={{
+                                    sx: { width: 300, bgcolor: 'background.default' }
+                                }}
+                            >
+                                <Box sx={{ p: 3, borderBottom: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
+                                    <Typography variant="caption" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1, textTransform: 'uppercase' }}>
+                                        {category?.group && <span style={{ opacity: 0.7 }}>{category.group} / </span>}
+                                        {category?.name || 'CATEGORY'}
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ fontWeight: 700, mt: 1, lineHeight: 1.2 }}>
+                                        {section.title}
+                                    </Typography>
+                                </Box>
+                                <List sx={{ overflowY: 'auto', flex: 1, px: 2, mt: 2 }}>
+                                    {allSections.map((s, idx) => (
+                                        <ListItem key={s.slug} disablePadding sx={{ mb: 1 }}>
+                                            <ListItemButton
+                                                selected={s.slug === sectionSlug}
+                                                onClick={() => {
+                                                    navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`);
+                                                    setMobileOpen(false);
+                                                }}
+                                                sx={{
+                                                    borderRadius: '12px',
+                                                    mb: 0.5,
+                                                    '&.Mui-selected': {
+                                                        bgcolor: `${topicColor}15`,
+                                                        color: topicColor,
+                                                        borderLeft: `3px solid ${topicColor}`,
+                                                        '&:hover': { bgcolor: `${topicColor}25` }
+                                                    }
+                                                }}
+                                            >
+                                                <ListItemIcon sx={{ minWidth: 32 }}>
+                                                    {s.slug === sectionSlug ? <PlayArrow sx={{ fontSize: 18, color: topicColor }} /> :
+                                                        progressMap?.[s.slug] ? <CheckCircle sx={{ fontSize: 18, color: '#30d158' }} /> :
+                                                            <RadioButtonUnchecked sx={{ fontSize: 18, color: 'text.disabled' }} />}
+                                                </ListItemIcon>
+                                                <ListItemText
+                                                    primary={s.title}
+                                                    primaryTypographyProps={{
+                                                        fontSize: '0.9rem',
+                                                        fontWeight: s.slug === sectionSlug ? 600 : 400
+                                                    }}
                                                 />
+                                            </ListItemButton>
+                                        </ListItem>
+                                    ))}
+                                </List>
+                            </Drawer>
+
+                            {/* Main Content */}
+                            <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                                {/* Custom Tab Header */}
+
+
+                                <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
+                                    {[
+                                        { id: 'learn', label: 'Learn Concept', icon: <MenuBook /> },
+                                        { id: 'practice', label: 'Practice', icon: <Code /> }
+                                    ].map((tab) => {
+                                        const isActive = activeTab === tab.id;
+                                        return (
+                                            <Button
+                                                key={tab.id}
+                                                onClick={() => setActiveTab(tab.id)}
+                                                startIcon={tab.icon}
+                                                sx={{
+                                                    borderRadius: '9999px',
+                                                    px: 3,
+                                                    bgcolor: isActive ? topicColor : 'transparent',
+                                                    color: isActive ? theme.palette.getContrastText(topicColor) : 'text.secondary',
+                                                    border: isActive ? 'none' : '1px solid',
+                                                    borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                                                    '&:hover': {
+                                                        bgcolor: isActive ? topicColor : `${topicColor}15`
+                                                    }
+                                                }}
+                                            >
+                                                {tab.label}
+                                            </Button>
+                                        )
+                                    })}
+                                </Box>
+
+                                <Card sx={{ ...glassSx, flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+                                    <Box sx={{ p: activeTab === 'practice' ? 0 : 4, overflowY: activeTab === 'practice' ? 'hidden' : 'auto', flex: 1, height: '100%' }}>
+                                        {activeTab === 'learn' && (
+                                            <Box>
+                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+                                                    <Typography variant="h5" sx={{ fontWeight: 700 }}>Learning Content</Typography>
+                                                    <Button
+                                                        size="small"
+                                                        onClick={() => generateAIContent(section, category, selectedLanguage)}
+                                                        sx={{
+                                                            color: topicColor,
+                                                            borderColor: topicColor,
+                                                            '&:hover': {
+                                                                bgcolor: `${topicColor}10`
+                                                            }
+                                                        }}
+                                                    >
+                                                        Regenerate
+                                                    </Button>
+                                                </Box>
+                                                <div className="markdown-content">
+                                                    {contentLoading || languageChangeLoading ? (
+                                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 8 }}>
+                                                            <CircularProgress sx={{ color: topicColor, mb: 2 }} />
+                                                            <Typography variant="body2" color="text.secondary">
+                                                                {languageChangeLoading
+                                                                    ? `Translating to ${targetLanguage?.charAt(0).toUpperCase() + targetLanguage?.slice(1)}...`
+                                                                    : 'Generating learning content...'}
+                                                            </Typography>
+                                                        </Box>
+                                                    ) : aiContent ? (
+                                                        <Suspense fallback={<ContentSkeleton />}>
+                                                            <ReactMarkdown
+                                                                components={{
+                                                                    code({ node, inline, className, children, ...props }) {
+                                                                        const match = /language-(\w+)/.exec(className || '');
+                                                                        return !inline && match ? (
+                                                                            <Suspense fallback={<EditorSkeleton />}>
+                                                                                <SyntaxHighlighter
+                                                                                    style={vscDarkPlus}
+                                                                                    language={match[1]}
+                                                                                    PreTag="div"
+                                                                                    {...props}
+                                                                                >
+                                                                                    {String(children).replace(/\n$/, '')}
+                                                                                </SyntaxHighlighter>
+                                                                            </Suspense>
+                                                                        ) : (
+                                                                            <code className={className} {...props}>
+                                                                                {children}
+                                                                            </code>
+                                                                        );
+                                                                    }
+                                                                }}
+                                                            >
+                                                                {aiContent}
+                                                            </ReactMarkdown>
+                                                        </Suspense>
+                                                    ) : (
+                                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
+                                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                                                No content available
+                                                            </Typography>
+                                                            <Button
+                                                                variant="outlined"
+                                                                size="small"
+                                                                onClick={() => generateAIContent(section, category, selectedLanguage)}
+                                                                sx={{ color: topicColor, borderColor: topicColor }}
+                                                            >
+                                                                Generate Content
+                                                            </Button>
+                                                        </Box>
+                                                    )}
+                                                </div>
                                             </Box>
                                         )}
+
+                                        {activeTab === 'practice' && (
+                                            <Box sx={{ display: 'flex', height: '100%', width: '100%', gap: 0 }}>
+                                                {category?.group?.startsWith('Blind 75') ? (
+                                                    <>
+                                                        <Box sx={{ width: '300px', height: '100%', overflowY: 'auto', borderRight: '1px solid', borderColor: 'divider', p: 3, flexShrink: 0, position: 'relative' }}>
+                                                            <Box sx={{ position: 'absolute', top: 0, right: 0, p: 2, opacity: 0.05, pointerEvents: 'none' }}>
+                                                                <SafeImage src={getTopicImage(topicSlug)} alt="" style={{ width: 100 }} />
+                                                            </Box>
+                                                            <Typography variant="h6" sx={{ mb: 2, fontWeight: 700 }}>Problem</Typography>
+                                                            <div className="markdown-content">
+                                                                <ReactMarkdown
+                                                                    components={{
+                                                                        code({ node, inline, className, children, ...props }) {
+                                                                            const match = /language-(\w+)/.exec(className || '');
+                                                                            return !inline && match ? (
+                                                                                <SyntaxHighlighter
+                                                                                    style={vscDarkPlus}
+                                                                                    language={match[1]}
+                                                                                    PreTag="div"
+                                                                                    {...props}
+                                                                                >
+                                                                                    {String(children).replace(/\n$/, '')}
+                                                                                </SyntaxHighlighter>
+                                                                            ) : (
+                                                                                <code className={className} {...props}>
+                                                                                    {children}
+                                                                                </code>
+                                                                            );
+                                                                        }
+                                                                    }}
+                                                                >
+                                                                    {problemContent || section.content}
+                                                                </ReactMarkdown>
+                                                            </div>
+                                                        </Box>
+                                                        <Box sx={{ flex: 1, height: '100%', minWidth: 0, overflow: 'hidden' }}>
+                                                            <CodeEditor
+                                                                defaultLanguage={topicSlug === 'typescript' ? 'typescript' : 'javascript'}
+                                                                code={editorCode}
+                                                                onCodeChange={setEditorCode}
+                                                                testCases={testCases}
+                                                                problemTitle={section?.title || ''}
+                                                                onAiHelp={handleAiHelp}
+                                                                externalOutput={aiOutput}
+                                                            />
+                                                        </Box>
+                                                    </>
+                                                ) : (
+                                                    <Box sx={{ flex: 1, height: '100%', width: '100%', overflow: 'hidden' }}>
+                                                        <CodeEditor
+                                                            defaultLanguage={selectedLanguage}
+                                                            code={editorCode}
+                                                            onCodeChange={setEditorCode}
+                                                            testCases={testCases}
+                                                            problemTitle={section?.title || ''}
+                                                            onAiHelp={(type, code) => handleAiHelp(type, code, selectedLanguage)}
+                                                            externalOutput={aiOutput}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        )}
+
                                     </Box>
-                                )}
-
+                                </Card>
                             </Box>
-                        </Card>
-                    </Box>
-                </Box>
-
-                {/* Floating AI Chat Button */}
-                <IconButton
-                    aria-label="chat-toggle"
-                    onClick={() => setIsChatOpen(!isChatOpen)}
-                    sx={{
-                        position: 'fixed',
-                        bottom: 32,
-                        right: 32,
-                        width: 56,
-                        height: 56,
-                        bgcolor: topicColor,
-                        color: '#fff',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
-                        '&:hover': { bgcolor: topicColor, transform: 'scale(1.1)' },
-                        zIndex: 1200
-                    }}
-                >
-                    <Lightbulb />
-                </IconButton>
-
-                {
-                    isChatOpen && (
-                        <Box sx={{
-                            position: 'fixed',
-                            bottom: 100,
-                            right: 32,
-                            width: 500,
-                            height: 650,
-                            zIndex: 1200,
-                            ...glassSx,
-                            overflow: 'hidden'
-                        }}>
-                            <AIChat
-                                ref={chatRef}
-                                topic={topicSlug}
-                                section={section.title}
-                                user={user}
-                                context={{
-                                    description: section.description,
-                                    activeTab,
-                                    module: category?.name
-                                }}
-                                codeContext={{ code: editorCode, setCode: setEditorCode }}
-                            />
                         </Box>
-                    )
-                }
 
-                {/* Language Change Loading Overlay */}
-                {
-                    languageChangeLoading && (
-                        <Box sx={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            bgcolor: 'rgba(0,0,0,0.7)',
-                            backdropFilter: 'blur(8px)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 9999,
-                            flexDirection: 'column',
-                            gap: 3
-                        }}>
-                            <CircularProgress size={60} sx={{ color: topicColor }} />
-                            <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
-                                {targetLanguage
-                                    ? `Translating to ${targetLanguage.charAt(0).toUpperCase() + targetLanguage.slice(1)}...`
-                                    : `Generating ${selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)} Examples...`
-                                }
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                                {targetLanguage
-                                    ? 'Translating code examples while preserving explanations'
-                                    : 'Please wait while AI creates optimized code snippets'
-                                }
-                            </Typography>
-                        </Box>
-                    )
-                }
+                        {/* Floating AI Chat Button */}
+                        <IconButton
+                            aria-label="chat-toggle"
+                            onClick={() => setIsChatOpen(!isChatOpen)}
+                            sx={{
+                                position: 'fixed',
+                                bottom: 32,
+                                right: 32,
+                                width: 56,
+                                height: 56,
+                                bgcolor: topicColor,
+                                color: theme.palette.getContrastText(topicColor),
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                                '&:hover': { bgcolor: topicColor, transform: 'scale(1.1)' },
+                                zIndex: 1200
+                            }}
+                        >
+                            <Lightbulb />
+                        </IconButton>
 
-                {/* AI Output Modal */}
-                <AIOutputModal
-                    open={aiModalOpen}
-                    onClose={() => setAiModalOpen(false)}
-                    type={aiModalType}
-                    response={aiModalResponse}
-                    loading={aiModalLoading}
-                />
-            </Container >
-        </Box >
+                        {
+                            isChatOpen && (
+                                <Box sx={{
+                                    position: 'fixed',
+                                    bottom: 100,
+                                    right: 32,
+                                    width: 500,
+                                    height: 650,
+                                    zIndex: 1200,
+                                    ...glassSx,
+                                    overflow: 'hidden'
+                                }}>
+                                    <AIChat
+                                        ref={chatRef}
+                                        topic={topicSlug}
+                                        section={section.title}
+                                        user={user}
+                                        context={{
+                                            description: section.description,
+                                            activeTab,
+                                            module: category?.name
+                                        }}
+                                        codeContext={{ code: editorCode, setCode: setEditorCode }}
+                                    />
+                                </Box>
+                            )
+                        }
+
+                        {/* Language Change Loading Overlay */}
+                        {
+                            languageChangeLoading && (
+                                <Box sx={{
+                                    position: 'fixed',
+                                    top: 0,
+                                    left: 0,
+                                    right: 0,
+                                    bottom: 0,
+                                    bgcolor: 'rgba(0,0,0,0.7)',
+                                    backdropFilter: 'blur(8px)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    zIndex: 9999,
+                                    flexDirection: 'column',
+                                    gap: 3
+                                }}>
+                                    <CircularProgress size={60} sx={{ color: topicColor }} />
+                                    <Typography variant="h6" sx={{ color: 'white', fontWeight: 600 }}>
+                                        {targetLanguage
+                                            ? `Translating to ${targetLanguage.charAt(0).toUpperCase() + targetLanguage.slice(1)}...`
+                                            : `Generating ${selectedLanguage.charAt(0).toUpperCase() + selectedLanguage.slice(1)} Examples...`
+                                        }
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                                        {targetLanguage
+                                            ? 'Translating code examples while preserving explanations'
+                                            : 'Please wait while AI creates optimized code snippets'
+                                        }
+                                    </Typography>
+                                </Box>
+                            )
+                        }
+
+                        {/* AI Output Modal */}
+                        <AIOutputModal
+                            open={aiModalOpen}
+                            onClose={() => setAiModalOpen(false)}
+                            type={aiModalType}
+                            response={aiModalResponse}
+                            loading={aiModalLoading}
+                        />
+                    </motion.div>
+                </AnimatePresence>
+            </Container>
+        </Box>
     );
 };
 

@@ -51,7 +51,7 @@ const DSAPage = () => {
         return (
             <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
                 <Container maxWidth="xl">
-                    <LoadingSpinner message="Loading DSA modules..." />
+                    <LoadingSpinner message="Compiling Algorithms & Data Structures..." />
                 </Container>
             </Box>
         );

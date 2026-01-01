@@ -9,7 +9,9 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'],
       devOptions: {
-        enabled: true
+        enabled: true,
+        suppressWarnings: true,
+        navigateFallback: 'index.html',
       },
       manifest: {
         name: 'PrepHub - AI Learning Platform',

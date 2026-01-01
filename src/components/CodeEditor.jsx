@@ -438,13 +438,14 @@ const CodeEditor = ({
                     }}>
                         <Box sx={{ textAlign: 'center' }}>
                             <CircularProgress size={40} sx={{ mb: 2 }} />
-                            <Typography variant="body2" color="text.secondary">Loading Editor...</Typography>
+                            <Typography variant="body2" color="text.secondary">Initializing Code Environment...</Typography>
                         </Box>
                     </Box>
                 )}
                 <Suspense fallback={
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                        <CircularProgress />
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 2 }}>
+                        <CircularProgress size={30} thickness={4} />
+                        <Typography variant="caption" color="text.secondary">Loading Monaco Editor...</Typography>
                     </Box>
                 }>
                     <Editor
