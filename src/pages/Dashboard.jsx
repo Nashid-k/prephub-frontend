@@ -639,7 +639,7 @@ const Dashboard = () => {
                                 <Typography variant="h6" sx={{ opacity: 0.7, fontWeight: 400, mb: 3 }}>
                                     Choose a topic to begin mastering
                                 </Typography>
-                                <DashboardHeader user={user} />
+                                <DashboardHeader user={user} onManagePath={openOnboarding} />
                             </Box>
                         </Box>
                         <motion.div
