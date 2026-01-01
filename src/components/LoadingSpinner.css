@@ -8,6 +8,15 @@
     min-height: 60vh;
 }
 
+.loading-spinner-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+}
+
 .ios-spinner {
     position: relative;
     width: 80px;

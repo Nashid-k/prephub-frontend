@@ -286,11 +286,7 @@ const TopicPage = () => {
 
     if (loading) {
         return (
-            <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
-                <Container maxWidth="xl">
-                    <LoadingSpinner message="Structuring topic curriculum..." />
-                </Container>
-            </Box>
+            <LoadingSpinner message="Structuring topic curriculum..." fullScreen />
         );
     }
 

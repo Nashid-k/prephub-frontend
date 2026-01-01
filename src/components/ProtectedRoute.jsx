@@ -9,9 +9,7 @@ const ProtectedRoute = ({ children }) => {
 
     if (loading) {
         return (
-            <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <LoadingSpinner message="Verifying session..." />
-            </div>
+            <LoadingSpinner message="Verifying session..." fullScreen />
         );
     }
 

@@ -200,7 +200,7 @@ const CategoryPage = () => {
         return sections.length > 0 && sections.every(s => progressMap[s.slug]);
     }, [sections, progressMap]);
 
-    if (loading) return <LoadingSpinner message="Fetching category insights..." />;
+    if (loading) return <LoadingSpinner message="Fetching category insights..." fullScreen />;
     if (!category) return <Typography>Category not found</Typography>;
 
     return (

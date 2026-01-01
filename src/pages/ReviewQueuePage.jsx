@@ -64,11 +64,7 @@ const ReviewQueuePage = () => {
 
     if (loading) {
         return (
-            <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
-                <Container maxWidth="xl">
-                    <LoadingSpinner message="Preparing your review session..." />
-                </Container>
-            </Box>
+            <LoadingSpinner message="Preparing your review session..." fullScreen />
         );
     }
 

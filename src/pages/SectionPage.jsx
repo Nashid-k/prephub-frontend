@@ -613,7 +613,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
         boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
     };
 
-    if (loading) return <LoadingSpinner message="Loading Topic..." />;
+    if (loading) return <LoadingSpinner message="Loading Topic..." fullScreen />;
     if (!section) return <Typography>Section not found</Typography>;
 
     const prevSection = currentIndex > 0 ? allSections[currentIndex - 1] : null;

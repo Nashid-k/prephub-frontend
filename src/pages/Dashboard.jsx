@@ -304,11 +304,7 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
-                <Container maxWidth="xl">
-                    <LoadingSpinner message="Personalizing your dashboard..." />
-                </Container>
-            </Box>
+            <LoadingSpinner message="Personalizing your dashboard..." fullScreen />
         );
     }
 

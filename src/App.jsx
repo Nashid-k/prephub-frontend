@@ -61,7 +61,7 @@ function AppContent() {
                         <AnalyticsWrapper />
                         <div className="App">
                             <Navbar />
-                            <React.Suspense fallback={<LoadingSpinner message="Initializing PrepHub..." />}>
+                            <React.Suspense fallback={<LoadingSpinner message="Initializing PrepHub..." fullScreen />}>
                                 <Routes>
                                     <Route path="/" element={<Home />} />
                                     <Route path="/login" element={<LoginPage />} />

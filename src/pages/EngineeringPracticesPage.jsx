@@ -48,11 +48,7 @@ const EngineeringPracticesPage = () => {
 
     if (loading) {
         return (
-            <Box sx={{ minHeight: 'calc(100vh - 100px)', display: 'flex', alignItems: 'center' }}>
-                <Container maxWidth="xl">
-                    <LoadingSpinner message="Loading Engineering Practices..." />
-                </Container>
-            </Box>
+            <LoadingSpinner message="Loading Engineering Practices..." fullScreen />
         );
     }
 

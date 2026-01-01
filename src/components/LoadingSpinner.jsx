@@ -3,16 +3,26 @@ import { Box, CircularProgress, Typography } from '@mui/material';
 import { motion } from 'framer-motion';
 import './LoadingSpinner.css';
 
-const LoadingSpinner = ({ message = 'Loading...' }) => {
+const LoadingSpinner = ({ message = 'Loading...', fullScreen = false }) => {
     return (
         <Box
+            className={fullScreen ? "loading-spinner-fullscreen" : ""}
             sx={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
                 justifyContent: 'center',
-                minHeight: '400px',
+                minHeight: fullScreen ? '100vh' : '400px',
                 gap: 3,
+                ...(fullScreen && {
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    zIndex: 9999,
+                    bgcolor: 'background.default', // Use theme background
+                })
             }}
         >
             <motion.div
