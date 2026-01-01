@@ -315,7 +315,7 @@ const OnboardingModal = ({ open, onComplete, onSkip, initialStep = 1, currentPat
         }
 
         await minDelay;
-        onComplete({ ...path, experienceLevel: experience });
+        if (onComplete) onComplete({ ...path, experienceLevel: experience });
     };
 
     return (

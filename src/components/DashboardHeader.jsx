@@ -77,7 +77,7 @@ const DashboardHeader = ({ user, onManagePath }) => {
 
                                 <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
                                     <Button
-                                        onClick={() => onManagePath(2)}
+                                        onClick={() => onManagePath && onManagePath(2)}
                                         variant="outlined"
                                         size="small"
                                         startIcon={<Psychology />}
@@ -86,7 +86,7 @@ const DashboardHeader = ({ user, onManagePath }) => {
                                         Adjust Difficulty
                                     </Button>
                                     <Button
-                                        onClick={() => onManagePath(1)}
+                                        onClick={() => onManagePath && onManagePath(1)}
                                         variant="text"
                                         size="small"
                                         sx={{ borderRadius: '12px', textTransform: 'none', color: 'text.secondary' }}
