@@ -24,7 +24,13 @@ import {
     Settings,
     CheckCircle,
     Computer,
-    Javascript
+    Javascript,
+    Psychology,
+    Analytics,
+    Cloud,
+    SignalCellularAlt,
+    TrendingUp,
+    RocketLaunch
 } from '@mui/icons-material';
 import axios from 'axios';
 import { generateSmartPath } from '../utils/SmartCurriculum';
@@ -33,7 +39,9 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 const OnboardingModal = ({ open, onComplete, onSkip }) => {
     const theme = useMuiTheme();
+    const [step, setStep] = useState(1); // 1: Path, 2: Experience
     const [selectedPath, setSelectedPath] = useState(null);
+    const [selectedExperience, setSelectedExperience] = useState(null);
     const [showLoading, setShowLoading] = useState(false);
     const [allTopics, setAllTopics] = useState([]);
     const [pathCounts, setPathCounts] = useState({});
@@ -41,7 +49,9 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
     useEffect(() => {
         if (open) {
             setShowLoading(false);
+            setStep(1);
             setSelectedPath(null);
+            setSelectedExperience(null);
             fetchTopics();
         }
     }, [open]);
@@ -147,6 +157,33 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
             detail: 'Microservices & concurrency'
         },
         {
+            id: 'machine-learning-engineer',
+            name: '🤖 ML Engineer',
+            description: 'AI, Deep Learning & MLOps',
+            icon: <Psychology sx={{ fontSize: 40 }} />,
+            color: '#FF2D55',
+            duration: '6-8 months',
+            detail: 'From Math to Deep Learning'
+        },
+        {
+            id: 'data-analyst',
+            name: '📊 Data Analyst',
+            description: 'SQL, Python, Visualization',
+            icon: <Analytics sx={{ fontSize: 40 }} />,
+            color: '#FF9500',
+            duration: '4-6 months',
+            detail: 'Insights from Data'
+        },
+        {
+            id: 'aws-cloud-architect',
+            name: '☁️ Cloud Architect',
+            description: 'AWS, Security & DevOps',
+            icon: <Cloud sx={{ fontSize: 40 }} />,
+            color: '#FF9F0A',
+            duration: '6-9 months',
+            detail: 'Mastering AWS Cloud'
+        },
+        {
             id: 'csharp-dotnet',
             name: '🔹 C# & .NET',
             description: 'Microsoft enterprise stack',
@@ -166,6 +203,30 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
         }
     ];
 
+    const experienceLevels = [
+        {
+            id: '0-1_year',
+            name: '🌱 Beginner (0-1 Year)',
+            description: 'Focus on foundations and core concepts.',
+            icon: <SignalCellularAlt sx={{ fontSize: 32 }} />,
+            color: '#34c759'
+        },
+        {
+            id: '1-3_years',
+            name: '🚀 Intermediate (1-3 Years)',
+            description: 'Advanced patterns, DSA, and best practices.',
+            icon: <TrendingUp sx={{ fontSize: 32 }} />,
+            color: '#0a84ff'
+        },
+        {
+            id: '3-5_years',
+            name: '🏗️ Advanced (3-5 Years)',
+            description: 'System design, scale, and architecture.',
+            icon: <RocketLaunch sx={{ fontSize: 32 }} />,
+            color: '#bf5af2'
+        }
+    ];
+
     useEffect(() => {
         if (allTopics.length > 0) {
             const counts = {};
@@ -182,36 +243,46 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
     };
 
     const handleContinue = async () => {
-        if (!selectedPath) return;
+        if (step === 1 && selectedPath) {
+            setStep(2);
+            return;
+        }
+
+        if (step === 2 && !selectedExperience) return;
 
         setShowLoading(true);
 
         try {
-            // Get the default topics for this path
-            const defaultTopics = generateSmartPath(allTopics, selectedPath.id);
+            // Get the default topics for this path with experience filter
+            // Note: experienceLevel is passed to generateSmartPath
+            const defaultTopics = generateSmartPath(allTopics, selectedPath.id, selectedExperience.id);
 
             // Call AI to structure them
             const response = await axios.post(`${API_URL}/ai/structure-path`, {
                 topics: defaultTopics,
-                pathName: selectedPath.name
+                pathName: selectedPath.name,
+                experienceLevel: selectedExperience.name
             });
 
             if (response.data.success && response.data.structure) {
                 // Save AI configuration
                 localStorage.setItem('prephub_ai_path_config', JSON.stringify({
                     pathId: selectedPath.id,
-                    ...response.data.structure // orderedSlugs, learningStrategy
+                    experienceLevelId: selectedExperience.id,
+                    ...response.data.structure
                 }));
             }
         } catch (error) {
             console.error('AI Structure failed, falling back to default:', error);
-            // Clear any old config on failure to ensure fallback works
-            localStorage.removeItem('prephub_ai_path_config');
+            // Fallback config
+            localStorage.setItem('prephub_ai_path_config', JSON.stringify({
+                pathId: selectedPath.id,
+                experienceLevelId: selectedExperience.id
+            }));
         }
 
-        // Add a small delay for the animation if the API call was too fast
         setTimeout(() => {
-            onComplete(selectedPath);
+            onComplete({ ...selectedPath, experienceLevel: selectedExperience });
         }, 1500);
     };
 
@@ -256,7 +327,7 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
                                             boxShadow: '0 8px 24px rgba(10, 132, 255, 0.4)'
                                         }}
                                     >
-                                        <School sx={{ fontSize: 48, color: 'white' }} />
+                                        {step === 1 ? <School sx={{ fontSize: 48, color: 'white' }} /> : <TrendingUp sx={{ fontSize: 48, color: 'white' }} />}
                                     </Box>
                                     <Typography
                                         variant="h4"
@@ -269,107 +340,171 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
                                             WebkitTextFillColor: 'transparent'
                                         }}
                                     >
-                                        Welcome to PrepHub! 🚀
+                                        {step === 1 ? 'Welcome to PrepHub! 🚀' : 'Select Experience Level'}
                                     </Typography>
                                     <Typography variant="h6" color="text.secondary" sx={{ mb: 0.5, fontWeight: 500 }}>
-                                        Let's personalize your learning journey
+                                        {step === 1 ? "Let's personalize your learning journey" : `Tailoring ${selectedPath?.name} for you`}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        Choose your path and we'll show you the right topics in the perfect order
+                                        {step === 1 ? "Choose your path and we'll show you the right topics" : "We'll adjust the curriculum depth based on your goal."}
                                     </Typography>
                                 </Box>
 
                                 <Box sx={{ maxHeight: '50vh', overflowY: 'auto', pr: 1, mb: 3 }}>
-                                    <Grid container spacing={2}>
-                                        {learningPaths.map((path, index) => (
-                                            <Grid item xs={12} sm={6} key={path.id}>
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 20 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ delay: index * 0.05 }}
-                                                >
-                                                    <Card
-                                                        elevation={0}
-                                                        sx={{
-                                                            height: '100%',
-                                                            border: '2px solid',
-                                                            borderColor: selectedPath?.id === path.id ? path.color : 'transparent',
-                                                            bgcolor: theme.palette.mode === 'dark'
-                                                                ? 'rgba(255,255,255,0.03)'
-                                                                : 'rgba(0,0,0,0.02)',
-                                                            transition: 'all 0.3s',
-                                                            position: 'relative',
-                                                            overflow: 'visible',
-                                                            '&:hover': {
-                                                                transform: 'translateY(-4px)',
-                                                                boxShadow: `0 12px 24px ${path.color}30`
-                                                            }
-                                                        }}
+                                    {step === 1 ? (
+                                        <Grid container spacing={2}>
+                                            {learningPaths.map((path, index) => (
+                                                <Grid item xs={12} sm={6} key={path.id}>
+                                                    <motion.div
+                                                        initial={{ opacity: 0, y: 20 }}
+                                                        animate={{ opacity: 1, y: 0 }}
+                                                        transition={{ delay: index * 0.05 }}
                                                     >
-                                                        <CardActionArea onClick={() => handleSelectPath(path)} sx={{ height: '100%', p: 2.5 }}>
-                                                            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                                                        <Card
+                                                            elevation={0}
+                                                            sx={{
+                                                                height: '100%',
+                                                                border: '2px solid',
+                                                                borderColor: selectedPath?.id === path.id ? path.color : 'transparent',
+                                                                bgcolor: theme.palette.mode === 'dark'
+                                                                    ? 'rgba(255,255,255,0.03)'
+                                                                    : 'rgba(0,0,0,0.02)',
+                                                                transition: 'all 0.3s',
+                                                                position: 'relative',
+                                                                overflow: 'visible',
+                                                                '&:hover': {
+                                                                    transform: 'translateY(-4px)',
+                                                                    boxShadow: `0 12px 24px ${path.color}30`
+                                                                }
+                                                            }}
+                                                        >
+                                                            <CardActionArea onClick={() => setSelectedPath(path)} sx={{ height: '100%', p: 2.5 }}>
+                                                                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                                                                    <Box
+                                                                        sx={{
+                                                                            p: 1.5,
+                                                                            borderRadius: '12px',
+                                                                            background: `${path.color}20`,
+                                                                            color: path.color,
+                                                                            display: 'flex'
+                                                                        }}
+                                                                    >
+                                                                        {path.icon}
+                                                                    </Box>
+                                                                    {selectedPath?.id === path.id && (
+                                                                        <CheckCircle
+                                                                            sx={{
+                                                                                position: 'absolute',
+                                                                                top: 16,
+                                                                                right: 16,
+                                                                                color: path.color,
+                                                                                fontSize: 28
+                                                                            }}
+                                                                        />
+                                                                    )}
+                                                                </Box>
+                                                                <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                                                                    {path.name}
+                                                                </Typography>
+                                                                <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
+                                                                    {path.description}
+                                                                </Typography>
+                                                                <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                                    <Chip
+                                                                        label={`${pathCounts[path.id] || 0} topics`}
+                                                                        size="small"
+                                                                        sx={{
+                                                                            bgcolor: `${path.color}15`,
+                                                                            color: path.color,
+                                                                            fontWeight: 600,
+                                                                            fontSize: '0.7rem'
+                                                                        }}
+                                                                    />
+                                                                    <Chip
+                                                                        label={path.duration}
+                                                                        size="small"
+                                                                        sx={{
+                                                                            bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                                                                            fontSize: '0.7rem'
+                                                                        }}
+                                                                    />
+                                                                </Box>
+                                                            </CardActionArea>
+                                                        </Card>
+                                                    </motion.div>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    ) : (
+                                        <Grid container spacing={2} justifyContent="center">
+                                            {experienceLevels.map((level, index) => (
+                                                <Grid item xs={12} sm={4} key={level.id}>
+                                                    <motion.div
+                                                        initial={{ opacity: 0, x: 20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: index * 0.1 }}
+                                                    >
+                                                        <Card
+                                                            elevation={0}
+                                                            sx={{
+                                                                height: '100%',
+                                                                border: '2px solid',
+                                                                borderColor: selectedExperience?.id === level.id ? level.color : 'transparent',
+                                                                bgcolor: theme.palette.mode === 'dark'
+                                                                    ? 'rgba(255,255,255,0.03)'
+                                                                    : 'rgba(0,0,0,0.02)',
+                                                                transition: 'all 0.3s',
+                                                                position: 'relative',
+                                                                '&:hover': {
+                                                                    transform: 'translateY(-4px)',
+                                                                    boxShadow: `0 12px 24px ${level.color}30`
+                                                                }
+                                                            }}
+                                                        >
+                                                            <CardActionArea onClick={() => setSelectedExperience(level)} sx={{ height: '100%', p: 3, textAlign: 'center' }}>
                                                                 <Box
                                                                     sx={{
-                                                                        p: 1.5,
-                                                                        borderRadius: '12px',
-                                                                        background: `${path.color}20`,
-                                                                        color: path.color,
-                                                                        display: 'flex'
+                                                                        p: 2,
+                                                                        borderRadius: '50%',
+                                                                        background: `${level.color}20`,
+                                                                        color: level.color,
+                                                                        display: 'inline-flex',
+                                                                        mb: 2
                                                                     }}
                                                                 >
-                                                                    {path.icon}
+                                                                    {level.icon}
                                                                 </Box>
-                                                                {selectedPath?.id === path.id && (
+                                                                {selectedExperience?.id === level.id && (
                                                                     <CheckCircle
                                                                         sx={{
                                                                             position: 'absolute',
                                                                             top: 16,
                                                                             right: 16,
-                                                                            color: path.color,
-                                                                            fontSize: 28
+                                                                            color: level.color,
+                                                                            fontSize: 24
                                                                         }}
                                                                     />
                                                                 )}
-                                                            </Box>
-                                                            <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
-                                                                {path.name}
-                                                            </Typography>
-                                                            <Typography variant="body2" color="text.secondary" sx={{ mb: 2, minHeight: 40 }}>
-                                                                {path.description}
-                                                            </Typography>
-                                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                                <Chip
-                                                                    label={`${pathCounts[path.id] || 0} topics`}
-                                                                    size="small"
-                                                                    sx={{
-                                                                        bgcolor: `${path.color}15`,
-                                                                        color: path.color,
-                                                                        fontWeight: 600,
-                                                                        fontSize: '0.7rem'
-                                                                    }}
-                                                                />
-                                                                <Chip
-                                                                    label={path.duration}
-                                                                    size="small"
-                                                                    sx={{
-                                                                        bgcolor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-                                                                        fontSize: '0.7rem'
-                                                                    }}
-                                                                />
-                                                            </Box>
-                                                        </CardActionArea>
-                                                    </Card>
-                                                </motion.div>
-                                            </Grid>
-                                        ))}
-                                    </Grid>
+                                                                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+                                                                    {level.name}
+                                                                </Typography>
+                                                                <Typography variant="body2" color="text.secondary">
+                                                                    {level.description}
+                                                                </Typography>
+                                                            </CardActionArea>
+                                                        </Card>
+                                                    </motion.div>
+                                                </Grid>
+                                            ))}
+                                        </Grid>
+                                    )}
                                 </Box>
 
                                 <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 3 }}>
                                     <Button
                                         variant="outlined"
                                         size="large"
-                                        onClick={handleSkipOnboarding}
+                                        onClick={step === 1 ? handleSkipOnboarding : () => setStep(1)}
                                         sx={{
                                             borderRadius: '9999px',
                                             px: 4,
@@ -378,13 +513,13 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
                                             borderColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.12)'
                                         }}
                                     >
-                                        Skip for now
+                                        {step === 1 ? 'Skip for now' : 'Back'}
                                     </Button>
                                     <Button
                                         variant="contained"
                                         size="large"
                                         onClick={handleContinue}
-                                        disabled={!selectedPath}
+                                        disabled={step === 1 ? !selectedPath : !selectedExperience}
                                         sx={{
                                             borderRadius: '9999px',
                                             px: 5,
@@ -392,7 +527,7 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
                                             textTransform: 'none',
                                             fontWeight: 700,
                                             fontSize: '1.1rem',
-                                            background: selectedPath
+                                            background: (step === 1 ? selectedPath : selectedExperience)
                                                 ? 'linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%)'
                                                 : undefined,
                                             '&:disabled': {
@@ -400,7 +535,7 @@ const OnboardingModal = ({ open, onComplete, onSkip }) => {
                                             }
                                         }}
                                     >
-                                        Let's Go! 🚀
+                                        {step === 1 ? 'Next' : 'Start Learning 🚀'}
                                     </Button>
                                 </Box>
                             </Box>

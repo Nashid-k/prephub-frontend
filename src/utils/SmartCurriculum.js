@@ -22,77 +22,108 @@ const DEPENDENCY_GRAPH = {
 
 const PATH_RULES = {
     'new-beginner': {
-        include: ['html-css-combined', 'javascript', 'react', 'dsa'],
-        exclude: ['html', 'css'],
-        mustHave: ['html-css-combined', 'dsa', 'algorithms', 'blind-75']
+        experienceLevels: {
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'react'],
+            '1-3_years': ['typescript', 'react', 'nextjs', 'dsa'],
+            '3-5_years': ['system-design', 'security', 'performance']
+        },
+        mustHave: ['html-css-combined', 'javascript', 'git-version-control']
     },
     'mern-fullstack': {
-        keywords: ['mongo', 'express', 'react', 'node', 'javascript', 'html', 'css', 'typescript'], 
-        include: ['algorithms', 'blind-75', 'data-structures', 'git'], // Keep these for legacy support if needed
-        mustHave: ['html-css-combined', 'javascript', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'angular', 'vue', 'html', 'css']
+        experienceLevels: {
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'react', 'nodejs', 'express', 'mongodb'],
+            '1-3_years': ['typescript', 'nextjs', 'dsa', 'algorithms', 'testing', 'redis-caching'],
+            '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'advanced-security', 'performance', 'aws-cloud']
+        },
+        mustHave: ['html-css-combined', 'javascript', 'dsa', 'mern-stack']
     },
     'mean-fullstack': {
-        keywords: ['mongo', 'express', 'angular', 'node', 'javascript', 'html', 'css', 'typescript'], 
-        include: ['git'],
-        mustHave: ['html-css-combined', 'javascript', 'angular', 'nodejs', 'express', 'mongodb', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'react', 'vue', 'html', 'css']
+        experienceLevels: {
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'angular', 'nodejs', 'express', 'mongodb'],
+            '1-3_years': ['typescript', 'rxjs', 'dsa', 'algorithms', 'testing'],
+            '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'performance', 'aws-cloud']
+        },
+        mustHave: ['html-css-combined', 'javascript', 'angular', 'nodejs'] 
     },
     'python-fullstack': {
-        keywords: ['python', 'django', 'flask', 'fastapi', 'html', 'css', 'javascript', 'react', 'postgres', 'sql', 'algorithm', 'structure', 'system', 'design'],
-        mustHave: ['html-css-combined', 'javascript', 'python', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['node', 'express', 'mongo', 'java', 'csharp', 'html', 'css']
+        experienceLevels: {
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'python', 'django', 'sql'],
+            '1-3_years': ['react', 'flask', 'fastapi', 'dsa', 'algorithms', 'docker'],
+            '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'aws-cloud']
+        },
+        mustHave: ['python', 'django', 'javascript']
     },
     'java-enterprise': {
-        keywords: ['java', 'spring', 'html', 'css', 'javascript', 'angular', 'postgres', 'sql', 'algorithm', 'structure', 'system', 'design'],
-        mustHave: ['html-css-combined', 'javascript', 'java', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['node', 'express', 'python', 'react', 'vue', 'html', 'css']
+        experienceLevels: {
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'java', 'spring-boot', 'sql'],
+            '1-3_years': ['angular', 'hibernate', 'dsa', 'algorithms', 'docker', 'junit'],
+            '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'aws-cloud']
+        },
+        mustHave: ['java', 'spring-boot', 'sql']
     },
     'flutter-mobile': {
-        keywords: ['flutter', 'dart', 'mobile', 'firebase', 'android', 'ios'],
-        mustHave: ['dart', 'flutter', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['html-css-combined', 'react', 'angular', 'vue', 'system', 'html', 'css']
-    },
-    'interview-prep': {
-        keywords: ['structure', 'algorithm', 'system', 'design', 'network', 'os', 'operating', 'blind', 'dsa', 'interview', 'code'],
-        mustHave: ['blind-75', 'algorithms', 'dsa'],
-        exclude: ['react', 'angular', 'vue', 'html', 'css']
+        experienceLevels: {
+            '0-1_year': ['git-version-control', 'dart', 'flutter', 'firebase'],
+            '1-3_years': ['state-management', 'native-integrations', 'dsa', 'algorithms', 'testing'],
+            '3-5_years': ['system-design', 'mobile-architecture', 'ci-cd', 'performance', 'aws-cloud']
+        },
+        mustHave: ['dart', 'flutter', 'dsa']
     },
     'frontend-specialist': {
-        keywords: ['html', 'css', 'javascript', 'typescript', 'react', 'next', 'angular', 'vue', 'tailwind', 'ui', 'ux', 'algorithm', 'structure'],
-        mustHave: ['html-css-combined', 'javascript', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['python', 'java', 'csharp', 'golang', 'sql', 'html', 'css']
+        experienceLevels: {
+            '0-1_year': ['html-css-combined', 'git-version-control', 'javascript', 'react', 'tailwind'],
+            '1-3_years': ['typescript', 'nextjs', 'vue', 'testing', 'accessibility', 'state-management'],
+            '3-5_years': ['system-design', 'web-performance', 'micro-frontends', 'security', 'aws-cloud']
+        },
+        mustHave: ['html-css-combined', 'javascript', 'react']
     },
     'backend-specialist': {
-        keywords: ['node', 'express', 'mongo', 'postgres', 'sql', 'api', 'cache', 'redis', 'docker', 'system', 'design', 'algorithm', 'structure', 'microservice'],
-        mustHave: ['api-design', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['react', 'angular', 'vue', 'html', 'css']
+        experienceLevels: {
+            '0-1_year': ['git-version-control', 'javascript', 'nodejs', 'express', 'sql', 'mongodb'],
+            '1-3_years': ['typescript', 'postgres', 'redis', 'docker', 'dsa', 'testing'],
+            '3-5_years': ['system-design', 'distributed-systems', 'microservices', 'kubernetes', 'aws-cloud']
+        },
+        mustHave: ['nodejs', 'sql', 'api-design']
     },
     'golang-backend': {
-        keywords: ['golang', 'go-', 'postgres', 'sql', 'api', 'concurrency', 'docker', 'algorithm', 'structure', 'system'],
-        mustHave: ['golang', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['javascript', 'python', 'java']
+        experienceLevels: {
+            '0-1_year': ['git-version-control', 'golang', 'sql', 'docker'],
+            '1-3_years': ['grpc', 'microservices', 'dsa', 'concurrency', 'postgres'],
+            '3-5_years': ['system-design', 'distributed-systems', 'kubernetes', 'aws-cloud']
+        },
+        mustHave: ['golang', 'sql']
     },
     'csharp-dotnet': {
-        keywords: ['csharp', 'dotnet', '.net', 'postgres', 'sql', 'api', 'test', 'algorithm', 'structure'],
-        mustHave: ['csharp', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['javascript', 'python', 'java']
+        experienceLevels: {
+            '0-1_year': ['git-version-control', 'csharp', 'dotnet', 'sql', 'html-css-combined'],
+            '1-3_years': ['entity-framework', 'dsa', 'azure', 'testing', 'microservices'],
+            '3-5_years': ['system-design', 'distributed-systems', 'cloud-architecture', 'performance', 'aws-cloud']
+        },
+        mustHave: ['csharp', 'dotnet']
     },
-    'systems-programming': {
-        keywords: ['c-programming', 'rust', 'os', 'operating', 'network', 'kernel', 'embedded', 'algorithm', 'structure', 'low-level'],
-        mustHave: ['c-programming', 'algorithms', 'dsa', 'blind-75'],
-        exclude: ['javascript', 'web', 'html']
+    'machine-learning-engineer': {
+        experienceLevels: {
+            '0-1_year': ['git-version-control', 'python', 'sql', 'statistics', 'pandas', 'numpy'],
+            '1-3_years': ['machine-learning', 'data-analyst', 'algorithms', 'data-visualization', 'docker'],
+            '3-5_years': ['deep-learning', 'distributed-systems', 'aws-cloud', 'mlops', 'system-design']
+        },
+        mustHave: ['python', 'machine-learning', 'math']
     },
-    'data-science': {
-        keywords: ['python', 'pandas', 'numpy', 'scikit', 'matplotlib', 'seaborn', 'tensorflow', 'pytorch', 'data', 'analysis', 'statistics', 'sql', 'visualization', 'algorithm', 'machine-learning', 'ai'],
-        mustHave: ['python', 'algorithms', 'dsa', 'blind-75'],
-        exclude: ['django', 'flask', 'node', 'react', 'css']
+    'data-analyst': {
+        experienceLevels: {
+            '0-1_year': ['git-version-control', 'python', 'sql', 'excel-advanced', 'statistics'],
+            '1-3_years': ['data-analyst', 'pandas', 'visualization-libs', 'tableau-powerbi'],
+            '3-5_years': ['machine-learning', 'big-data', 'aws-cloud', 'data-modeling']
+        },
+        mustHave: ['python', 'sql', 'data-analyst']
     },
-    'game-development': {
-        keywords: ['unity', 'unreal', 'godot', 'csharp', 'cpp', 'c-plus-plus', 'game', 'physics', 'graphics', 'shader', '3d', '2d', 'animation', 'algorithm'],
-        mustHave: ['algorithms', 'dsa', 'blind-75'],
-        include: ['csharp'],
-        exclude: ['html', 'css', 'react', 'web']
+    'aws-cloud-architect': {
+        experienceLevels: {
+            '0-1_year': ['git-version-control', 'linux-basics', 'networking-basics', 'aws-cloud'],
+            '1-3_years': ['docker', 'kubernetes', 'terraform', 'python', 'dsa'],
+            '3-5_years': ['system-design', 'distributed-systems', 'security-specialty', 'advanced-networking']
+        },
+        mustHave: ['aws-cloud', 'linux-basics']
     }
 };
 
@@ -122,39 +153,57 @@ const sortTopicsByDependency = (topics) => {
     };
 
     topics.forEach(t => {
-        if (t.slug !== 'dsa') {
-            visit(t.slug);
-        }
+        // Run topological sort
+        visit(t.slug);
     });
 
     return result;
 };
 
-export const generateSmartPath = (allTopics, pathId) => {
+export const generateSmartPath = (allTopics, pathId, experienceLevel = '0-1_year') => {
     if (!pathId || pathId === 'all' || !PATH_RULES[pathId]) {
         return sortTopicsByDependency(allTopics); 
     }
 
     const rules = PATH_RULES[pathId];
-    
-    let filteredTopics = allTopics.filter(topic => {
-        const slug = topic.slug.toLowerCase();
-        
-        if (rules.exclude && rules.exclude.some(ex => slug.includes(ex))) return false;
-        if (rules.include && rules.include.includes(slug)) return true;
-        if (rules.mustHave && rules.mustHave.includes(slug)) return true;
-        if (rules.keywords) return rules.keywords.some(k => slug.includes(k));
+    let selectedSlugs = new Set();
 
-        return false;
+    // 1. Get topics based on experience level
+    if (rules.experienceLevels) {
+        // Add current level topics
+        if (rules.experienceLevels[experienceLevel]) {
+             rules.experienceLevels[experienceLevel].forEach(slug => selectedSlugs.add(slug));
+        }
+        
+        // Add previous levels (cumulative learning)
+        if (experienceLevel === '1-3_years') {
+             rules.experienceLevels['0-1_year']?.forEach(slug => selectedSlugs.add(slug));
+        } else if (experienceLevel === '3-5_years') {
+             rules.experienceLevels['0-1_year']?.forEach(slug => selectedSlugs.add(slug));
+             rules.experienceLevels['1-3_years']?.forEach(slug => selectedSlugs.add(slug));
+        }
+    }
+
+    // 2. Add must haves (if not already included)
+    if (rules.mustHave) {
+        rules.mustHave.forEach(slug => selectedSlugs.add(slug));
+    }
+
+    // 3. Filter allTopics based on selected slugs
+    let filteredTopics = allTopics.filter(topic => {
+        // Also support partial matching/keywords if needed, but strict slug matching is safer for tiered
+        return selectedSlugs.has(topic.slug);
     });
 
-    if (rules.mustHave) {
-        rules.mustHave.forEach(mustSlug => {
-            const alreadyIn = filteredTopics.find(t => t.slug === mustSlug);
-            if (!alreadyIn) {
-                const found = allTopics.find(t => t.slug === mustSlug);
-                if (found) filteredTopics.push(found);
-            }
+    // 4. Fallback: If no experienceLevels defined (legacy), use old logic (keywords inclusion)
+    if (!rules.experienceLevels && rules.keywords) {
+         filteredTopics = allTopics.filter(topic => {
+            const slug = topic.slug.toLowerCase();
+            if (rules.exclude && rules.exclude.some(ex => slug.includes(ex))) return false;
+            if (rules.include && rules.include.includes(slug)) return true;
+            if (rules.mustHave && rules.mustHave.includes(slug)) return true;
+            if (rules.keywords) return rules.keywords.some(k => slug.includes(k));
+            return false;
         });
     }
 
