@@ -23,35 +23,35 @@ const DEPENDENCY_GRAPH = {
 const PATH_RULES = {
     'new-beginner': {
         include: ['html-css-combined', 'javascript', 'react', 'dsa'],
-        exclude: [],
+        exclude: ['html', 'css'],
         mustHave: ['html-css-combined', 'dsa', 'algorithms', 'blind-75']
     },
     'mern-fullstack': {
         keywords: ['mongo', 'express', 'react', 'node', 'javascript', 'html', 'css', 'typescript'], 
         include: ['algorithms', 'blind-75', 'data-structures', 'git'], // Keep these for legacy support if needed
         mustHave: ['html-css-combined', 'javascript', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'angular', 'vue']
+        exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'angular', 'vue', 'html', 'css']
     },
     'mean-fullstack': {
         keywords: ['mongo', 'express', 'angular', 'node', 'javascript', 'html', 'css', 'typescript'], 
         include: ['git'],
         mustHave: ['html-css-combined', 'javascript', 'angular', 'nodejs', 'express', 'mongodb', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'react', 'vue']
+        exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'react', 'vue', 'html', 'css']
     },
     'python-fullstack': {
         keywords: ['python', 'django', 'flask', 'fastapi', 'html', 'css', 'javascript', 'react', 'postgres', 'sql', 'algorithm', 'structure', 'system', 'design'],
         mustHave: ['html-css-combined', 'javascript', 'python', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['node', 'express', 'mongo', 'java', 'csharp']
+        exclude: ['node', 'express', 'mongo', 'java', 'csharp', 'html', 'css']
     },
     'java-enterprise': {
         keywords: ['java', 'spring', 'html', 'css', 'javascript', 'angular', 'postgres', 'sql', 'algorithm', 'structure', 'system', 'design'],
         mustHave: ['html-css-combined', 'javascript', 'java', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['node', 'express', 'python', 'react', 'vue']
+        exclude: ['node', 'express', 'python', 'react', 'vue', 'html', 'css']
     },
     'flutter-mobile': {
         keywords: ['flutter', 'dart', 'mobile', 'firebase', 'android', 'ios'],
         mustHave: ['dart', 'flutter', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['html-css-combined', 'react', 'angular', 'vue', 'system']
+        exclude: ['html-css-combined', 'react', 'angular', 'vue', 'system', 'html', 'css']
     },
     'interview-prep': {
         keywords: ['structure', 'algorithm', 'system', 'design', 'network', 'os', 'operating', 'blind', 'dsa', 'interview', 'code'],
@@ -61,7 +61,7 @@ const PATH_RULES = {
     'frontend-specialist': {
         keywords: ['html', 'css', 'javascript', 'typescript', 'react', 'next', 'angular', 'vue', 'tailwind', 'ui', 'ux', 'algorithm', 'structure'],
         mustHave: ['html-css-combined', 'javascript', 'dsa', 'algorithms', 'blind-75'],
-        exclude: ['python', 'java', 'csharp', 'golang', 'sql']
+        exclude: ['python', 'java', 'csharp', 'golang', 'sql', 'html', 'css']
     },
     'backend-specialist': {
         keywords: ['node', 'express', 'mongo', 'postgres', 'sql', 'api', 'cache', 'redis', 'docker', 'system', 'design', 'algorithm', 'structure', 'microservice'],

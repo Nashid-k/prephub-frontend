@@ -327,6 +327,17 @@ Provide:
         let isMounted = true;
         abortControllerRef.current = new AbortController();
 
+        // Reset content to show loading state immediately when navigating
+        setAiContent('');
+        setProblemContent('');
+        setTestCases(null);
+        // Do NOT reset section immediately to null if you want to keep the frame, 
+        // but resetting it forces a "loading" spinner which might be what the user wants 
+        // if they say "loading content not changing".
+        // Let's reset it to ensure the fresh data is perceived.
+        setSection(null);
+        setLoading(true);
+
         const loadData = async () => {
             // 1. Load from cache first for instant UI
             const cacheKey = `prephub_section_agg_${topicSlug}_${sectionSlug}`;
@@ -336,10 +347,13 @@ Provide:
             if (cachedData && isMounted) {
                 try {
                     const data = JSON.parse(cachedData);
-                    await applyAggregateData(data);
-                    if (isMounted) {
-                        setLoading(false);
-                        cachedLoaded = true;
+                    // Check if cached data matches current slug to avoid stale data from collision
+                    if (data.section?.slug === sectionSlug) {
+                        await applyAggregateData(data);
+                        if (isMounted) {
+                            setLoading(false);
+                            cachedLoaded = true;
+                        }
                     }
                 } catch (e) {
                     console.error('Failed to parse cached section data');
@@ -431,6 +445,14 @@ Provide:
         const idx = (allTopicSections || siblingSections || []).findIndex(s => s.slug === sectionSlug);
         setCurrentIndex(idx);
     };
+
+    // Auto-scroll active item into view
+    useEffect(() => {
+        const activeItem = document.querySelector('.Mui-selected');
+        if (activeItem) {
+            activeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, [sectionSlug, allSections, mobileOpen, activeTab]);
 
     useEffect(() => {
         if (typeof window.hljs !== 'undefined') {
