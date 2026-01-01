@@ -49,8 +49,48 @@ const TopicPage = () => {
     const [bookmarks, setBookmarks] = useState(new Set()); // Added bookmarks state
     const [loading, setLoading] = useState(true);
 
+    // Track experience level from localStorage to refetch when it changes
+    const [experienceLevel, setExperienceLevel] = useState(() => {
+        try {
+            const configStr = localStorage.getItem('prephub_ai_path_config');
+            if (configStr) {
+                const config = JSON.parse(configStr);
+                return config.experienceLevelId || '0-1_year';
+            }
+        } catch (e) {
+            console.error('Error reading experience level', e);
+        }
+        return '0-1_year';
+    });
+
+    useEffect(() => {
+        // Update experience level from localStorage (in case it changed)
+        try {
+            const configStr = localStorage.getItem('prephub_ai_path_config');
+            if (configStr) {
+                const config = JSON.parse(configStr);
+                const newLevel = config.experienceLevelId || '0-1_year';
+                if (newLevel !== experienceLevel) {
+                    setExperienceLevel(newLevel);
+                }
+            }
+        } catch (e) {
+            console.error('Error updating experience level', e);
+        }
+    }, []);
+
     useEffect(() => {
         // Fetch data (handles cache internally)
+        // Clear cache when experience level changes to force refetch
+        const cacheKey = `prephub_topic_agg_${slug}`;
+        if (localStorage.getItem(cacheKey)) {
+            const cachedData = JSON.parse(localStorage.getItem(cacheKey));
+            // Clear cache if experience level changed
+            if (cachedData.experienceLevel && cachedData.experienceLevel !== experienceLevel) {
+                localStorage.removeItem(cacheKey);
+            }
+        }
+
         fetchAggregateData();
 
         // Refetch when user returns to this page (e.g., after visiting category page)
@@ -66,7 +106,7 @@ const TopicPage = () => {
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, [slug]);
+    }, [slug, experienceLevel]);
 
     const applyAggregateData = (data) => {
         setTopic(data.topic);

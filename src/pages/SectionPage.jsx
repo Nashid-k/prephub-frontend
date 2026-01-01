@@ -1034,29 +1034,54 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                             </Button>
                                         </Box>
                                         <div className="markdown-content">
-                                            <ReactMarkdown
-                                                components={{
-                                                    code({ node, inline, className, children, ...props }) {
-                                                        const match = /language-(\w+)/.exec(className || '');
-                                                        return !inline && match ? (
-                                                            <SyntaxHighlighter
-                                                                style={vscDarkPlus}
-                                                                language={match[1]}
-                                                                PreTag="div"
-                                                                {...props}
-                                                            >
-                                                                {String(children).replace(/\n$/, '')}
-                                                            </SyntaxHighlighter>
-                                                        ) : (
-                                                            <code className={className} {...props}>
-                                                                {children}
-                                                            </code>
-                                                        );
-                                                    }
-                                                }}
-                                            >
-                                                {aiContent}
-                                            </ReactMarkdown>
+                                            {contentLoading || languageChangeLoading ? (
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', py: 8 }}>
+                                                    <CircularProgress sx={{ color: topicColor, mb: 2 }} />
+                                                    <Typography variant="body2" color="text.secondary">
+                                                        {languageChangeLoading
+                                                            ? `Translating to ${targetLanguage?.charAt(0).toUpperCase() + targetLanguage?.slice(1)}...`
+                                                            : 'Generating learning content...'}
+                                                    </Typography>
+                                                </Box>
+                                            ) : aiContent ? (
+                                                <ReactMarkdown
+                                                    components={{
+                                                        code({ node, inline, className, children, ...props }) {
+                                                            const match = /language-(\w+)/.exec(className || '');
+                                                            return !inline && match ? (
+                                                                <SyntaxHighlighter
+                                                                    style={vscDarkPlus}
+                                                                    language={match[1]}
+                                                                    PreTag="div"
+                                                                    {...props}
+                                                                >
+                                                                    {String(children).replace(/\n$/, '')}
+                                                                </SyntaxHighlighter>
+                                                            ) : (
+                                                                <code className={className} {...props}>
+                                                                    {children}
+                                                                </code>
+                                                            );
+                                                        }
+                                                    }}
+                                                >
+                                                    {aiContent}
+                                                </ReactMarkdown>
+                                            ) : (
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 8 }}>
+                                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                                        No content available
+                                                    </Typography>
+                                                    <Button
+                                                        variant="outlined"
+                                                        size="small"
+                                                        onClick={() => generateAIContent(section, category, selectedLanguage)}
+                                                        sx={{ color: topicColor, borderColor: topicColor }}
+                                                    >
+                                                        Generate Content
+                                                    </Button>
+                                                </Box>
+                                            )}
                                         </div>
                                     </Box>
                                 )}
