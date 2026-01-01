@@ -24,33 +24,33 @@ const PATH_RULES = {
     'new-beginner': {
         include: ['html-css-combined', 'javascript', 'react', 'dsa'],
         exclude: [],
-        mustHave: ['html-css-combined', 'dsa']
+        mustHave: ['html-css-combined', 'dsa', 'algorithms', 'blind-75']
     },
     'mern-fullstack': {
         keywords: ['mongo', 'express', 'react', 'node', 'javascript', 'html', 'css', 'typescript'], 
         include: ['algorithms', 'blind-75', 'data-structures', 'git'], // Keep these for legacy support if needed
-        mustHave: ['html-css-combined', 'javascript', 'dsa'],
+        mustHave: ['html-css-combined', 'javascript', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'angular', 'vue']
     },
     'mean-fullstack': {
         keywords: ['mongo', 'express', 'angular', 'node', 'javascript', 'html', 'css', 'typescript'], 
         include: ['git'],
-        mustHave: ['html-css-combined', 'javascript', 'angular', 'nodejs', 'express', 'mongodb', 'dsa'],
+        mustHave: ['html-css-combined', 'javascript', 'angular', 'nodejs', 'express', 'mongodb', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['python', 'java', 'csharp', 'flutter', 'dart', 'golang', 'react', 'vue']
     },
     'python-fullstack': {
         keywords: ['python', 'django', 'flask', 'fastapi', 'html', 'css', 'javascript', 'react', 'postgres', 'sql', 'algorithm', 'structure', 'system', 'design'],
-        mustHave: ['html-css-combined', 'javascript', 'python', 'dsa'],
+        mustHave: ['html-css-combined', 'javascript', 'python', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['node', 'express', 'mongo', 'java', 'csharp']
     },
     'java-enterprise': {
         keywords: ['java', 'spring', 'html', 'css', 'javascript', 'angular', 'postgres', 'sql', 'algorithm', 'structure', 'system', 'design'],
-        mustHave: ['html-css-combined', 'javascript', 'java', 'dsa'],
+        mustHave: ['html-css-combined', 'javascript', 'java', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['node', 'express', 'python', 'react', 'vue']
     },
     'flutter-mobile': {
         keywords: ['flutter', 'dart', 'mobile', 'firebase', 'android', 'ios'],
-        mustHave: ['dart', 'flutter', 'dsa'],
+        mustHave: ['dart', 'flutter', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['html-css-combined', 'react', 'angular', 'vue', 'system']
     },
     'interview-prep': {
@@ -60,37 +60,37 @@ const PATH_RULES = {
     },
     'frontend-specialist': {
         keywords: ['html', 'css', 'javascript', 'typescript', 'react', 'next', 'angular', 'vue', 'tailwind', 'ui', 'ux', 'algorithm', 'structure'],
-        mustHave: ['html-css-combined', 'javascript', 'dsa'],
+        mustHave: ['html-css-combined', 'javascript', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['python', 'java', 'csharp', 'golang', 'sql']
     },
     'backend-specialist': {
         keywords: ['node', 'express', 'mongo', 'postgres', 'sql', 'api', 'cache', 'redis', 'docker', 'system', 'design', 'algorithm', 'structure', 'microservice'],
-        mustHave: ['api-design', 'dsa'],
+        mustHave: ['api-design', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['react', 'angular', 'vue', 'html', 'css']
     },
     'golang-backend': {
         keywords: ['golang', 'go-', 'postgres', 'sql', 'api', 'concurrency', 'docker', 'algorithm', 'structure', 'system'],
-        mustHave: ['golang', 'dsa'],
+        mustHave: ['golang', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['javascript', 'python', 'java']
     },
     'csharp-dotnet': {
         keywords: ['csharp', 'dotnet', '.net', 'postgres', 'sql', 'api', 'test', 'algorithm', 'structure'],
-        mustHave: ['csharp', 'dsa'],
+        mustHave: ['csharp', 'dsa', 'algorithms', 'blind-75'],
         exclude: ['javascript', 'python', 'java']
     },
     'systems-programming': {
         keywords: ['c-programming', 'rust', 'os', 'operating', 'network', 'kernel', 'embedded', 'algorithm', 'structure', 'low-level'],
-        mustHave: ['c-programming', 'algorithms', 'dsa'],
+        mustHave: ['c-programming', 'algorithms', 'dsa', 'blind-75'],
         exclude: ['javascript', 'web', 'html']
     },
     'data-science': {
         keywords: ['python', 'pandas', 'numpy', 'scikit', 'matplotlib', 'seaborn', 'tensorflow', 'pytorch', 'data', 'analysis', 'statistics', 'sql', 'visualization', 'algorithm', 'machine-learning', 'ai'],
-        mustHave: ['python', 'algorithms', 'dsa'],
+        mustHave: ['python', 'algorithms', 'dsa', 'blind-75'],
         exclude: ['django', 'flask', 'node', 'react', 'css']
     },
     'game-development': {
         keywords: ['unity', 'unreal', 'godot', 'csharp', 'cpp', 'c-plus-plus', 'game', 'physics', 'graphics', 'shader', '3d', '2d', 'animation', 'algorithm'],
-        mustHave: ['algorithms', 'dsa'],
+        mustHave: ['algorithms', 'dsa', 'blind-75'],
         include: ['csharp'],
         exclude: ['html', 'css', 'react', 'web']
     }
