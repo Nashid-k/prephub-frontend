@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { retryWithBackoff, deduplicatedRequest } from '../utils/retry';
 
 const getApiUrl = () => {
   const url = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -39,16 +40,23 @@ api.interceptors.request.use(
 );
 
 export const curriculumAPI = {
-  getAllTopics: (params = {}) => api.get('/curriculum/topics', { params }),
-  getPersonalizedTopics: (params = {}) => api.get('/curriculum/topics/personalized', { params }),
-  getTopicBySlug: (slug) => api.get(`/curriculum/topics/${slug}`),
-  getSectionBySlug: (topicSlug, sectionSlug) => 
-    api.get(`/curriculum/sections/${topicSlug}/${sectionSlug}`),
-  getTopicAggregate: (slug, params = {}) => api.get(`/curriculum/aggregate/topic/${slug}`, { params }),
-  getCategoryAggregate: (topicSlug, categorySlug) =>
-    api.get(`/curriculum/aggregate/category/${topicSlug}/${categorySlug}`),
-  getSectionAggregate: (topicSlug, sectionSlug) =>
-    api.get(`/curriculum/aggregate/section/${topicSlug}/${sectionSlug}`),
+  getAllTopics: (params = {}) => retryWithBackoff(() => api.get('/curriculum/topics', { params })),
+  getPersonalizedTopics: (params = {}) => retryWithBackoff(() => api.get('/curriculum/topics/personalized', { params })),
+  getTopicBySlug: (slug) => deduplicatedRequest(`topic-${slug}`, () => 
+    retryWithBackoff(() => api.get(`/curriculum/topics/${slug}`))
+  ),
+  getSectionBySlug: (topicSlug, sectionSlug) => deduplicatedRequest(`section-${topicSlug}-${sectionSlug}`, () =>
+    retryWithBackoff(() => api.get(`/curriculum/sections/${topicSlug}/${sectionSlug}`))
+  ),
+  getTopicAggregate: (slug, params = {}) => deduplicatedRequest(`topic-agg-${slug}`, () =>
+    retryWithBackoff(() => api.get(`/curriculum/aggregate/topic/${slug}`, { params }))
+  ),
+  getCategoryAggregate: (topicSlug, categorySlug) => deduplicatedRequest(`cat-agg-${topicSlug}-${categorySlug}`, () =>
+    retryWithBackoff(() => api.get(`/curriculum/aggregate/category/${topicSlug}/${categorySlug}`))
+  ),
+  getSectionAggregate: (topicSlug, sectionSlug) => deduplicatedRequest(`sec-agg-${topicSlug}-${sectionSlug}`, () =>
+    retryWithBackoff(() => api.get(`/curriculum/aggregate/section/${topicSlug}/${sectionSlug}`))
+  ),
   getTopicStatic: (slug) => api.get(`/curriculum/static/topic/${slug}`),
   getCategoryStatic: (topicSlug, categorySlug) =>
     api.get(`/curriculum/static/category/${topicSlug}/${categorySlug}`),
