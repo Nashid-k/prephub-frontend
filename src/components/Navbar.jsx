@@ -419,7 +419,6 @@ const Navbar = () => {
                                             '&:hover': {
                                                 background: 'linear-gradient(135deg, #d070ff 0%, #b865ff 100%)',
                                                 transform: 'scale(1.05)',
-                                                transform: 'scale(1.05)',
                                             },
                                             transition: 'all 0.2s',
                                         }}
