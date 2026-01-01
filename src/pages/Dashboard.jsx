@@ -359,6 +359,8 @@ const Dashboard = () => {
                     open={showOnboarding}
                     onComplete={handleOnboardingComplete}
                     onSkip={handleOnboardingSkip}
+                    initialStep={onboardingStep}
+                    currentPathId={selectedPath === 'all' ? null : selectedPath}
                 />
                 <Walkthrough run={runTour} onClose={handleTourClose} />
                 <motion.div
