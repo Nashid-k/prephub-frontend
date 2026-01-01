@@ -1,15 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
-
-// Lazy load heavy components for better performance
-const ReactMarkdown = React.lazy(() => import('react-markdown'));
-const SyntaxHighlighter = React.lazy(() =>
-    import('react-syntax-highlighter').then(module => ({
-        default: module.Prism
-    }))
-);
-const CodeEditor = React.lazy(() => import('../components/CodeEditor'));
 import AIChat from '../components/AIChat';
 import QuizModal from '../components/QuizModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -20,6 +11,15 @@ import Breadcrumb from '../components/Breadcrumb';
 import SafeImage from '../components/SafeImage';
 import AIOutputModal from '../components/AIOutputModal';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
+
+// Lazy load heavy components for better performance
+const ReactMarkdown = React.lazy(() => import('react-markdown'));
+const SyntaxHighlighter = React.lazy(() =>
+    import('react-syntax-highlighter').then(module => ({
+        default: module.Prism
+    }))
+);
+const CodeEditor = React.lazy(() => import('../components/CodeEditor'));
 import { useAuth } from '../context/AuthContext';
 import {
     Container,
