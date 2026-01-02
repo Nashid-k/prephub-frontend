@@ -285,9 +285,11 @@ const SectionPage = () => {
     const [aiModalLoading, setAiModalLoading] = useState(false);
 
     const handleAiHelp = async (type, code, lang = 'javascript') => {
-        setAiModalType(type);
-        setAiModalOpen(true);
-        setAiModalLoading(true);
+        startTransition(() => {
+            setAiModalType(type);
+            setAiModalOpen(true);
+            setAiModalLoading(true);
+        });
 
         try {
             // Mode mapping: 'explain' -> 'review' (or we can add 'explain' mode to backend if needed)
@@ -303,12 +305,16 @@ const SectionPage = () => {
 
             const res = await aiAPI.analyzeCode(code, mode, lang);
 
-            setAiModalResponse(res.data.analysis);
-            setAiModalLoading(false);
+            startTransition(() => {
+                setAiModalResponse(res.data.analysis);
+                setAiModalLoading(false);
+            });
             trackAIExplanation(topicSlug, section?.title);
         } catch (err) {
-            setAiModalResponse('Failed to analyze code. Please try again.');
-            setAiModalLoading(false);
+            startTransition(() => {
+                setAiModalResponse('Failed to analyze code. Please try again.');
+                setAiModalLoading(false);
+            });
         }
     };
 
@@ -1020,7 +1026,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                     <Typography variant="h5" sx={{ fontWeight: 700 }}>Learning Content</Typography>
                                                     <Button
                                                         size="small"
-                                                        onClick={() => generateAIContent(section, category, selectedLanguage)}
+                                                        onClick={() => startTransition(() => generateAIContent(section, category, selectedLanguage))}
                                                         sx={{
                                                             color: topicColor,
                                                             borderColor: topicColor,
