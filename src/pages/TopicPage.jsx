@@ -47,6 +47,36 @@ const TopicPage = () => {
     const [progressMap, setProgressMap] = useState({});
     const [progressStats, setProgressStats] = useState({ totalSections: 0, completedSections: 0, percentage: 0 });
     const [bookmarks, setBookmarks] = useState(new Set()); // Added bookmarks state
+
+    // Refresh bookmarks from storage
+    const refreshBookmarks = () => {
+        const allBookmarks = localStorage.getItem('prephub_bookmarks');
+        if (allBookmarks) {
+            try {
+                const parsed = JSON.parse(allBookmarks);
+                setBookmarks(new Set(parsed.map(b => b.id)));
+            } catch (e) {
+                console.error('Error parsing bookmarks', e);
+            }
+        } else {
+            setBookmarks(new Set());
+        }
+    };
+
+    // Load bookmarks on mount
+    useEffect(() => {
+        refreshBookmarks();
+
+        // Listen for storage events to sync across tabs
+        const handleStorage = (e) => {
+            if (e.key === 'prephub_bookmarks') {
+                refreshBookmarks();
+            }
+        };
+        window.addEventListener('storage', handleStorage);
+        return () => window.removeEventListener('storage', handleStorage);
+    }, []);
+
     const [loading, setLoading] = useState(true);
 
     // Track experience level from localStorage to refetch when it changes
@@ -98,6 +128,7 @@ const TopicPage = () => {
             if (!document.hidden) {
                 // Refresh topic data when component becomes visible
                 fetchAggregateData();
+                refreshBookmarks(); // Also refresh bookmarks
             }
         };
 
@@ -263,9 +294,8 @@ const TopicPage = () => {
             topicSlug: topic.slug, categorySlug: category.slug,
         });
         if (result.success) {
+            refreshBookmarks(); // Sync state
             toast.success(result.message === 'Bookmark added' ? 'Category bookmarked' : 'Bookmark removed');
-            // Force re-render of bookmarks by updating categories (shallow clone to trigger update)
-            setCategories([...categories]);
         } else {
             toast.error(result.message);
         }

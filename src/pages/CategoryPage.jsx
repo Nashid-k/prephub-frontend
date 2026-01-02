@@ -256,8 +256,8 @@ const CategoryPage = () => {
                         overflow: 'hidden'
                     }}>
                         <Box sx={{ position: 'relative', zIndex: 1 }}>
-                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'flex-start' }, gap: { xs: 2, md: 0 } }}>
-                                <Box sx={{ width: '100%' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
+                                <Box sx={{ flex: 1 }}>
                                     <Typography variant="overline" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', fontSize: { xs: '0.7rem', md: '0.75rem' } }}>
                                         {category.group || 'CATEGORY'}
                                     </Typography>
@@ -280,11 +280,7 @@ const CategoryPage = () => {
                                         border: '1px solid',
                                         borderColor: isBookmarked(category._id) ? `${topicColor}40` : 'rgba(128,128,128,0.2)',
                                         '&:hover': { bgcolor: `${topicColor}15` },
-                                        alignSelf: { xs: 'flex-end', md: 'flex-start' }, // Align to right on mobile too
-                                        mt: { xs: -8, md: 0 }, // Pull up on mobile to sit next to title or over it if needed (optional styling choice, but safer to just stack or keep separate)
-                                        position: { xs: 'absolute', md: 'relative' },
-                                        top: { xs: 24, md: 'auto' },
-                                        right: { xs: 24, md: 'auto' }
+                                        flexShrink: 0
                                     }}
                                 >
                                     {isBookmarked(category._id) ? <Bookmark /> : <BookmarkBorder />}
@@ -328,6 +324,7 @@ const CategoryPage = () => {
                             filter: 'blur(100px)',
                             opacity: 0.1,
                             pointerEvents: 'none',
+                            zIndex: 0
                         }} />
                         <Box sx={{
                             position: 'absolute',
@@ -340,7 +337,8 @@ const CategoryPage = () => {
                             overflow: 'hidden',
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center'
+                            justifyContent: 'center',
+                            zIndex: 0
                         }}>
                             <SafeImage
                                 src={getTopicImage(topicSlug)}

@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useTransition } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const ThemeContext = createContext();
 
@@ -13,6 +14,8 @@ export const ThemeProvider = ({ children }) => {
         return prefersDark ? 'dark' : 'light';
     });
 
+    const [isPending, startTransition] = useTransition();
+
     useEffect(() => {
         const root = document.documentElement;
         root.setAttribute('data-theme', theme);
@@ -20,11 +23,13 @@ export const ThemeProvider = ({ children }) => {
     }, [theme]);
 
     const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+        startTransition(() => {
+            setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+        });
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{ theme, toggleTheme, isPending }}>
             {children}
         </ThemeContext.Provider>
     );
