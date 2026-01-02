@@ -653,7 +653,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                         <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <Button
                                 startIcon={<ArrowBack />}
-                                onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}`)}
+                                onClick={() => startTransition(() => navigate(`/topic/${topicSlug}/category/${categorySlug}`))}
                                 sx={{
                                     borderRadius: '9999px',
                                     px: 3,
@@ -682,7 +682,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
 
                             {/* Mobile Sidebar Toggle */}
                             <IconButton
-                                onClick={() => setMobileOpen(true)}
+                                onClick={() => startTransition(() => setMobileOpen(true))}
                                 sx={{
                                     display: { xs: 'flex', md: 'none' },
                                     bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
@@ -697,7 +697,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                 {showLanguageSwitcher && (
                                     <>
                                         <Button
-                                            onClick={handleLanguageMenuOpen}
+                                            onClick={() => startTransition(() => handleLanguageMenuOpen())}
                                             sx={{
                                                 borderRadius: '9999px',
                                                 px: 3,
@@ -743,7 +743,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                             ].map((lang) => (
                                                 <MenuItem
                                                     key={lang.code}
-                                                    onClick={() => handleLanguageSelect(lang.code)}
+                                                    onClick={() => startTransition(() => handleLanguageSelect(lang.code))}
                                                     selected={selectedLanguage === lang.code}
                                                     sx={{
                                                         '&.Mui-selected': {
@@ -761,7 +761,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                 )}
                                 <Button
                                     startIcon={<Psychology />}
-                                    onClick={() => setIsQuizOpen(true)}
+                                    onClick={() => startTransition(() => setIsQuizOpen(true))}
                                     sx={{
                                         display: { xs: 'none', sm: 'flex' },
                                         borderRadius: '9999px',
@@ -781,7 +781,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                     Take Quiz
                                 </Button>
                                 <IconButton
-                                    onClick={handleToggleBookmark}
+                                    onClick={() => startTransition(() => handleToggleBookmark())}
                                     sx={{
                                         color: bookmarked ? topicColor : 'text.secondary',
                                         bgcolor: bookmarked ? `${topicColor}15` : 'transparent',
@@ -998,7 +998,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                         return (
                                             <Button
                                                 key={tab.id}
-                                                onClick={() => setActiveTab(tab.id)}
+                                                onClick={() => startTransition(() => setActiveTab(tab.id))}
                                                 startIcon={tab.icon}
                                                 sx={{
                                                     borderRadius: '9999px',
@@ -1100,7 +1100,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                             <Button
                                                                 variant="outlined"
                                                                 size="small"
-                                                                onClick={() => generateAIContent(section, category, selectedLanguage)}
+                                                                onClick={() => startTransition(() => generateAIContent(section, category, selectedLanguage))}
                                                                 sx={{ color: topicColor, borderColor: topicColor }}
                                                             >
                                                                 Generate Content
@@ -1182,7 +1182,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                         {/* Floating AI Chat Button */}
                         <IconButton
                             aria-label="chat-toggle"
-                            onClick={() => setIsChatOpen(!isChatOpen)}
+                            onClick={() => startTransition(() => setIsChatOpen(!isChatOpen))}
                             sx={{
                                 position: 'fixed',
                                 bottom: 32,

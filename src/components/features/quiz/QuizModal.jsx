@@ -191,6 +191,11 @@ const QuizModal = ({ open, onClose, topic, section, isDark, language = 'javascri
                                 </Button>
                             </Box>
                         </Box>
+                    ) : !currentQuestion ? (
+                        <Box sx={{ textAlign: 'center', py: 4 }}>
+                            <Typography color="text.secondary">No questions available. Please try again.</Typography>
+                            <Button variant="outlined" onClick={() => fetchQuiz(true)} sx={{ mt: 2 }}>Retry</Button>
+                        </Box>
                     ) : (
                         <Fade in={true} key={currentIndex}>
                             <Box>
