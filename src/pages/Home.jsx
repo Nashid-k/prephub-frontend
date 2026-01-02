@@ -42,6 +42,7 @@ import OnboardingModal from '../components/features/onboarding/OnboardingModal';
 import { progressAPI } from '../services/api';
 import { getBookmarks } from '../utils/bookmarks';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
+import { useAuth } from '../context/AuthContext';
 import './Home.css';
 
 import { styled } from '@mui/material/styles';
