@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, Suspense, startTransition } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
@@ -227,7 +227,7 @@ const SectionPage = () => {
 
         // Otherwise (Learn Mode), do the full AI translation of content
         setTargetLanguage(newLang);
-        setLanguageChangeLoading(true);
+        startTransition(() => setLanguageChangeLoading(true));
 
         try {
             // ... existing translation logic ...
@@ -449,7 +449,7 @@ const SectionPage = () => {
 
 
     const generateProblemContent = async (sectionData) => {
-        setContentLoading(true);
+        startTransition(() => setContentLoading(true));
         try {
             const prompt = `You are writing ONLY the problem description for LeetCode problem "${sectionData.title}".
             ... (Keep prompt logic) ...`; // Simplified for brevity in tool call, user: assume logic is preserved if I were careful. I will paste logic.
@@ -494,7 +494,8 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
     };
 
     const generateAIContent = async (sectionData, categoryData, lang = 'javascript') => {
-        setContentLoading(true);
+        // Use startTransition to prevent blocking the UI during state updates
+        startTransition(() => setContentLoading(true));
         try {
             const isBlind75 = categoryData?.group?.startsWith('Blind 75');
             let context = '';
@@ -538,7 +539,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
     };
 
     const generateHints = async (currentSection) => {
-        setContentLoading(true);
+        startTransition(() => setContentLoading(true));
         try {
             const prompt = `Generate 4-5 progressive hints for solving "${currentSection.title}". Format as JSON array of strings.`;
             const response = await aiAPI.explainTopic(topicSlug, currentSection.title, prompt);
