@@ -682,22 +682,24 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
 
                             {/* Mobile Sidebar Toggle */}
                             <IconButton
-                                onClick={() => startTransition(() => setMobileOpen(true))}
+                                onClick={() => setMobileOpen(true)}
                                 sx={{
                                     display: { xs: 'flex', md: 'none' },
                                     bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-                                    borderRadius: '12px',
-                                    ml: 1
+                                    color: 'text.primary',
+                                    backdropFilter: 'blur(10px)',
+                                    border: '1px solid',
+                                    borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                                 }}
                             >
-                                <ListIcon />
+                                <MenuIcon />
                             </IconButton>
 
                             <Box sx={{ display: 'flex', gap: 1 }}>
                                 {showLanguageSwitcher && (
                                     <>
                                         <Button
-                                            onClick={() => startTransition(() => handleLanguageMenuOpen())}
+                                            onClick={handleLanguageMenuOpen}
                                             sx={{
                                                 borderRadius: '9999px',
                                                 px: 3,
