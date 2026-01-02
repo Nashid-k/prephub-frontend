@@ -35,7 +35,8 @@ import {
     AutoAwesome,
     FlashOn,
     LaptopMac,
-    Timeline
+    Timeline,
+    Architecture
 } from '@mui/icons-material';
 import OnboardingModal from '../components/OnboardingModal';
 import { progressAPI } from '../services/api';
@@ -43,10 +44,24 @@ import { getBookmarks } from '../utils/bookmarks';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import './Home.css';
 
-import { useAuth } from '../context/AuthContext';
+import { styled } from '@mui/material/styles';
+
+const BannerBadge = styled(Box)(({ theme }) => ({
+    display: 'inline-flex',
+    padding: '8px 16px',
+    borderRadius: '12px',
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+    border: '1px solid',
+    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+    color: theme.palette.text.primary,
+    fontSize: '0.875rem',
+    fontWeight: 600,
+    letterSpacing: '0.02em',
+    marginBottom: theme.spacing(2),
+}));
 
 const Home = () => {
-    const { user } = useAuth();
+    const { user, experienceLevel } = useAuth();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
     const navigate = useNavigate();
@@ -150,6 +165,242 @@ const Home = () => {
         { icon: <EmojiEvents />, label: 'Practice Problems', value: '75+', color: '#ff9f0a' },
     ];
 
+
+    // Elite Title Mapping
+    const getEliteTitle = (level) => {
+        switch (level) {
+            case 'beginner': return "Apprentice Developer";
+            case 'intermediate': return "Senior Engineer";
+            case 'advanced': return "Distinguished Architect";
+            default: return "Software Engineer";
+        }
+    };
+
+    const eliteTitle = getEliteTitle(user?.experienceLevel || 'advanced');
+
+    // Quick Actions Configuration
+    const quickActions = [
+        {
+            title: 'Debug Console',
+            icon: <Code />,
+            path: '/share',
+            color: '#ff9f0a',
+            desc: 'Analyze & Fix Code'
+        },
+        {
+            title: 'Deep Dive',
+            icon: <Psychology />,
+            path: '/dashboard',
+            color: '#5e5ce6',
+            desc: 'Master Core Concepts'
+        },
+        {
+            title: 'System Design',
+            icon: <Architecture />,
+            path: '/system-design',
+            color: '#30d158',
+            desc: 'Scalability & Architecture'
+        }
+    ];
+
+    if (user) {
+        return (
+            <Box sx={{ minHeight: 'calc(100vh - 100px)', pb: 8 }}>
+                {/* Elite Hero Section */}
+                <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
+                    <Box
+                        sx={{
+                            p: { xs: 4, md: 6 },
+                            borderRadius: '32px',
+                            background: isDark
+                                ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)'
+                                : 'linear-gradient(135deg, #fff 0%, #f5f5f7 100%)',
+                            border: '1px solid',
+                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                            backdropFilter: 'blur(20px)',
+                            boxShadow: isDark ? '0 20px 80px -10px rgba(0,0,0,0.5)' : '0 20px 60px -10px rgba(0,0,0,0.1)',
+                            position: 'relative',
+                            overflow: 'hidden'
+                        }}
+                    >
+                        {/* Background Decor */}
+                        <Box sx={{ position: 'absolute', top: 0, right: 0, width: '40%', height: '100%', opacity: 0.1, background: 'linear-gradient(90deg, transparent, #5e5ce6)', pointerEvents: 'none' }} />
+
+                        <Grid container alignItems="center" spacing={4}>
+                            <Grid item xs={12} md={8}>
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+                                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
+                                        <BannerBadge>{eliteTitle}</BannerBadge>
+                                        <Chip
+                                            icon={<AutoAwesome sx={{ fontSize: 16 }} />}
+                                            label="Elite Mode Active"
+                                            size="small"
+                                            sx={{
+                                                bgcolor: 'rgba(94, 92, 230, 0.2)',
+                                                color: '#5e5ce6',
+                                                fontWeight: 700,
+                                                border: '1px solid rgba(94, 92, 230, 0.3)'
+                                            }}
+                                        />
+                                    </Stack>
+
+                                    <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+                                        Welcome to Command, <br />
+                                        <span style={{ color: '#5e5ce6' }}>{user.name?.split(' ')[0]}</span>.
+                                    </Typography>
+
+                                    <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '600px', mb: 4, fontWeight: 400 }}>
+                                        Your personalized intelligence hub is ready.
+                                        {loading ? ' Syncing latest metrics...' : ` You have ${hasActivity ? 'active' : 'no'} pending modules in your queue.`}
+                                    </Typography>
+
+                                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                                        <Button
+                                            variant="contained"
+                                            size="large"
+                                            startIcon={<PlayArrow />}
+                                            onClick={handleStartLearning}
+                                            sx={{
+                                                borderRadius: '16px',
+                                                px: 4, py: 1.5,
+                                                bgcolor: '#fff',
+                                                color: '#000',
+                                                fontWeight: 700,
+                                                '&:hover': { bgcolor: '#f0f0f0' }
+                                            }}
+                                        >
+                                            {progress?.activeTopic ? 'Resume Session' : 'Start New Session'}
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            size="large"
+                                            startIcon={<TrendingUp />}
+                                            component={Link}
+                                            to="/progress"
+                                            sx={{
+                                                borderRadius: '16px',
+                                                px: 4,
+                                                borderColor: 'rgba(255,255,255,0.2)',
+                                                color: 'text.primary',
+                                                '&:hover': { borderColor: 'text.primary', bgcolor: 'transparent' }
+                                            }}
+                                        >
+                                            Analytics
+                                        </Button>
+                                    </Stack>
+                                </motion.div>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Container>
+
+                {/* Quick Actions Grid */}
+                <Container maxWidth="xl" sx={{ mb: 6 }}>
+                    <Typography variant="h6" sx={{ mb: 3, fontWeight: 700, opacity: 0.8 }}>Quick Actions</Typography>
+                    <Grid container spacing={3}>
+                        {quickActions.map((action, index) => (
+                            <Grid item xs={12} sm={4} key={index}>
+                                <motion.div whileHover={{ y: -5 }} whileTap={{ scale: 0.98 }}>
+                                    <Link to={action.path} style={{ textDecoration: 'none' }}>
+                                        <Box
+                                            sx={{
+                                                p: 3,
+                                                borderRadius: '24px',
+                                                bgcolor: isDark ? '#1c1c1e' : '#fff',
+                                                border: '1px solid',
+                                                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 2,
+                                                transition: 'all 0.2s',
+                                                '&:hover': {
+                                                    borderColor: action.color,
+                                                    boxShadow: `0 10px 40px -10px ${action.color}30`
+                                                }
+                                            }}
+                                        >
+                                            <Box sx={{
+                                                p: 1.5,
+                                                borderRadius: '16px',
+                                                bgcolor: `${action.color}20`,
+                                                color: action.color,
+                                                display: 'flex'
+                                            }}>
+                                                {action.icon}
+                                            </Box>
+                                            <Box>
+                                                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>{action.title}</Typography>
+                                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>{action.desc}</Typography>
+                                            </Box>
+                                            <ArrowForward sx={{ ml: 'auto', opacity: 0.3, fontSize: 18 }} />
+                                        </Box>
+                                    </Link>
+                                </motion.div>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Container>
+
+                {/* Recent Activity Section */}
+                {hasActivity && (
+                    <Container maxWidth="xl">
+                        <Typography variant="h6" sx={{ mb: 3, fontWeight: 700, opacity: 0.8 }}>Current Focus</Typography>
+                        <Grid container spacing={3}>
+                            {progress?.activeTopic && (() => {
+                                const topicColor = getTopicColor(progress.activeTopic.topicSlug, isDark);
+                                return (
+                                    <Grid item xs={12}>
+                                        <CardContent sx={{
+                                            p: 4,
+                                            bgcolor: isDark ? '#1c1c1e' : '#fff',
+                                            borderRadius: '24px',
+                                            border: '1px solid',
+                                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 4
+                                        }}>
+                                            <Box sx={{ width: 80, height: 80, borderRadius: '20px', bgcolor: `${topicColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                <img
+                                                    src={getTopicImage(progress.activeTopic.topicSlug)}
+                                                    alt={progress.activeTopic.topicName}
+                                                    style={{ width: '50%' }}
+                                                />
+                                            </Box>
+                                            <Box sx={{ flex: 1 }}>
+                                                <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{progress.activeTopic.topicName}</Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                                    <LinearProgress variant="determinate" value={progress.activeTopic.percentage} sx={{ width: 200, height: 8, borderRadius: 4, bgcolor: `${topicColor}20`, '& .MuiLinearProgress-bar': { bgcolor: topicColor } }} />
+                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: topicColor }}>{progress.activeTopic.percentage}% Complete</Typography>
+                                                </Box>
+                                            </Box>
+                                            <Button
+                                                variant="contained"
+                                                component={Link}
+                                                to={progress.activeTopic.continueLink || `/topic/${progress.activeTopic.topicSlug}`}
+                                                sx={{
+                                                    borderRadius: '12px',
+                                                    bgcolor: topicColor,
+                                                    fontWeight: 700,
+                                                    px: 4,
+                                                    py: 1.5,
+                                                    boxShadow: `0 8px 20px ${topicColor}40`
+                                                }}
+                                            >
+                                                Continue
+                                            </Button>
+                                        </CardContent>
+                                    </Grid>
+                                );
+                            })()}
+                        </Grid>
+                    </Container>
+                )}
+            </Box>
+        );
+    }
+
+    // Guest View (The Pitch)
     return (
         <Box sx={{ minHeight: 'calc(100vh - 100px)', overflow: 'hidden' }}>
             {/* Hero Section */}
@@ -238,55 +489,29 @@ const Home = () => {
                             </motion.div>
 
                             {/* Title */}
-                            {hasActivity && user ? (
-                                <Typography
-                                    variant="h2"
-                                    component="h1"
+                            <Typography
+                                variant="h1"
+                                component="h1"
+                                gutterBottom
+                                sx={{
+                                    fontWeight: 800,
+                                    fontSize: { xs: '2.25rem', md: '4.5rem' },
+                                    mb: 2,
+                                    letterSpacing: '-0.03em',
+                                }}
+                            >
+                                Master the{' '}
+                                <Box
+                                    component="span"
                                     sx={{
-                                        fontWeight: 800,
-                                        mb: 2,
-                                        fontSize: { xs: '2rem', md: '3.5rem' },
-                                        letterSpacing: '-0.02em',
+                                        background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
+                                        WebkitBackgroundClip: 'text',
+                                        WebkitTextFillColor: 'transparent',
                                     }}
                                 >
-                                    Welcome back,{' '}
-                                    <Box
-                                        component="span"
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
-                                        }}
-                                    >
-                                        {user.name?.split(' ')[0]}
-                                    </Box>{' '}
-                                    👋
-                                </Typography>
-                            ) : (
-                                <Typography
-                                    variant="h1"
-                                    component="h1"
-                                    gutterBottom
-                                    sx={{
-                                        fontWeight: 800,
-                                        fontSize: { xs: '2.25rem', md: '4.5rem' },
-                                        mb: 2,
-                                        letterSpacing: '-0.03em',
-                                    }}
-                                >
-                                    Master the{' '}
-                                    <Box
-                                        component="span"
-                                        sx={{
-                                            background: 'linear-gradient(135deg, #5e5ce6 0%, #0a84ff 100%)',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
-                                        }}
-                                    >
-                                        Art of Code
-                                    </Box>
-                                </Typography>
-                            )}
+                                    Art of Code
+                                </Box>
+                            </Typography>
 
                             <Typography
                                 variant="h5"
@@ -421,419 +646,10 @@ const Home = () => {
             </Box>
 
             {/* Activity Section (for logged-in users) */}
-            {hasActivity && (
-                <Container maxWidth="xl" sx={{ py: 6 }}>
-                    <Grid container spacing={3}>
-                        {/* Continue Learning Card */}
-                        {progress?.activeTopic && (() => {
-                            const topicColor = getTopicColor(progress.activeTopic.topicSlug, isDark);
+            {/* Removed: Handled in Elite Command Center */}
 
-                            return (
-                                <Grid item xs={12} md={recentBookmarks.length > 0 ? 6 : 12}>
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.95 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        whileHover={{ y: -12 }}
-                                        transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-                                        style={{ height: '100%' }}
-                                    >
-                                        <Card
-                                            component={Link}
-                                            to={progress.activeTopic.continueLink || `/topic/${progress.activeTopic.topicSlug}`}
-                                            sx={{
-                                                textDecoration: 'none',
-                                                height: '100%',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                position: 'relative',
-                                                overflow: 'hidden',
-                                                borderRadius: '32px',
-                                                background: (theme) =>
-                                                    theme.palette.mode === 'dark'
-                                                        ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
-                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                                backdropFilter: 'blur(10px)',
-                                                border: '1px solid',
-                                                borderColor: (theme) =>
-                                                    theme.palette.mode === 'dark'
-                                                        ? 'rgba(255, 255, 255, 0.08)'
-                                                        : 'rgba(0, 0, 0, 0.06)',
-                                                boxShadow: (theme) =>
-                                                    theme.palette.mode === 'dark'
-                                                        ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                                                        : '0 8px 32px rgba(0, 0, 0, 0.08)',
-                                                transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                                '&:hover': {
-                                                    boxShadow: `0 24px 64px ${topicColor}40`,
-                                                    borderColor: topicColor,
-                                                    '& .topic-icon': {
-                                                        transform: 'scale(1.15) rotate(5deg)',
-                                                    },
-                                                    '& .arrow-icon': {
-                                                        transform: 'translateX(8px)',
-                                                    },
-                                                },
-                                            }}
-                                        >
-                                            {/* Gradient Background Accent */}
-                                            <Box
-                                                sx={{
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    right: 0,
-                                                    height: '200px',
-                                                    background: `linear-gradient(135deg, ${topicColor}15 0%, transparent 100%)`,
-                                                    opacity: 0.6,
-                                                    pointerEvents: 'none',
-                                                }}
-                                            />
+            {/* Recent Bookmarks */}
 
-                                            <CardContent sx={{ p: { xs: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 3, position: 'relative', zIndex: 1 }}>
-                                                {/* Icon */}
-                                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                                                    <Box
-                                                        className="topic-icon"
-                                                        sx={{
-                                                            width: 96,
-                                                            height: 96,
-                                                            borderRadius: '28px',
-                                                            background: `linear-gradient(135deg, ${topicColor}20 0%, ${topicColor}10 100%)`,
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            border: '2px solid',
-                                                            borderColor: `${topicColor}40`,
-                                                            boxShadow: `0 8px 32px ${topicColor}30`,
-                                                            transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                                        }}
-                                                    >
-                                                        <img
-                                                            src={getTopicImage(progress.activeTopic.topicSlug)}
-                                                            alt={progress.activeTopic.topicName}
-                                                            style={{
-                                                                width: '60%',
-                                                                height: '60%',
-                                                                objectFit: 'contain',
-                                                            }}
-                                                            onError={(e) => {
-                                                                e.target.style.display = 'none';
-                                                            }}
-                                                        />
-                                                    </Box>
-                                                </Box>
-
-                                                {/* Title */}
-                                                <Box sx={{ textAlign: 'center' }}>
-                                                    <Typography
-                                                        variant="h5"
-                                                        component="h3"
-                                                        sx={{
-                                                            fontWeight: 700,
-                                                            mb: 1,
-                                                            color: 'text.primary',
-                                                        }}
-                                                    >
-                                                        {progress.activeTopic.topicName}
-                                                    </Typography>
-                                                    <Typography
-                                                        variant="body2"
-                                                        color="text.secondary"
-                                                        sx={{
-                                                            lineHeight: 1.6,
-                                                            minHeight: '40px',
-                                                        }}
-                                                    >
-                                                        Continue where you left off
-                                                    </Typography>
-                                                </Box>
-
-                                                {/* Stats Row */}
-                                                <Box
-                                                    sx={{
-                                                        display: 'flex',
-                                                        gap: 1.5,
-                                                        justifyContent: 'center',
-                                                        flexWrap: 'wrap',
-                                                    }}
-                                                >
-                                                    <Chip
-                                                        icon={<MenuBook sx={{ fontSize: 16 }} />}
-                                                        label={`${progress.activeTopic.completedSections}/${progress.activeTopic.totalSections} Chapters`}
-                                                        size="small"
-                                                        sx={{
-                                                            borderRadius: '9999px',
-                                                            fontWeight: 600,
-                                                            bgcolor: 'action.hover',
-                                                            fontSize: '0.8rem',
-                                                        }}
-                                                    />
-                                                    <Chip
-                                                        icon={<PlayArrow sx={{ fontSize: 16 }} />}
-                                                        label={`${progress.activeTopic.percentage}%`}
-                                                        size="small"
-                                                        sx={{
-                                                            borderRadius: '9999px',
-                                                            fontWeight: 700,
-                                                            fontSize: '0.8rem',
-                                                            bgcolor: `${topicColor}20`,
-                                                            color: topicColor,
-                                                            border: `2px solid ${topicColor}40`,
-                                                        }}
-                                                    />
-                                                </Box>
-
-                                                {/* Progress Bar */}
-                                                <Box>
-                                                    <LinearProgress
-                                                        variant="determinate"
-                                                        value={progress.activeTopic.percentage}
-                                                        sx={{
-                                                            height: 8,
-                                                            borderRadius: '9999px',
-                                                            bgcolor: (theme) =>
-                                                                theme.palette.mode === 'dark'
-                                                                    ? 'rgba(255, 255, 255, 0.08)'
-                                                                    : 'rgba(0, 0, 0, 0.06)',
-                                                            '& .MuiLinearProgress-bar': {
-                                                                borderRadius: '9999px',
-                                                                background: `linear-gradient(90deg, ${topicColor} 0%, ${topicColor}CC 100%)`,
-                                                                boxShadow: `0 2px 8px ${topicColor}40`,
-                                                            },
-                                                        }}
-                                                    />
-                                                </Box>
-
-                                                {/* Action Button */}
-                                                <Box
-                                                    sx={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                        gap: 1,
-                                                        mt: 'auto',
-                                                        pt: 2,
-                                                        color: topicColor,
-                                                        fontWeight: 600,
-                                                        fontSize: '0.9rem',
-                                                    }}
-                                                >
-                                                    <span>Continue Learning</span>
-                                                    <ArrowForward
-                                                        className="arrow-icon"
-                                                        sx={{
-                                                            fontSize: 20,
-                                                            transition: 'transform 0.3s ease',
-                                                        }}
-                                                    />
-                                                </Box>
-                                            </CardContent>
-                                        </Card>
-                                    </motion.div>
-                                </Grid>
-                            );
-                        })()}
-
-                        {/* Recent Bookmarks */}
-                        {recentBookmarks.length > 0 && (
-                            <Grid item xs={12} md={6}>
-                                <motion.div
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    whileHover={{ y: -12 }}
-                                    transition={{ duration: 0.4 }}
-                                >
-                                    <Card
-                                        sx={{
-                                            height: '100%',
-                                            borderRadius: '32px',
-                                            background: (theme) =>
-                                                theme.palette.mode === 'dark'
-                                                    ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
-                                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                            backdropFilter: 'blur(10px)',
-                                            border: '1px solid',
-                                            borderColor: (theme) =>
-                                                theme.palette.mode === 'dark'
-                                                    ? 'rgba(255, 255, 255, 0.08)'
-                                                    : 'rgba(0, 0, 0, 0.06)',
-                                            boxShadow: '0 8px 32px rgba(90, 200, 250, 0.2)',
-                                            position: 'relative',
-                                            overflow: 'hidden',
-                                            transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                            '&:hover': {
-                                                boxShadow: '0 24px 64px rgba(90, 200, 250, 0.35)',
-                                                borderColor: '#5ac8fa',
-                                            },
-                                        }}
-                                    >
-                                        {/* Gradient Background Accent */}
-                                        <Box
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 0,
-                                                left: 0,
-                                                right: 0,
-                                                height: '200px',
-                                                background: 'linear-gradient(135deg, rgba(90, 200, 250, 0.15) 0%, transparent 100%)',
-                                                opacity: 0.6,
-                                                pointerEvents: 'none',
-                                            }}
-                                        />
-
-                                        <CardContent sx={{ p: { xs: 3, md: 4 }, position: 'relative', zIndex: 1 }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
-                                                <Box
-                                                    sx={{
-                                                        p: 1.5,
-                                                        borderRadius: '16px',
-                                                        background: 'linear-gradient(135deg, rgba(90, 200, 250, 0.2) 0%, rgba(50, 174, 216, 0.2) 100%)',
-                                                        border: '2px solid',
-                                                        borderColor: 'rgba(90, 200, 250, 0.4)',
-                                                    }}
-                                                >
-                                                    <Bookmark sx={{ color: '#5ac8fa', fontSize: 28 }} />
-                                                </Box>
-                                                <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                                                    Recent Bookmarks
-                                                </Typography>
-                                            </Box>
-                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                {recentBookmarks.map((b) => {
-                                                    const bookmarkTopicColor = getTopicColor(b.topicSlug, isDark);
-
-                                                    return (
-                                                        <Box
-                                                            key={b.id}
-                                                            component={Link}
-                                                            to={b.type === 'topic' ? `/topic/${b.slug}` : `/topic/${b.topicSlug}/category/${b.categorySlug}${b.type === 'section' ? `/section/${b.slug}` : ''}`}
-                                                            sx={{
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                gap: 2,
-                                                                p: 2,
-                                                                borderRadius: '16px',
-                                                                bgcolor: 'action.hover',
-                                                                textDecoration: 'none',
-                                                                border: '2px solid',
-                                                                borderColor: 'transparent',
-                                                                transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                                                '&:hover': {
-                                                                    bgcolor: `${bookmarkTopicColor}10`,
-                                                                    borderColor: bookmarkTopicColor,
-                                                                    transform: 'translateY(-4px)',
-                                                                    boxShadow: `0 8px 24px ${bookmarkTopicColor}40`,
-                                                                    '& .bookmark-icon': {
-                                                                        transform: 'scale(1.1) rotate(5deg)',
-                                                                    },
-                                                                    '& .bookmark-arrow': {
-                                                                        transform: 'translateX(8px)',
-                                                                    },
-                                                                },
-                                                            }}
-                                                        >
-                                                            {/* Topic Icon */}
-                                                            <Box
-                                                                className="bookmark-icon"
-                                                                sx={{
-                                                                    width: 48,
-                                                                    height: 48,
-                                                                    borderRadius: '12px',
-                                                                    background: `linear-gradient(135deg, ${bookmarkTopicColor}20 0%, ${bookmarkTopicColor}10 100%)`,
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center',
-                                                                    border: '2px solid',
-                                                                    borderColor: `${bookmarkTopicColor}40`,
-                                                                    flexShrink: 0,
-                                                                    transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
-                                                                }}
-                                                            >
-                                                                <img
-                                                                    src={getTopicImage(b.topicSlug)}
-                                                                    alt={b.topicSlug}
-                                                                    style={{
-                                                                        width: '60%',
-                                                                        height: '60%',
-                                                                        objectFit: 'contain',
-                                                                    }}
-                                                                    onError={(e) => {
-                                                                        e.target.style.display = 'none';
-                                                                    }}
-                                                                />
-                                                            </Box>
-
-                                                            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                                                                <Typography
-                                                                    variant="body1"
-                                                                    sx={{
-                                                                        fontWeight: 600,
-                                                                        color: bookmarkTopicColor,
-                                                                        overflow: 'hidden',
-                                                                        textOverflow: 'ellipsis',
-                                                                        whiteSpace: 'nowrap',
-                                                                    }}
-                                                                >
-                                                                    {b.title}
-                                                                </Typography>
-                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                                                                    <Chip
-                                                                        label={b.type}
-                                                                        size="small"
-                                                                        sx={{
-                                                                            height: '20px',
-                                                                            fontSize: '0.7rem',
-                                                                            fontWeight: 600,
-                                                                            textTransform: 'capitalize',
-                                                                            bgcolor: `${bookmarkTopicColor}20`,
-                                                                            color: bookmarkTopicColor,
-                                                                            border: `1px solid ${bookmarkTopicColor}40`,
-                                                                        }}
-                                                                    />
-                                                                </Box>
-                                                            </Box>
-
-                                                            <ArrowForward
-                                                                className="bookmark-arrow"
-                                                                sx={{
-                                                                    color: bookmarkTopicColor,
-                                                                    fontSize: 20,
-                                                                    flexShrink: 0,
-                                                                    transition: 'transform 0.3s ease',
-                                                                }}
-                                                            />
-                                                        </Box>
-                                                    );
-                                                })}
-                                                <Button
-                                                    component={Link}
-                                                    to="/bookmarks"
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    sx={{
-                                                        borderRadius: '9999px',
-                                                        mt: 1,
-                                                        borderColor: '#5e5ce6',
-                                                        color: '#5e5ce6',
-                                                        borderWidth: '2px',
-                                                        '&:hover': {
-                                                            borderWidth: '2px',
-                                                            borderColor: '#5e5ce6',
-                                                            background: 'rgba(94, 92, 230, 0.1)',
-                                                        },
-                                                    }}
-                                                >
-                                                    View All Bookmarks
-                                                </Button>
-                                            </Box>
-                                        </CardContent>
-                                    </Card>
-                                </motion.div>
-                            </Grid>
-                        )}
-                    </Grid>
-                </Container>
-            )}
 
             {/* Features Grid */}
             <Container maxWidth="xl" sx={{ py: 8 }}>
