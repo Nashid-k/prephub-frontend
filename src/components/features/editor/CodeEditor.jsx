@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useRef, useEffect, Suspense, lazy, startTransition } from 'react';
 import { compilerAPI } from '../../../services/api';
 import { Box, Button, Select, MenuItem, Typography, IconButton, Tooltip, CircularProgress, Chip, Stack } from '@mui/material';
 import { PlayArrow, CheckCircle, BugReport, Lightbulb, AutoFixHigh, ExpandMore, Code as CodeIcon } from '@mui/icons-material';
@@ -98,9 +98,11 @@ const CodeEditor = ({
     };
 
     const handleRun = async () => {
-        setIsRunning(true);
-        setTestResults(null);
-        setError('');
+        startTransition(() => {
+            setIsRunning(true);
+            setTestResults(null);
+            setError('');
+        });
 
         try {
             if (!testCases || !testCases.sampleCases) {
@@ -144,9 +146,11 @@ const CodeEditor = ({
             return;
         }
 
-        setIsSubmitting(true);
-        setTestResults(null);
-        setError('');
+        startTransition(() => {
+            setIsSubmitting(true);
+            setTestResults(null);
+            setError('');
+        });
 
         try {
             const allCases = [...testCases.sampleCases, ...testCases.hiddenCases];

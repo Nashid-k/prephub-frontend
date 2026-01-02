@@ -861,7 +861,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                     <ListItem disablePadding sx={{ mb: 1 }}>
                                                         <ListItemButton
                                                             selected={s.slug === sectionSlug}
-                                                            onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`)}
+                                                            onClick={() => startTransition(() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${s.slug}`))}
                                                             sx={{
                                                                 bgcolor: s.slug === sectionSlug ? `${topicColor}15` : 'transparent',
                                                                 color: s.slug === sectionSlug ? topicColor : 'text.primary',
@@ -895,7 +895,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                     <Box sx={{ p: 2, display: 'flex', gap: 1, borderTop: '1px solid', borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}>
                                         <Button
                                             disabled={!prevSection}
-                                            onClick={() => prevSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`)}
+                                            onClick={() => prevSection && startTransition(() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${prevSection.slug}`))}
                                             fullWidth
                                             variant="outlined"
                                             startIcon={<ArrowBack />}
@@ -905,7 +905,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                         </Button>
                                         <Button
                                             disabled={!nextSection}
-                                            onClick={() => nextSection && navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`)}
+                                            onClick={() => nextSection && startTransition(() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${nextSection.slug}`))}
                                             fullWidth
                                             variant="contained"
                                             endIcon={<ArrowForward />}
