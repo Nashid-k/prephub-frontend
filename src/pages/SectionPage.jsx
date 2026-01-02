@@ -6,7 +6,7 @@ import { useSectionAggregate } from '../hooks/useCurriculum';
 import AIChat from '../components/features/ai/AIChat';
 import QuizModal from '../components/features/quiz/QuizModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { ContentSkeleton, EditorSkeleton } from '../components/common/SkeletonLoader';
+import { TopicContentSkeleton, EditorSkeleton } from '../components/common/SkeletonLoader';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Drawer } from '@mui/material';
 import Breadcrumb from '../components/layout/Breadcrumb';
@@ -1051,7 +1051,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                             </Typography>
                                                         </Box>
                                                     ) : aiContent ? (
-                                                        <Suspense fallback={<ContentSkeleton />}>
+                                                        <Suspense fallback={<TopicContentSkeleton />}>
                                                             <ReactMarkdown
                                                                 components={{
                                                                     code({ node, inline, className, children, ...props }) {

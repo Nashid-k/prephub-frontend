@@ -4,7 +4,7 @@ import { Box, Skeleton, Typography } from '@mui/material';
 /**
  * Skeleton loader for content while lazy components load
  */
-export const ContentSkeleton = () => (
+export const TopicContentSkeleton = () => (
     <Box sx={{ p: 4 }}>
         <Skeleton variant="text" width="60%" height={40} sx={{ mb: 3 }} />
         <Skeleton variant="rectangular" height={200} sx={{ mb: 2, borderRadius: '12px' }} />
@@ -36,4 +36,4 @@ export const EditorSkeleton = () => (
     </Box>
 );
 
-export default ContentSkeleton;
+export default TopicContentSkeleton;
