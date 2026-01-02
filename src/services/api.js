@@ -65,16 +65,23 @@ export const curriculumAPI = {
 };
 
 export const aiAPI = {
-  explainTopic: (topic, section, context = '', language = 'javascript') => 
-    api.post('/ai/explain', { topic, section, context, language }),
-  askQuestion: (question, context = {}, language = 'javascript') => 
-    api.post('/ai/ask', { question, context, language }),
+  explainTopic: (topic, section, context = '', language = 'javascript', experienceLevel = 'advanced') => 
+    api.post('/ai/explain', { topic, section, context, language, experienceLevel }),
+  
+  askQuestion: (question, context = {}, language = 'javascript', experienceLevel = 'advanced') => 
+    api.post('/ai/ask', { question, context, language, experienceLevel }),
+  
   generateInterviewQuestions: (topic, type = 'both', difficulty = 'medium') => 
     api.post('/ai/interview-questions', { topic, type, difficulty }),
-  generateQuiz: (topic, section, regenerate = false, language = 'javascript', content = '') => 
-    api.post('/ai/quiz', { topic, section, regenerate, language, content }),
+  
+  generateQuiz: (topic, section, regenerate = false, language = 'javascript', content = '', experienceLevel = 'advanced') => 
+    api.post('/ai/quiz', { topic, section, regenerate, language, content, experienceLevel }),
+  
   translateCode: (codeBlocks, sourceLanguage, targetLanguage) =>
-    api.post('/ai/translate-code', { codeBlocks, sourceLanguage, targetLanguage })
+    api.post('/ai/translate-code', { codeBlocks, sourceLanguage, targetLanguage }),
+  
+  analyzeCode: (code, mode = 'review', language = 'javascript', experienceLevel = 'advanced') =>
+    api.post('/ai/analyze', { code, mode, language, experienceLevel })
 };
 
 export const compilerAPI = {

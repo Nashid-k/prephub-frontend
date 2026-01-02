@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [experienceLevel, setExperienceLevel] = useState('beginner'); // Default to beginner
 
     const getApiUrl = () => {
         const url = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -22,6 +23,16 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
+
+        // Load experience level from onboarding data
+        try {
+            const onboardingData = JSON.parse(localStorage.getItem('prephub_onboarding') || '{}');
+            if (onboardingData.level) {
+                setExperienceLevel(onboardingData.level);
+            }
+        } catch (e) {
+            console.warn('Failed to parse onboarding data', e);
+        }
 
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -88,7 +99,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, token, login, logout, loading, experienceLevel }}>
             <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
                 {children}
             </GoogleOAuthProvider>

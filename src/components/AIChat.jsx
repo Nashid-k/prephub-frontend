@@ -3,7 +3,7 @@ import { aiAPI } from '../services/api';
 import ReactMarkdown from 'react-markdown';
 import './AIChat.css';
 
-const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeContext = null }, ref) => {
+const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeContext = null, experienceLevel = 'advanced' }, ref) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -66,7 +66,7 @@ const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeConte
                 currentCode: codeContext?.code
             };
 
-            const response = await aiAPI.askQuestion(textToSend, requestContext);
+            const response = await aiAPI.askQuestion(textToSend, requestContext, 'javascript', experienceLevel);
 
             const aiMessage = { role: 'ai', content: response.data.answer };
             setMessages(prev => [...prev, aiMessage]);

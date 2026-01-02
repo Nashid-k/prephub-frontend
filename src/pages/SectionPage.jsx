@@ -250,61 +250,24 @@ const SectionPage = () => {
         setAiModalLoading(true);
 
         try {
-            let prompt = '';
-            switch (type) {
-                case 'explain':
-                    prompt = `Explain this ${lang} code concisely:
+            // Mode mapping: 'explain' -> 'review' (or we can add 'explain' mode to backend if needed)
+            // Actually, 'explain' usually means general explanation. 'review' is critique.
+            // Let's map: 
+            // - explain -> review (General analysis)
+            // - debug -> debug
+            // - optimize -> optimize
 
-\`\`\`${lang}
-${code}
-\`\`\`
+            let mode = 'review';
+            if (type === 'debug') mode = 'debug';
+            if (type === 'optimize') mode = 'optimize';
 
-Provide:
-1. **Purpose** (1 sentence)
-2. **Key concepts** (bullet points)
-3. **How it works** (brief steps)`;
-                    break;
-                case 'debug':
-                    prompt = `Analyze this ${lang} code for bugs and issues:
+            const res = await aiAPI.analyzeCode(code, mode, lang);
 
-\`\`\`${lang}
-${code}
-\`\`\`
-
-Provide:
-1. **Issues found** (list each)
-2. **Why they're problems**
-3. **How to fix them** (with code examples)`;
-                    break;
-                case 'optimize':
-                    prompt = `Suggest optimizations for this ${lang} code:
-
-\`\`\`${lang}
-${code}
-\`\`\`
-
-Provide:
-1. **Performance improvements**
-2. **Best practices** to follow
-3. **Cleaner alternatives** (with code)`;
-                    break;
-                default:
-                    prompt = `Help me with this ${lang} code:\n\n${code}`;
-            }
-
-            const context = {
-                topic: topicSlug,
-                section: section?.title,
-                code: code,
-                problem: ''
-            };
-
-            const res = await aiAPI.askQuestion(prompt, context, lang);
-            setAiModalResponse(res.data.answer || res.data);
+            setAiModalResponse(res.data.analysis);
             setAiModalLoading(false);
             trackAIExplanation(topicSlug, section?.title);
         } catch (err) {
-            setAiModalResponse('Failed to get AI help. Please try again.');
+            setAiModalResponse('Failed to analyze code. Please try again.');
             setAiModalLoading(false);
         }
     };
@@ -1075,6 +1038,22 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                                                 {children}
                                                                             </code>
                                                                         );
+                                                                    },
+                                                                    h4({ node, children, ...props }) {
+                                                                        const text = String(children);
+                                                                        if (text.includes('Trade-offs')) {
+                                                                            return <h4 className="elite-header trade-off" {...props}>{children}</h4>;
+                                                                        }
+                                                                        if (text.includes('Internals') || text.includes('Deep Dive')) {
+                                                                            return <h4 className="elite-header internal" {...props}>{children}</h4>;
+                                                                        }
+                                                                        if (text.includes('Gotchas') || text.includes('Anti-Patterns')) {
+                                                                            return <h4 className="elite-header warning" {...props}>{children}</h4>;
+                                                                        }
+                                                                        if (text.includes('Mental Model')) {
+                                                                            return <h4 className="elite-header mental-model" {...props}>{children}</h4>;
+                                                                        }
+                                                                        return <h4 {...props}>{children}</h4>;
                                                                     }
                                                                 }}
                                                             >

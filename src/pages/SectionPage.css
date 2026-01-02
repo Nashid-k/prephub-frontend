@@ -333,7 +333,42 @@
     font-weight: 800;
     line-height: 1.4;
     letter-spacing: -0.02em;
+    letter-spacing: -0.02em;
     position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Elite Headers */
+.elite-header {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    margin-top: 2.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+.elite-header.trade-off {
+    background: rgba(245, 158, 11, 0.1);
+    color: #fbbf24;
+    border-left: 4px solid #fbbf24;
+}
+
+.elite-header.internal {
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    border-left: 4px solid #818cf8;
+}
+
+.elite-header.warning {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border-left: 4px solid #f87171;
+}
+
+.elite-header.mental-model {
+    background: rgba(16, 185, 129, 0.1);
+    color: #34d399;
+    border-left: 4px solid #34d399;
 }
 
 .markdown-content h1 {
