@@ -4,7 +4,7 @@ import { Container, Grid, Typography, Box, Button, Alert, useTheme as useMuiThem
 import { Refresh, Handyman } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/features/dashboard/TopicCard';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import { useNavigate } from 'react-router-dom';
 import { ArrowBack } from '@mui/icons-material';
 
@@ -48,7 +48,7 @@ const EngineeringPracticesPage = () => {
 
     if (loading) {
         return (
-            <LoadingSpinner message="Loading Engineering Practices..." fullScreen />
+            <GlobalLoader fullScreen />
         );
     }
 

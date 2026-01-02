@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Navbar from './components/layout/Navbar';
-import LoadingSpinner from './components/common/LoadingSpinner';
+import GlobalLoader from './components/common/GlobalLoader';
 
 const Home = React.lazy(() => import('./pages/Home'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
@@ -61,7 +61,7 @@ function AppContent() {
                         <AnalyticsWrapper />
                         <div className="App">
                             <Navbar />
-                            <React.Suspense fallback={<LoadingSpinner message="Initializing PrepHub..." fullScreen />}>
+                            <React.Suspense fallback={<GlobalLoader fullScreen />}>
                                 <Routes>
                                     <Route path="/" element={<Home />} />
                                     <Route path="/login" element={<LoginPage />} />

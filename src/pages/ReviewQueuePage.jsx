@@ -20,7 +20,7 @@ import {
     TrendingUp,
 } from '@mui/icons-material';
 import { progressAPI } from '../services/api';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import { getDueReviews, getDifficultyLabel, getDifficultyColor } from '../utils/spacedRepetition';
 
 const ReviewQueuePage = () => {
@@ -64,7 +64,7 @@ const ReviewQueuePage = () => {
 
     if (loading) {
         return (
-            <LoadingSpinner message="Preparing your review session..." fullScreen />
+            <GlobalLoader fullScreen />
         );
     }
 
@@ -139,7 +139,16 @@ const ReviewQueuePage = () => {
                 {/* Stats */}
                 <Grid container spacing={3} sx={{ mb: 4 }}>
                     <Grid item xs={12} md={4}>
-                        <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 3 }}>
+                        <Paper sx={{
+                            p: 3,
+                            textAlign: 'center',
+                            borderRadius: '24px',
+                            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(30,30,30,0.4)' : 'rgba(255,255,255,0.65)',
+                            backdropFilter: 'blur(20px)',
+                            border: '1px solid',
+                            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                        }}>
                             <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
                                 {stats.total}
                             </Typography>
@@ -149,7 +158,16 @@ const ReviewQueuePage = () => {
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                        <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 3 }}>
+                        <Paper sx={{
+                            p: 3,
+                            textAlign: 'center',
+                            borderRadius: '24px',
+                            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(30,30,30,0.4)' : 'rgba(255,255,255,0.65)',
+                            backdropFilter: 'blur(20px)',
+                            border: '1px solid',
+                            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                        }}>
                             <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'success.main' }}>
                                 {stats.today}
                             </Typography>
@@ -159,7 +177,16 @@ const ReviewQueuePage = () => {
                         </Paper>
                     </Grid>
                     <Grid item xs={12} md={4}>
-                        <Paper sx={{ p: 3, textAlign: 'center', borderRadius: 3 }}>
+                        <Paper sx={{
+                            p: 3,
+                            textAlign: 'center',
+                            borderRadius: '24px',
+                            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(30,30,30,0.4)' : 'rgba(255,255,255,0.65)',
+                            backdropFilter: 'blur(20px)',
+                            border: '1px solid',
+                            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.1)'
+                        }}>
                             <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'error.main' }}>
                                 {stats.overdue}
                             </Typography>
@@ -191,13 +218,19 @@ const ReviewQueuePage = () => {
                                 >
                                     <Card
                                         sx={{
-                                            borderRadius: 3,
-                                            transition: 'all 0.3s',
-                                            border: isOverdue ? '2px solid' : '1px solid',
-                                            borderColor: isOverdue ? 'error.main' : 'divider',
+                                            borderRadius: '24px',
+                                            transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                                            background: (theme) => theme.palette.mode === 'dark' ? 'rgba(30,30,30,0.4)' : 'rgba(255,255,255,0.65)',
+                                            backdropFilter: 'blur(30px)',
+                                            border: '1px solid',
+                                            borderColor: isOverdue
+                                                ? 'error.main'
+                                                : (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                                            boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 10px 30px rgba(0,0,0,0.2)' : '0 10px 30px rgba(0,0,0,0.05)',
                                             '&:hover': {
                                                 transform: 'translateY(-4px)',
-                                                boxShadow: 4,
+                                                boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 20px 40px rgba(0,0,0,0.3)' : '0 20px 40px rgba(0,0,0,0.1)',
+                                                borderColor: 'primary.main'
                                             },
                                         }}
                                     >
@@ -251,7 +284,7 @@ const ReviewQueuePage = () => {
                     })}
                 </Grid>
             </Container>
-        </Box>
+        </Box >
     );
 };
 

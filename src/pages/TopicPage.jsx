@@ -29,7 +29,7 @@ import { Collapse } from '@mui/material';
 import { curriculumAPI, categoryAPI, progressAPI } from '../services/api';
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks';
 import toast from 'react-hot-toast';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import SafeImage from '../components/common/SafeImage';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 
@@ -286,7 +286,7 @@ const TopicPage = () => {
 
     if (loading) {
         return (
-            <LoadingSpinner message="Structuring topic curriculum..." fullScreen />
+            <GlobalLoader fullScreen />
         );
     }
 
@@ -309,12 +309,17 @@ const TopicPage = () => {
                 sx={{
                     background: (theme) =>
                         theme.palette.mode === 'dark'
-                            ? `radial-gradient(ellipse at top, ${topicColor}15 0%, transparent 60%)`
-                            : `radial-gradient(ellipse at top, ${topicColor}08 0%, transparent 60%)`,
+                            ? `radial-gradient(circle at top center, ${topicColor}15 0%, ${theme.palette.background.default} 100%)`
+                            : `radial-gradient(circle at top center, ${topicColor}08 0%, ${theme.palette.background.default} 100%)`,
                     py: 8,
                     mb: 6,
                     position: 'relative',
                     overflow: 'hidden',
+                    borderBottom: '1px solid',
+                    borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.05)'
+                            : 'rgba(0, 0, 0, 0.05)',
                 }}
             >
                 {/* Large Background Logo */}
@@ -350,13 +355,13 @@ const TopicPage = () => {
                                 background: (theme) =>
                                     theme.palette.mode === 'dark'
                                         ? 'rgba(255, 255, 255, 0.05)'
-                                        : 'rgba(0, 0, 0, 0.03)',
+                                        : 'rgba(255, 255, 255, 0.8)',
                                 backdropFilter: 'blur(10px)',
                                 border: '1px solid',
                                 borderColor: (theme) =>
                                     theme.palette.mode === 'dark'
                                         ? 'rgba(255, 255, 255, 0.1)'
-                                        : 'rgba(0, 0, 0, 0.08)',
+                                        : 'rgba(255, 255, 255, 0.4)',
                                 color: 'text.primary',
                                 textTransform: 'none',
                                 '&:hover': {
@@ -370,38 +375,33 @@ const TopicPage = () => {
                         </Button>
 
                         {/* Topic Header */}
-                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 4, mb: 4 }}>
-                            {/* Topic Icon */}
-                            <motion.div
-                                whileHover={{ scale: 1.1, rotate: 5 }}
-                                transition={{ duration: 0.3 }}
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'flex-start', md: 'center' }, gap: { xs: 2, md: 3 }, mb: 4 }}>
+                            <Box
+                                sx={{
+                                    width: { xs: 80, md: 120 },
+                                    height: { xs: 80, md: 120 },
+                                    borderRadius: '24px',
+                                    background: `linear-gradient(135deg, ${topic.color}20 0%, ${topic.color}10 100%)`,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backdropFilter: 'blur(10px)',
+                                    border: '1px solid',
+                                    borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.5)',
+                                    boxShadow: `0 8px 32px ${topic.color}20`,
+                                    alignSelf: { xs: 'flex-start', md: 'auto' }
+                                }}
                             >
-                                <Box
+                                <SafeImage
+                                    src={getTopicImage(topic.slug)}
+                                    alt={topic.name}
                                     sx={{
-                                        width: 120,
-                                        height: 120,
-                                        borderRadius: '32px',
-                                        background: `linear-gradient(135deg, ${topicColor}20 0%, ${topicColor}10 100%)`,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        border: '2px solid',
-                                        borderColor: `${topicColor}40`,
-                                        boxShadow: `0 12px 40px ${topicColor}30`,
-                                        overflow: 'hidden'
+                                        width: '70%',
+                                        height: '70%',
+                                        margin: 'auto'
                                     }}
-                                >
-                                    <SafeImage
-                                        src={getTopicImage(topic.slug)}
-                                        alt={topic.name}
-                                        sx={{
-                                            width: '70%',
-                                            height: '70%',
-                                            margin: 'auto'
-                                        }}
-                                    />
-                                </Box>
-                            </motion.div>
+                                />
+                            </Box>
 
                             {/* Topic Info */}
                             <Box sx={{ flexGrow: 1 }}>
@@ -481,11 +481,11 @@ const TopicPage = () => {
                             </Box>
                         </Box>
                     </motion.div>
-                </Container>
-            </Box>
+                </Container >
+            </Box >
 
             {/* Categories List */}
-            <Container maxWidth="xl" sx={{ px: { xs: 1, md: 3 } }}>
+            < Container maxWidth="xl" sx={{ px: { xs: 1, md: 3 } }}>
                 <Typography
                     variant="h4"
                     sx={{

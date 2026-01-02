@@ -25,26 +25,37 @@ const CategoryCard = ({
         >
             <Card
                 sx={{
-                    borderRadius: '20px',
-                    background: isDark ? 'rgba(255, 255, 255, 0.03)' : '#fff',
+                    borderRadius: '24px',
+                    background: isDark
+                        ? 'rgba(30, 30, 30, 0.4)'
+                        : 'rgba(255, 255, 255, 0.65)',
+                    backdropFilter: 'blur(30px)',
                     border: '1px solid',
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                    borderColor: isDark
+                        ? 'rgba(255, 255, 255, 0.08)'
+                        : 'rgba(255, 255, 255, 0.5)',
                     overflow: 'hidden',
+                    boxShadow: isDark
+                        ? '0 10px 30px rgba(0, 0, 0, 0.2)'
+                        : '0 10px 30px rgba(31, 38, 135, 0.05)',
                     transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                     '&:hover': {
-                        transform: 'translateY(-2px)',
-                        boxShadow: `0 8px 24px ${topic.color}15`,
+                        transform: 'translateY(-4px)',
+                        boxShadow: `0 20px 40px ${topic.color}20`,
                         borderColor: `${topic.color}40`,
+                        background: isDark
+                            ? 'rgba(30, 30, 30, 0.6)'
+                            : 'rgba(255, 255, 255, 0.8)',
                     },
                 }}
             >
                 <Box
                     onClick={onClick}
                     sx={{
-                        p: 3,
+                        p: { xs: 2, sm: 3 },
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 3,
+                        gap: { xs: 2, sm: 3 },
                         cursor: 'pointer',
                         '&:hover': {
                             bgcolor: isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)'

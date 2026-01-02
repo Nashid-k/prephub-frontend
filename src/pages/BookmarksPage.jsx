@@ -126,10 +126,15 @@ const BookmarksPage = () => {
                 sx={{
                     background: (theme) =>
                         theme.palette.mode === 'dark'
-                            ? 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.15) 0%, transparent 60%)'
-                            : 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.08) 0%, transparent 60%)',
+                            ? 'radial-gradient(circle at top center, rgba(30, 30, 30, 0.4) 0%, rgba(10, 10, 10, 0.95) 100%)'
+                            : 'radial-gradient(circle at top center, rgba(255, 255, 255, 0.8) 0%, rgba(245, 245, 247, 1) 100%)',
                     py: 8,
                     mb: 6,
+                    borderBottom: '1px solid',
+                    borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.05)'
+                            : 'rgba(0, 0, 0, 0.05)',
                 }}
             >
                 <Container maxWidth="xl">
@@ -269,26 +274,30 @@ const BookmarksPage = () => {
                                                 flexDirection: 'column',
                                                 position: 'relative',
                                                 overflow: 'hidden',
-                                                borderRadius: '32px',
+                                                borderRadius: '24px',
                                                 background: (theme) =>
                                                     theme.palette.mode === 'dark'
-                                                        ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
-                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                                backdropFilter: 'blur(20px)',
+                                                        ? 'rgba(30, 30, 30, 0.4)'
+                                                        : 'rgba(255, 255, 255, 0.65)',
+                                                backdropFilter: 'blur(30px)',
                                                 border: '1px solid',
                                                 borderColor: (theme) =>
                                                     theme.palette.mode === 'dark'
                                                         ? 'rgba(255, 255, 255, 0.08)'
-                                                        : 'rgba(0, 0, 0, 0.06)',
+                                                        : 'rgba(255, 255, 255, 0.5)',
                                                 boxShadow: (theme) =>
                                                     theme.palette.mode === 'dark'
-                                                        ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                                                        : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                                                        ? '0 10px 30px rgba(0, 0, 0, 0.2)'
+                                                        : '0 10px 30px rgba(31, 38, 135, 0.05)',
                                                 cursor: 'pointer',
                                                 transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                                 '&:hover': {
-                                                    boxShadow: `0 24px 64px ${topicColor}40`,
+                                                    boxShadow: `0 20px 40px ${topicColor}20`,
                                                     borderColor: topicColor,
+                                                    background: (theme) =>
+                                                        theme.palette.mode === 'dark'
+                                                            ? 'rgba(30, 30, 30, 0.6)'
+                                                            : 'rgba(255, 255, 255, 0.8)',
                                                     '& .bookmark-bg-image': {
                                                         transform: 'scale(1.1) rotate(5deg)',
                                                         opacity: 0.4,
@@ -474,6 +483,21 @@ const BookmarksPage = () => {
                                 textAlign: 'center',
                                 py: 12,
                                 px: 3,
+                                borderRadius: '24px',
+                                background: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                        ? 'rgba(30, 30, 30, 0.4)'
+                                        : 'rgba(255, 255, 255, 0.65)',
+                                backdropFilter: 'blur(30px)',
+                                border: '1px solid',
+                                borderColor: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                        ? 'rgba(255, 255, 255, 0.08)'
+                                        : 'rgba(255, 255, 255, 0.5)',
+                                boxShadow: (theme) =>
+                                    theme.palette.mode === 'dark'
+                                        ? '0 10px 30px rgba(0, 0, 0, 0.2)'
+                                        : '0 10px 30px rgba(31, 38, 135, 0.05)',
                             }}
                         >
                             <BookmarkIcon sx={{ fontSize: 80, color: 'text.disabled', mb: 3 }} />

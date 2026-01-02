@@ -6,7 +6,7 @@ import { Refresh, School, Code, Storage, Cloud, Psychology, TrendingUp, Timer, E
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/features/dashboard/TopicCard';
 import DashboardHeader from '../components/features/dashboard/DashboardHeader';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import Walkthrough from '../components/features/onboarding/Walkthrough';
 import OnboardingModal from '../components/features/onboarding/OnboardingModal';
 import { useAuth } from '../context/AuthContext';
@@ -19,6 +19,7 @@ import { generateSmartPath, getNextRecommendation } from '../utils/SmartCurricul
 const Dashboard = () => {
     const { user } = useAuth();
     const theme = useMuiTheme();
+    const isDark = theme.palette.mode === 'dark';
     const [stats, setStats] = useState(null);
 
     // UI State
@@ -302,9 +303,13 @@ const Dashboard = () => {
         return getNextRecommendation(filteredTopics);
     }, [selectedPath, loading, filteredTopics]);
 
+
+
     if (loading) {
         return (
-            <LoadingSpinner message="Personalizing your dashboard..." fullScreen />
+            <Box sx={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <GlobalLoader isDark={isDark} />
+            </Box>
         );
     }
 
@@ -365,8 +370,8 @@ const Dashboard = () => {
                                 px: 3,
                                 textAlign: 'center',
                                 background: theme.palette.mode === 'dark'
-                                    ? 'radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 50%)'
-                                    : 'radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.08) 0%, rgba(255, 255, 255, 0) 50%)',
+                                    ? 'radial-gradient(circle at top left, rgba(10,132,255,0.15), transparent 40%), radial-gradient(circle at bottom right, rgba(94,92,230,0.1), transparent 40%)'
+                                    : 'radial-gradient(circle at top left, rgba(10,132,255,0.08), transparent 40%), radial-gradient(circle at bottom right, rgba(94,92,230,0.05), transparent 40%)',
                             }}
                         >
                             <motion.div
@@ -381,8 +386,8 @@ const Dashboard = () => {
                                         fontWeight: 800,
                                         mb: 2,
                                         background: theme.palette.mode === 'dark'
-                                            ? 'linear-gradient(135deg, #fff 0%, #a5b4fc 100%)'
-                                            : 'linear-gradient(135deg, #1e1b4b 0%, #4338ca 100%)',
+                                            ? 'linear-gradient(135deg, #fff 30%, #aaa 100%)'
+                                            : 'linear-gradient(135deg, #1a1a1a 30%, #4a4a4a 100%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         fontSize: { xs: '2rem', md: '4rem' }
@@ -465,13 +470,15 @@ const Dashboard = () => {
                                             mx: 'auto',
                                             mb: 6,
                                             p: 3,
-                                            borderRadius: '24px',
+                                            borderRadius: '32px',
                                             background: theme.palette.mode === 'dark'
-                                                ? 'linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(99, 102, 241, 0.05) 100%)'
-                                                : 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.02) 100%)',
+                                                ? 'rgba(30, 30, 30, 0.4)'
+                                                : 'rgba(255, 255, 255, 0.65)',
                                             border: '1px solid',
-                                            borderColor: theme.palette.mode === 'dark' ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.2)',
-                                            backdropFilter: 'blur(10px)',
+                                            borderColor: theme.palette.mode === 'dark'
+                                                ? 'rgba(255, 255, 255, 0.08)'
+                                                : 'rgba(255, 255, 255, 0.5)',
+                                            backdropFilter: 'blur(30px)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             width: { xs: '100%', md: 'auto' },
@@ -479,7 +486,9 @@ const Dashboard = () => {
                                             mt: { xs: 1, md: 0 },
                                             flexDirection: { xs: 'column', sm: 'row' },
                                             gap: 2,
-                                            boxShadow: '0 8px 32px rgba(99, 102, 241, 0.15)'
+                                            boxShadow: theme.palette.mode === 'dark'
+                                                ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+                                                : '0 20px 40px rgba(99, 102, 241, 0.15)'
                                         }}
                                     >
                                         <Box sx={{ textAlign: 'left', flex: 1 }}>
@@ -572,13 +581,18 @@ const Dashboard = () => {
                                                 mx: 'auto',
                                                 mb: 4,
                                                 p: 3,
-                                                borderRadius: '24px',
+                                                borderRadius: '32px',
                                                 background: (theme) => theme.palette.mode === 'dark'
-                                                    ? 'linear-gradient(135deg, rgba(94, 92, 230, 0.2) 0%, rgba(94, 92, 230, 0.05) 100%)'
-                                                    : 'linear-gradient(135deg, rgba(94, 92, 230, 0.1) 0%, rgba(94, 92, 230, 0.05) 100%)',
+                                                    ? 'rgba(30, 30, 30, 0.4)'
+                                                    : 'rgba(255, 255, 255, 0.65)',
                                                 border: '1px solid',
-                                                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(94, 92, 230, 0.3)' : 'rgba(94, 92, 230, 0.2)',
-                                                backdropFilter: 'blur(10px)',
+                                                borderColor: (theme) => theme.palette.mode === 'dark'
+                                                    ? 'rgba(94, 92, 230, 0.3)'
+                                                    : 'rgba(94, 92, 230, 0.3)',
+                                                backdropFilter: 'blur(30px)',
+                                                boxShadow: (theme) => theme.palette.mode === 'dark'
+                                                    ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+                                                    : '0 20px 40px rgba(94, 92, 230, 0.1)',
                                                 textAlign: 'left',
                                                 display: 'flex',
                                                 gap: 2,

@@ -101,9 +101,39 @@ const getDesignTokens = (mode) => {
                 'Arial',
                 'sans-serif',
             ].join(','),
-            h1: { fontWeight: 800, letterSpacing: '-0.025em', lineHeight: 1.1 },
-            h2: { fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2 },
-            h3: { fontWeight: 700, letterSpacing: '-0.015em', lineHeight: 1.3 },
+            h1: { 
+                fontWeight: 800, 
+                letterSpacing: '-0.025em', 
+                lineHeight: 1.1,
+                fontSize: '2.5rem', // Default mobile size
+                '@media (min-width:600px)': {
+                    fontSize: '3.5rem',
+                },
+                '@media (min-width:900px)': {
+                    fontSize: '4.5rem',
+                },
+            },
+            h2: { 
+                fontWeight: 700, 
+                letterSpacing: '-0.02em', 
+                lineHeight: 1.2,
+                fontSize: '2rem',
+                '@media (min-width:600px)': {
+                    fontSize: '2.5rem',
+                },
+                '@media (min-width:900px)': {
+                    fontSize: '3rem',
+                },
+            },
+            h3: { 
+                fontWeight: 700, 
+                letterSpacing: '-0.015em', 
+                lineHeight: 1.3,
+                fontSize: '1.75rem',
+                '@media (min-width:600px)': {
+                    fontSize: '2rem',
+                },
+            },
             h4: { fontWeight: 600, letterSpacing: '-0.01em' },
             h5: { fontWeight: 600 },
             h6: { fontWeight: 600 },

@@ -35,13 +35,14 @@ const TopicCard = (props) => {
                         borderRadius: '24px',
                         background: (theme) =>
                             theme.palette.mode === 'dark'
-                                ? 'rgba(255, 255, 255, 0.03)'
-                                : '#fff',
+                                ? 'rgba(255, 255, 255, 0.05)'
+                                : 'rgba(255, 255, 255, 0.6)',
+                        backdropFilter: 'blur(10px)',
                         border: '1px solid',
                         borderColor: (theme) =>
                             theme.palette.mode === 'dark'
                                 ? 'rgba(255, 255, 255, 0.05)'
-                                : 'rgba(0, 0, 0, 0.1)',
+                                : 'rgba(255, 255, 255, 0.4)',
                         transition: 'all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)',
                         '&:hover': {
                             transform: 'translateY(-2px)',
@@ -140,7 +141,7 @@ const TopicCard = (props) => {
                 sx={{
                     textDecoration: 'none',
                     height: '100%',
-                    minHeight: '340px',
+                    minHeight: { xs: 'auto', md: '340px' },
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
@@ -149,22 +150,27 @@ const TopicCard = (props) => {
                     borderRadius: '32px',
                     background: (theme) =>
                         theme.palette.mode === 'dark'
-                            ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
-                            : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                    backdropFilter: 'blur(10px)',
+                            ? 'rgba(30, 30, 30, 0.4)' // More translucent
+                            : 'rgba(255, 255, 255, 0.65)',
+                    backdropFilter: 'blur(30px)', // Deep blur
                     border: '1px solid',
                     borderColor: (theme) =>
                         theme.palette.mode === 'dark'
                             ? 'rgba(255, 255, 255, 0.08)'
-                            : 'rgba(0, 0, 0, 0.12)',
+                            : 'rgba(255, 255, 255, 0.5)',
                     boxShadow: (theme) =>
                         theme.palette.mode === 'dark'
-                            ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                            : '0 8px 24px rgba(0, 0, 0, 0.08)',
+                            ? '0 20px 40px rgba(0, 0, 0, 0.4)' // Stronger shadow for depth
+                            : '0 20px 40px rgba(31, 38, 135, 0.1)',
                     transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                     '&:hover': {
-                        boxShadow: `0 24px 64px ${topicColor}40`,
+                        transform: 'translateY(-8px)',
+                        boxShadow: `0 30px 60px ${topicColor}30`, // Colored glow on hover
                         borderColor: topicColor,
+                        background: (theme) =>
+                            theme.palette.mode === 'dark'
+                                ? 'rgba(30, 30, 30, 0.6)'
+                                : 'rgba(255, 255, 255, 0.8)',
                         '& .topic-icon': {
                             transform: 'scale(1.15) rotate(5deg)',
                         },
@@ -187,7 +193,7 @@ const TopicCard = (props) => {
                     }}
                 />
 
-                <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', gap: 2, height: '100%', position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ p: { xs: 3, md: 4 }, display: 'flex', flexDirection: 'column', gap: 2, height: '100%', position: 'relative', zIndex: 1 }}>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                         <Box
                             className="topic-icon"

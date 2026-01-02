@@ -24,7 +24,7 @@ import {
     Timeline,
 } from '@mui/icons-material';
 import { progressAPI } from '../services/api';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import { getStreakData } from '../utils/streakTracker';
 import StudyHeatmap from '../components/analytics/StudyHeatmap';
@@ -117,7 +117,7 @@ const ProgressPage = () => {
 
     if (loading) {
         return (
-            <LoadingSpinner message="Loading your progress..." fullScreen />
+            <GlobalLoader fullScreen />
         );
     }
 
@@ -128,10 +128,15 @@ const ProgressPage = () => {
                 sx={{
                     background: (theme) =>
                         theme.palette.mode === 'dark'
-                            ? 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.15) 0%, transparent 60%)'
-                            : 'radial-gradient(ellipse at top, rgba(94, 92, 230, 0.08) 0%, transparent 60%)',
+                            ? 'radial-gradient(circle at top center, rgba(30, 30, 30, 0.4) 0%, rgba(10, 10, 10, 0.95) 100%)'
+                            : 'radial-gradient(circle at top center, rgba(255, 255, 255, 0.8) 0%, rgba(245, 245, 247, 1) 100%)',
                     py: { xs: 6, md: 8 },
                     mb: { xs: 4, md: 6 },
+                    borderBottom: '1px solid',
+                    borderColor: (theme) =>
+                        theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.05)'
+                            : 'rgba(0, 0, 0, 0.05)',
                 }}
             >
                 <Container maxWidth="xl">
@@ -188,17 +193,22 @@ const ProgressPage = () => {
                                 <Card
                                     sx={{
                                         background: isDark
-                                            ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%)'
-                                            : 'rgba(255, 255, 255, 0.8)',
+                                            ? 'rgba(30, 30, 30, 0.4)'
+                                            : 'rgba(255, 255, 255, 0.65)',
                                         borderRadius: '24px',
-                                        backdropFilter: 'blur(20px)',
+                                        backdropFilter: 'blur(30px)',
                                         border: '1px solid',
-                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
-                                        boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
+                                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.5)',
+                                        boxShadow: isDark ? '0 20px 40px rgba(0, 0, 0, 0.4)' : '0 20px 40px rgba(0, 0, 0, 0.1)',
                                         height: '100%',
                                         transition: 'transform 0.3s ease',
                                         '&:hover': {
                                             transform: 'translateY(-5px)',
+                                            boxShadow: `0 24px 64px ${stat.color}30`,
+                                            borderColor: stat.color,
+                                            background: isDark
+                                                ? 'rgba(30, 30, 30, 0.6)'
+                                                : 'rgba(255, 255, 255, 0.8)',
                                         }
                                     }}
                                 >
@@ -246,14 +256,14 @@ const ProgressPage = () => {
                                 p: 4,
                                 borderRadius: '24px',
                                 background: isDark
-                                    ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%)'
-                                    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                backdropFilter: 'blur(20px)',
+                                    ? 'rgba(30, 30, 30, 0.4)'
+                                    : 'rgba(255, 255, 255, 0.65)',
+                                backdropFilter: 'blur(30px)',
                                 border: '1px solid',
-                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.5)',
                                 boxShadow: isDark
-                                    ? '0 8px 32px rgba(0, 0, 0, 0.3)'
-                                    : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                                    ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+                                    : '0 20px 40px rgba(31, 38, 135, 0.05)',
                             }}>
                                 <StudyHeatmap studyDates={studyDates} />
                             </Paper>
@@ -297,26 +307,30 @@ const ProgressPage = () => {
                                                 flexDirection: 'column',
                                                 position: 'relative',
                                                 overflow: 'hidden',
-                                                borderRadius: '32px',
+                                                borderRadius: '24px',
                                                 background: (theme) =>
                                                     theme.palette.mode === 'dark'
-                                                        ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
-                                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                                backdropFilter: 'blur(20px)',
+                                                        ? 'rgba(30, 30, 30, 0.4)'
+                                                        : 'rgba(255, 255, 255, 0.65)',
+                                                backdropFilter: 'blur(30px)',
                                                 border: '1px solid',
                                                 borderColor: (theme) =>
                                                     theme.palette.mode === 'dark'
                                                         ? 'rgba(255, 255, 255, 0.08)'
-                                                        : 'rgba(0, 0, 0, 0.06)',
+                                                        : 'rgba(255, 255, 255, 0.5)',
                                                 boxShadow: (theme) =>
                                                     theme.palette.mode === 'dark'
-                                                        ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                                                        : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                                                        ? '0 10px 30px rgba(0, 0, 0, 0.2)'
+                                                        : '0 10px 30px rgba(31, 38, 135, 0.05)',
                                                 transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                                 '&:hover': {
                                                     transform: 'translateY(-8px)',
-                                                    boxShadow: `0 24px 64px ${topicColor}40`,
+                                                    boxShadow: `0 20px 40px ${topicColor}20`,
                                                     borderColor: topicColor,
+                                                    background: (theme) =>
+                                                        theme.palette.mode === 'dark'
+                                                            ? 'rgba(30, 30, 30, 0.6)'
+                                                            : 'rgba(255, 255, 255, 0.8)',
                                                     '& .progress-bg-image': {
                                                         transform: 'scale(1.1) rotate(5deg)',
                                                         opacity: 0.15,

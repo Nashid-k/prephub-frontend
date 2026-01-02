@@ -62,7 +62,7 @@ const BannerBadge = styled(Box)(({ theme }) => ({
 }));
 
 const Home = () => {
-    const { user, experienceLevel } = useAuth();
+    const { user, experienceLevel, role } = useAuth();
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
     const navigate = useNavigate();
@@ -168,7 +168,13 @@ const Home = () => {
 
 
     // Elite Title Mapping
-    const getEliteTitle = (level) => {
+    const getEliteTitle = (level, role) => {
+        // If role is defined (e.g. "Frontend Engineer"), use it + level
+        if (role) {
+            const roleName = role.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            return `${level.charAt(0).toUpperCase() + level.slice(1)} ${roleName}`;
+        }
+
         switch (level) {
             case 'beginner': return "Apprentice Developer";
             case 'intermediate': return "Senior Engineer";
@@ -177,7 +183,7 @@ const Home = () => {
         }
     };
 
-    const eliteTitle = getEliteTitle(user?.experienceLevel || 'advanced');
+    const eliteTitle = getEliteTitle(experienceLevel || 'advanced', role);
 
     // Quick Actions Configuration
     const quickActions = [
@@ -211,15 +217,15 @@ const Home = () => {
                 <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
                     <Box
                         sx={{
-                            p: { xs: 4, md: 6 },
+                            p: { xs: 3, md: 6 },
                             borderRadius: '32px',
                             background: isDark
-                                ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.8) 0%, rgba(10, 10, 10, 0.9) 100%)'
-                                : 'linear-gradient(135deg, #fff 0%, #f5f5f7 100%)',
+                                ? 'rgba(30, 30, 30, 0.4)'
+                                : 'rgba(255, 255, 255, 0.65)',
                             border: '1px solid',
-                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                            backdropFilter: 'blur(20px)',
-                            boxShadow: isDark ? '0 20px 80px -10px rgba(0,0,0,0.5)' : '0 20px 60px -10px rgba(0,0,0,0.1)',
+                            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                            backdropFilter: 'blur(30px)',
+                            boxShadow: isDark ? '0 20px 60px rgba(0,0,0,0.4)' : '0 20px 60px rgba(0,0,0,0.1)',
                             position: 'relative',
                             overflow: 'hidden'
                         }}
@@ -227,14 +233,14 @@ const Home = () => {
                         {/* Background Decor */}
                         <Box sx={{ position: 'absolute', top: 0, right: 0, width: '40%', height: '100%', opacity: 0.1, background: 'linear-gradient(90deg, transparent, #5e5ce6)', pointerEvents: 'none' }} />
 
-                        <Grid container alignItems="center" spacing={4}>
+                        <Grid container alignItems="center" spacing={{ xs: 2, md: 4 }}>
                             <Grid item xs={12} md={8}>
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
                                     <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 3 }}>
                                         <BannerBadge>{eliteTitle}</BannerBadge>
                                         <Chip
                                             icon={<AutoAwesome sx={{ fontSize: 16 }} />}
-                                            label="Elite Mode Active"
+                                            label={experienceLevel === 'advanced' ? "Elite Mode Active" : "Career Path Active"}
                                             size="small"
                                             sx={{
                                                 bgcolor: 'rgba(94, 92, 230, 0.2)',
@@ -246,12 +252,14 @@ const Home = () => {
                                     </Stack>
 
                                     <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-                                        Welcome to Command, <br />
-                                        <span style={{ color: '#5e5ce6' }}>{user.name?.split(' ')[0]}</span>.
+                                        Command Center <br />
+                                        <Typography component="span" variant="inherit" sx={{ color: '#5e5ce6' }}>
+                                            {user.name?.split(' ')[0]}
+                                        </Typography>
                                     </Typography>
 
                                     <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '600px', mb: 4, fontWeight: 400 }}>
-                                        Your personalized intelligence hub is ready.
+                                        Your personalized intelligence hub is online.
                                         {loading ? ' Syncing latest metrics...' : ` You have ${hasActivity ? 'active' : 'no'} pending modules in your queue.`}
                                     </Typography>
 
@@ -298,42 +306,78 @@ const Home = () => {
                 {/* Quick Actions Grid */}
                 <Container maxWidth="xl" sx={{ mb: 6 }}>
                     <Typography variant="h6" sx={{ mb: 3, fontWeight: 700, opacity: 0.8 }}>Quick Actions</Typography>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={{ xs: 2, md: 3 }}>
                         {quickActions.map((action, index) => (
-                            <Grid item xs={12} sm={4} key={index}>
-                                <motion.div whileHover={{ y: -5 }} whileTap={{ scale: 0.98 }}>
-                                    <Link to={action.path} style={{ textDecoration: 'none' }}>
+                            <Grid item xs={12} key={index} sx={{ display: 'flex' }}>
+                                <motion.div
+                                    whileHover={{ y: -5 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    style={{ width: '100%', display: 'flex' }}
+                                >
+                                    <Link to={action.path} style={{ textDecoration: 'none', width: '100%', display: 'flex' }}>
                                         <Box
                                             sx={{
-                                                p: 3,
+                                                p: { xs: 2, md: 3 },
+                                                width: '100%',
                                                 borderRadius: '24px',
-                                                bgcolor: isDark ? '#1c1c1e' : '#fff',
+                                                bgcolor: isDark ? 'rgba(30, 30, 30, 0.4)' : 'rgba(255, 255, 255, 0.65)',
                                                 border: '1px solid',
-                                                borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                                borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                                                backdropFilter: 'blur(30px)',
+                                                boxShadow: isDark ? '0 10px 30px rgba(0,0,0,0.2)' : '0 10px 30px rgba(31, 38, 135, 0.05)',
                                                 display: 'flex',
                                                 alignItems: 'center',
-                                                gap: 2,
-                                                transition: 'all 0.2s',
+                                                gap: { xs: 1.5, md: 2 },
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                                transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                                 '&:hover': {
                                                     borderColor: action.color,
-                                                    boxShadow: `0 10px 40px -10px ${action.color}30`
+                                                    bgcolor: isDark ? 'rgba(30, 30, 30, 0.6)' : 'rgba(255, 255, 255, 0.8)',
+                                                    boxShadow: `0 20px 40px ${action.color}20`,
+                                                    '& .action-icon': {
+                                                        transform: 'scale(1.1) rotate(5deg)',
+                                                        bgcolor: action.color,
+                                                        color: '#fff'
+                                                    },
+                                                    '& .arrow-icon': {
+                                                        transform: 'translateX(4px)',
+                                                        opacity: 1,
+                                                        color: action.color
+                                                    }
                                                 }
                                             }}
                                         >
-                                            <Box sx={{
-                                                p: 1.5,
-                                                borderRadius: '16px',
-                                                bgcolor: `${action.color}20`,
-                                                color: action.color,
-                                                display: 'flex'
-                                            }}>
-                                                {action.icon}
+                                            <Box
+                                                className="action-icon"
+                                                sx={{
+                                                    p: { xs: 1.25, md: 1.5 },
+                                                    borderRadius: '16px',
+                                                    bgcolor: `${action.color}15`,
+                                                    color: action.color,
+                                                    display: 'flex',
+                                                    transition: 'all 0.3s ease'
+                                                }}>
+                                                {React.cloneElement(action.icon, { fontSize: '1.5rem' })}
                                             </Box>
-                                            <Box>
-                                                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: '1rem' }}>{action.title}</Typography>
-                                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.85rem' }}>{action.desc}</Typography>
+                                            <Box sx={{ flex: 1, minWidth: 0 }}>
+                                                <Typography variant="h6" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '0.95rem', md: '1rem' } }}>
+                                                    {action.title}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: '0.8rem', md: '0.85rem' }, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    {action.desc}
+                                                </Typography>
                                             </Box>
-                                            <ArrowForward sx={{ ml: 'auto', opacity: 0.3, fontSize: 18 }} />
+                                            <ArrowForward
+                                                className="arrow-icon"
+                                                sx={{
+                                                    ml: 'auto',
+                                                    opacity: 0.3,
+                                                    fontSize: 18,
+                                                    transition: 'all 0.3s ease',
+                                                    flexShrink: 0
+                                                }}
+                                            />
                                         </Box>
                                     </Link>
                                 </motion.div>
@@ -353,10 +397,12 @@ const Home = () => {
                                     <Grid item xs={12}>
                                         <CardContent sx={{
                                             p: 4,
-                                            bgcolor: isDark ? '#1c1c1e' : '#fff',
+                                            bgcolor: isDark ? 'rgba(30, 30, 30, 0.4)' : 'rgba(255, 255, 255, 0.65)',
                                             borderRadius: '24px',
                                             border: '1px solid',
-                                            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                                            borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                                            backdropFilter: 'blur(30px)',
+                                            boxShadow: isDark ? '0 20px 60px rgba(0,0,0,0.4)' : '0 20px 60px rgba(0,0,0,0.1)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: 4
@@ -396,8 +442,9 @@ const Home = () => {
                             })()}
                         </Grid>
                     </Container>
-                )}
-            </Box>
+                )
+                }
+            </Box >
         );
     }
 
@@ -604,18 +651,18 @@ const Home = () => {
                                                             p: { xs: 1.5, md: 2.5 },
                                                             borderRadius: '20px',
                                                             background: isDark
-                                                                ? 'rgba(255, 255, 255, 0.05)'
-                                                                : 'rgba(255, 255, 255, 0.9)',
+                                                                ? 'rgba(30, 30, 30, 0.4)'
+                                                                : 'rgba(255, 255, 255, 0.65)',
                                                             border: '1px solid',
                                                             borderColor: isDark
                                                                 ? 'rgba(255, 255, 255, 0.08)'
-                                                                : 'rgba(0, 0, 0, 0.05)',
-                                                            backdropFilter: 'blur(10px)',
+                                                                : 'rgba(255, 255, 255, 0.5)',
+                                                            backdropFilter: 'blur(30px)',
                                                             textAlign: 'center',
                                                             transition: 'all 0.3s',
                                                             '&:hover': {
                                                                 borderColor: stat.color,
-                                                                boxShadow: `0 8px 24px ${stat.color}30`,
+                                                                boxShadow: `0 20px 40px ${stat.color}20`,
                                                             },
                                                         }}
                                                     >
@@ -702,24 +749,29 @@ const Home = () => {
                                         textAlign: 'center',
                                         background: (theme) =>
                                             theme.palette.mode === 'dark'
-                                                ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
-                                                : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                        backdropFilter: 'blur(20px)',
+                                                ? 'rgba(30, 30, 30, 0.4)'
+                                                : 'rgba(255, 255, 255, 0.65)',
+                                        backdropFilter: 'blur(30px)',
                                         border: '1px solid',
                                         borderColor: (theme) =>
                                             theme.palette.mode === 'dark'
                                                 ? 'rgba(255, 255, 255, 0.08)'
-                                                : 'rgba(0, 0, 0, 0.06)',
+                                                : 'rgba(255, 255, 255, 0.5)',
                                         boxShadow: (theme) =>
                                             theme.palette.mode === 'dark'
-                                                ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                                                : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                                                ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+                                                : '0 20px 40px rgba(31, 38, 135, 0.1)',
                                         transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                         position: 'relative',
                                         overflow: 'hidden',
                                         '&:hover': {
-                                            boxShadow: `0 24px 64px ${feature.color}40`,
+                                            transform: 'translateY(-8px)',
+                                            boxShadow: `0 30px 60px ${feature.color}30`,
                                             borderColor: feature.color,
+                                            background: (theme) =>
+                                                theme.palette.mode === 'dark'
+                                                    ? 'rgba(30, 30, 30, 0.6)'
+                                                    : 'rgba(255, 255, 255, 0.8)',
                                         },
                                     }}
                                 >

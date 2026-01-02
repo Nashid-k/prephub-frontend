@@ -44,7 +44,14 @@ const ShareCodePage = () => {
     };
 
     return (
-        <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Container maxWidth="xl" sx={{
+            py: 12, // Increased top padding to clear navbar
+            minHeight: '100vh',
+            background: (theme) =>
+                theme.palette.mode === 'dark'
+                    ? 'radial-gradient(circle at top center, rgba(10, 132, 255, 0.1) 0%, rgba(0, 0, 0, 0) 70%)'
+                    : 'radial-gradient(circle at top center, rgba(10, 132, 255, 0.05) 0%, rgba(255, 255, 255, 0) 70%)',
+        }}>
             <Box sx={{ mb: 3 }}>
                 <Button
                     startIcon={<ArrowBack />}
@@ -82,12 +89,18 @@ const ShareCodePage = () => {
                 </Typography>
             </Box>
 
-            <Paper elevation={3} sx={{ overflow: 'hidden', borderRadius: 2 }}>
+            <Paper elevation={0} sx={{
+                overflow: 'hidden',
+                borderRadius: '24px',
+                border: '1px solid',
+                borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 20px 40px rgba(0,0,0,0.3)' : '0 20px 40px rgba(0,0,0,0.05)',
+            }}>
                 <Editor
                     height="70vh"
                     language={language}
                     value={code}
-                    theme={theme === 'dark' ? 'vs-dark' : 'light'}
+                    theme={theme === 'dark' ? 'vsc-dark-plus' : 'light'} // Match global editor theme if possible, or just vs-dark
                     options={{
                         readOnly: true,
                         minimap: { enabled: false },
@@ -95,6 +108,7 @@ const ShareCodePage = () => {
                         lineNumbers: 'on',
                         scrollBeyondLastLine: false,
                         wordWrap: 'on',
+                        padding: { top: 20, bottom: 20 }
                     }}
                 />
             </Paper>

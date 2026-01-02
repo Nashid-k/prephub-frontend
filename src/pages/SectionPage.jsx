@@ -5,7 +5,7 @@ import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api'
 import { useSectionAggregate } from '../hooks/useCurriculum';
 import AIChat from '../components/features/ai/AIChat';
 import QuizModal from '../components/features/quiz/QuizModal';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import { TopicContentSkeleton, EditorSkeleton } from '../components/common/SkeletonLoader';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Drawer } from '@mui/material';
@@ -156,8 +156,7 @@ const SectionPage = () => {
     const [activeTab, setActiveTab] = useState('learn');
     const [problemContent, setProblemContent] = useState('');
     const [isQuizOpen, setIsQuizOpen] = useState(false);
-    const [hints, setHints] = useState([]);
-    const [visibleHints, setVisibleHints] = useState(0);
+    // hints state removed
     const [solutions, setSolutions] = useState(null);
     const [solutionLoading, setSolutionLoading] = useState(false);
     const [testCases, setTestCases] = useState(null);
@@ -544,28 +543,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
         }
     };
 
-    const generateHints = async (currentSection) => {
-        startTransition(() => setContentLoading(true));
-        try {
-            const prompt = `Generate 4-5 progressive hints for solving "${currentSection.title}". Format as JSON array of strings.`;
-            const response = await aiAPI.explainTopic(topicSlug, currentSection.title, prompt);
-            try {
-                const parsed = JSON.parse(response.data.explanation);
-                if (Array.isArray(parsed)) {
-                    setHints(parsed);
-                    setVisibleHints(0);
-                } else {
-                    setHints(response.data.explanation.split('\n').filter(l => l.trim()));
-                }
-            } catch {
-                setHints(response.data.explanation.split('\n').filter(l => l.trim()));
-            }
-        } catch (e) {
-            setHints(['Unable to load hints.']);
-        } finally {
-            setContentLoading(false);
-        }
-    };
+    // Questions/Hints logic removed as per user request to replace with Quiz only
 
     // Dead code removed: fetchMoreQuestions
     const handleToggleBookmark = () => {
@@ -599,16 +577,17 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
     };
 
     // Styling
+    // Styling
     const glassSx = {
-        background: isDark ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%)' : 'rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
+        background: isDark ? 'rgba(30, 30, 30, 0.4)' : 'rgba(255, 255, 255, 0.65)',
+        backdropFilter: 'blur(30px)',
         border: '1px solid',
-        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.1)',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.5)',
         borderRadius: '24px',
-        boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
+        boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.2)' : '0 10px 30px rgba(31, 38, 135, 0.05)',
     };
 
-    if (loading) return <LoadingSpinner message="Loading Topic..." fullScreen />;
+    if (loading) return <GlobalLoader fullScreen />;
     if (!section) return <Typography>Section not found</Typography>;
 
     const prevSection = currentIndex > 0 ? allSections[currentIndex - 1] : null;
@@ -619,7 +598,10 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
             minHeight: '100vh',
             pt: { xs: 10, md: 12 },
             pb: 8,
-            background: isDark ? 'linear-gradient(180deg, #09090b 0%, #18181b 100%)' : '#f8fafc',
+            background: (theme) =>
+                theme.palette.mode === 'dark'
+                    ? `radial-gradient(circle at top center, ${topicColor}15 0%, ${theme.palette.background.default} 100%)`
+                    : `radial-gradient(circle at top center, ${topicColor}08 0%, ${theme.palette.background.default} 100%)`,
             color: 'text.primary',
         }}>
             {/* Top Loading Bar for Background Fetching */}
@@ -656,18 +638,19 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                 onClick={() => startTransition(() => navigate(`/topic/${topicSlug}/category/${categorySlug}`))}
                                 sx={{
                                     borderRadius: '9999px',
-                                    px: 3,
+                                    px: { xs: 1.5, md: 3 },
                                     py: 1,
+                                    minWidth: 'auto', // Allow shrinking
                                     background: (theme) =>
                                         theme.palette.mode === 'dark'
                                             ? 'rgba(255, 255, 255, 0.05)'
-                                            : 'rgba(0, 0, 0, 0.06)',
+                                            : 'rgba(255, 255, 255, 0.65)',
                                     backdropFilter: 'blur(10px)',
                                     border: '1px solid',
                                     borderColor: (theme) =>
                                         theme.palette.mode === 'dark'
                                             ? 'rgba(255, 255, 255, 0.1)'
-                                            : 'rgba(0, 0, 0, 0.12)',
+                                            : 'rgba(255, 255, 255, 0.5)',
                                     color: 'text.primary',
                                     textTransform: 'none',
                                     '&:hover': {
@@ -677,7 +660,12 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                     },
                                 }}
                             >
-                                Back to {category?.name || 'Category'}
+                                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                                    Back to {category?.name || 'Category'}
+                                </Box>
+                                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' }, fontWeight: 600 }}>
+                                    Back
+                                </Box>
                             </Button>
 
                             {/* Mobile Sidebar Toggle */}
@@ -765,10 +753,11 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                     startIcon={<Psychology />}
                                     onClick={() => startTransition(() => setIsQuizOpen(true))}
                                     sx={{
-                                        display: { xs: 'none', sm: 'flex' },
+                                        display: 'flex', // Always visible
                                         borderRadius: '9999px',
-                                        px: 3,
+                                        px: { xs: 2, md: 3 }, // Adjust padding for mobile
                                         py: 1,
+                                        minWidth: 'auto',
                                         background: bookmarked ? (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' : 'transparent',
                                         border: '1px solid',
                                         borderColor: 'rgba(128,128,128,0.2)',
@@ -780,7 +769,8 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                         }
                                     }}
                                 >
-                                    Take Quiz
+                                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>Take Quiz</Box>
+                                    <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>Quiz</Box>
                                 </Button>
                                 <IconButton
                                     onClick={() => startTransition(() => handleToggleBookmark())}
@@ -807,16 +797,17 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                         />
 
                         <Box sx={{
-                            height: 'calc(100vh - 140px)', // Adjust based on navbar/header
+                            height: { xs: 'auto', md: 'calc(100vh - 140px)' },
                             display: 'flex',
-                            gap: 3,
-                            overflow: 'hidden'
+                            flexDirection: { xs: 'column', md: 'row' },
+                            gap: { xs: 2, md: 3 },
+                            overflow: { xs: 'visible', md: 'hidden' } // Allow scroll on mobile, contained on desktop
                         }}>
                             {/* Sidebar */}
                             <Box sx={{
-                                width: activeTab === 'practice' ? 0 : { md: 280, lg: 320 },
+                                width: { md: 280, lg: 320 },
                                 flexShrink: 0,
-                                display: { xs: 'none', md: activeTab === 'practice' ? 'none' : 'flex' }, // Hide on mobile for now or handle via drawer
+                                display: { xs: 'none', md: activeTab === 'practice' ? 'none' : 'flex' },
                                 flexDirection: 'column',
                                 height: '100%',
                                 transition: 'width 0.3s ease'
@@ -987,11 +978,11 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                             </Drawer>
 
                             {/* Main Content */}
-                            <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+                            <Box sx={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: { xs: 'auto', md: '100%' } }}>
                                 {/* Custom Tab Header */}
 
 
-                                <Box sx={{ mb: 2, display: 'flex', gap: 1 }}>
+                                <Box sx={{ mb: 2, display: 'flex', gap: 1, overflowX: 'auto', pb: 1, '::-webkit-scrollbar': { display: 'none' } }}>
                                     {[
                                         { id: 'learn', label: 'Learn Concept', icon: <MenuBook /> },
                                         { id: 'practice', label: 'Practice', icon: <Code /> }
@@ -1005,6 +996,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                 sx={{
                                                     borderRadius: '9999px',
                                                     px: 3,
+                                                    flexShrink: 0,
                                                     bgcolor: isActive ? topicColor : 'transparent',
                                                     color: isActive ? theme.palette.getContrastText(topicColor) : 'text.secondary',
                                                     border: isActive ? 'none' : '1px solid',
@@ -1021,7 +1013,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                 </Box>
 
                                 <Card sx={{ ...glassSx, flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-                                    <Box sx={{ p: activeTab === 'practice' ? 0 : 4, overflowY: activeTab === 'practice' ? 'hidden' : 'auto', flex: 1, height: '100%' }}>
+                                    <Box sx={{ p: activeTab === 'practice' ? 0 : { xs: 2, md: 4 }, overflowY: activeTab === 'practice' ? 'hidden' : 'auto', flex: 1, height: '100%' }}>
                                         {activeTab === 'learn' && (
                                             <Box>
                                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
@@ -1205,19 +1197,28 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                             isChatOpen && (
                                 <Box sx={{
                                     position: 'fixed',
-                                    bottom: 100,
-                                    right: 32,
-                                    width: 500,
-                                    height: 650,
+                                    bottom: { xs: 0, md: 100 },
+                                    right: { xs: 0, md: 32 },
+                                    width: { xs: '100vw', md: 500 },
+                                    height: { xs: '100dvh', md: 650 }, // Use dvh for mobile browsers
+                                    top: { xs: 0, md: 'auto' },
+                                    left: { xs: 0, md: 'auto' },
                                     zIndex: 1200,
-                                    ...glassSx,
-                                    overflow: 'hidden'
+                                    backdropFilter: 'blur(20px)',
+                                    backgroundColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+                                    borderRadius: { xs: 0, md: '24px' },
+                                    border: { xs: 'none', md: '1px solid rgba(255, 255, 255, 0.1)' },
+                                    boxShadow: { xs: 'none', md: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' },
+                                    overflow: 'hidden',
+                                    display: 'flex',
+                                    flexDirection: 'column'
                                 }}>
                                     <AIChat
                                         ref={chatRef}
                                         topic={topicSlug}
                                         section={section.title}
                                         user={user}
+                                        onClose={() => setIsChatOpen(false)}
                                         context={{
                                             description: section.description,
                                             activeTab,

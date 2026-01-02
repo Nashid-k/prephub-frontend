@@ -4,7 +4,7 @@ import { Container, Grid, Typography, Box, Button, Alert, useTheme as useMuiThem
 import { Refresh, Code } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/features/dashboard/TopicCard';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import { useNavigate } from 'react-router-dom';
 import { ArrowBack } from '@mui/icons-material';
 
@@ -49,7 +49,7 @@ const DSAPage = () => {
 
     if (loading) {
         return (
-            <LoadingSpinner message="Compiling Algorithms & Data Structures..." fullScreen />
+            <GlobalLoader fullScreen />
         );
     }
 
@@ -62,7 +62,14 @@ const DSAPage = () => {
     }
 
     return (
-        <Box sx={{ minHeight: 'calc(100vh - 100px)', py: 6 }}>
+        <Box sx={{
+            minHeight: '100vh',
+            py: 6,
+            background: (theme) =>
+                theme.palette.mode === 'dark'
+                    ? `radial-gradient(circle at top center, #FF3B3015 0%, ${theme.palette.background.default} 100%)`
+                    : `radial-gradient(circle at top center, #FF3B3008 0%, ${theme.palette.background.default} 100%)`,
+        }}>
             <Container maxWidth="xl">
                 <Button
                     onClick={() => navigate('/dashboard')}

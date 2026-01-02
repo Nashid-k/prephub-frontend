@@ -3,15 +3,19 @@ import { aiAPI } from '../../../services/api';
 import ReactMarkdown from 'react-markdown';
 import './AIChat.css';
 
-const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeContext = null, experienceLevel = 'advanced' }, ref) => {
+const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeContext = null, experienceLevel = 'advanced', onClose }, ref) => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const messagesEndRef = useRef(null);
-    const chatContainerRef = useRef(null);
+    const [loadingMessage, setLoadingMessage] = useState('');
 
+    const messagesEndRef = useRef(null);
+    const chatContainerRef = useRef(null); // Fixed: Added missing ref
+
+    // Expose methods via ref
     React.useImperativeHandle(ref, () => ({
         sendMessage: (text) => {
+            setInput(text);
             handleSend(text);
         }
     }));
@@ -22,68 +26,40 @@ const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeConte
 
     useEffect(() => {
         scrollToBottom();
-    }, [messages]);
-
-    const [loadingMessage, setLoadingMessage] = useState('');
-
-    const getLoadingMessage = (topic) => {
-        const messages = {
-            default: ['Thinking...', 'Analyzing...', 'Consulting the archives...', 'Formatting response...'],
-            mongodb: ['Querying the database...', 'Optimizing aggregation pipeline...', 'Indexing your request...', 'Connecting to cluster...'],
-            react: ['Rendering component...', 'Updating virtual DOM...', 'Running useEffect...', 'Checking dependency array...'],
-            node: ['Spinning up server...', 'Handling request...', 'Resolving promise...', 'Reading stream...'],
-            javascript: ['Hoisting variables...', 'Executing call stack...', 'Parsing script...', 'Checking types...']
-        };
-
-        const topicLower = (topic || '').toLowerCase();
-        let key = 'default';
-        if (topicLower.includes('mongo')) key = 'mongodb';
-        else if (topicLower.includes('react')) key = 'react';
-        else if (topicLower.includes('node') || topicLower.includes('express')) key = 'node';
-        else if (topicLower.includes('script')) key = 'javascript';
-
-        const list = messages[key];
-        return list[Math.floor(Math.random() * list.length)];
-    };
-
+    }, [messages, isLoading]);
 
     const handleSend = async (manualInput = null) => {
         const textToSend = manualInput || input;
         if (!textToSend.trim() || isLoading) return;
 
-        const userMessage = { role: 'user', content: textToSend };
-        setMessages(prev => [...prev, userMessage]);
-        if (!manualInput) setInput('');
-
+        const newMessage = { role: 'user', content: textToSend };
+        setMessages(prev => [...prev, newMessage]);
+        setInput('');
         setIsLoading(true);
-        setLoadingMessage(getLoadingMessage(topic));
+        setLoadingMessage('Thinking...');
 
         try {
-            const requestContext = {
-                topic,
-                section,
+            // Include code context if available (for logic help)
+            const fullContext = {
                 ...context,
-                currentCode: codeContext?.code
+                currentCode: codeContext?.code || '',
+                sectionTitle: section,
+                topicSlug: topic
             };
 
-            const response = await aiAPI.askQuestion(textToSend, requestContext, 'javascript', experienceLevel);
+            const response = await aiAPI.askQuestion(
+                textToSend,
+                fullContext,
+                'javascript', // Default, or pass from props if needed
+                experienceLevel
+            );
 
-            const aiMessage = { role: 'ai', content: response.data.answer };
-            setMessages(prev => [...prev, aiMessage]);
+            const aiResponse = response.data.answer || response.data.explanation || "I couldn't generate a response.";
 
-            if (codeContext && (textToSend.toLowerCase().includes('fix') || textToSend.toLowerCase().includes('code'))) {
-                const codeBlockMatch = response.data.answer.match(/```(?:javascript|js|typescript|ts)?\n([\s\S]*?)```/);
-                if (codeBlockMatch && codeBlockMatch[1]) {
-                }
-            }
-
-        } catch (err) {
-            console.error('AI Error:', err);
-            const errorMessage = {
-                role: 'ai',
-                content: 'Sorry, I encountered an error. Please try again.'
-            };
-            setMessages(prev => [...prev, errorMessage]);
+            setMessages(prev => [...prev, { role: 'ai', content: aiResponse }]);
+        } catch (error) {
+            console.error('AI Chat Error:', error);
+            setMessages(prev => [...prev, { role: 'ai', content: "Sorry, I encountered an error. Please try again." }]);
         } finally {
             setIsLoading(false);
             setLoadingMessage('');
@@ -97,9 +73,58 @@ const AIChat = React.forwardRef(({ topic, section, user, context = {}, codeConte
         }
     };
 
+    const updateEditorWithCode = (content) => {
+        // Extract code block if present
+        const codeBlockRegex = /```\w*\n([\s\S]*?)```/;
+        const match = content.match(codeBlockRegex);
+
+        if (match && match[1] && codeContext?.setCode) {
+            codeContext.setCode(match[1]);
+        } else if (codeContext?.setCode) {
+            // If no block, try setting content directly (though risky if explanation included)
+            // Better to only update if code block found, or ask user? 
+            // For now, if no block, maybe just ignore or try to clean it?
+            // Let's assume content IS the code if no blocks, or just notify user.
+            // But usually AI returns markdown.
+            // If no match, we don't update to avoid breaking editor with text.
+            console.warn("No code block found to update editor");
+        }
+    };
+
     return (
         <div className="ai-chat glass">
             <div className="chat-header">
+                <div className="chat-title">
+                    <div className="chat-icon">💬</div>
+                    <div>
+                        AI Tutor
+                        <div className="chat-subtitle">{topic ? topic : 'General Help'}</div>
+                    </div>
+                </div>
+                {onClose && (
+                    <button
+                        onClick={onClose}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            color: 'rgba(255,255,255,0.7)',
+                            cursor: 'pointer',
+                            padding: '8px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'background 0.2s'
+                        }}
+                        onMouseEnter={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
+                        onMouseLeave={(e) => e.target.style.background = 'transparent'}
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                )}
             </div>
 
             <div className="chat-messages" ref={chatContainerRef}>

@@ -34,7 +34,7 @@ import {
     AccessTime,
     FilterList
 } from '@mui/icons-material';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 
 const CategoryPage = () => {
     const { topicSlug, categorySlug } = useParams();
@@ -200,7 +200,7 @@ const CategoryPage = () => {
         return sections.length > 0 && sections.every(s => progressMap[s.slug]);
     }, [sections, progressMap]);
 
-    if (loading) return <LoadingSpinner message="Fetching category insights..." fullScreen />;
+    if (loading) return <GlobalLoader fullScreen />;
     if (!category) return <Typography>Category not found</Typography>;
 
     return (
@@ -247,25 +247,25 @@ const CategoryPage = () => {
                     <Box sx={{
                         p: 4,
                         borderRadius: '24px',
-                        background: isDark ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.6) 0%, rgba(20, 20, 20, 0.4) 100%)' : 'rgba(255, 255, 255, 0.8)',
-                        backdropFilter: 'blur(20px)',
+                        background: isDark ? 'rgba(30, 30, 30, 0.4)' : 'rgba(255, 255, 255, 0.65)',
+                        backdropFilter: 'blur(30px)',
                         border: '1px solid',
-                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
-                        boxShadow: isDark ? '0 8px 32px rgba(0, 0, 0, 0.2)' : '0 8px 32px rgba(0, 0, 0, 0.05)',
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.5)',
+                        boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.2)' : '0 10px 30px rgba(31, 38, 135, 0.05)',
                         position: 'relative',
                         overflow: 'hidden'
                     }}>
                         <Box sx={{ position: 'relative', zIndex: 1 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                <Box>
-                                    <Typography variant="overline" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'flex-start' }, gap: { xs: 2, md: 0 } }}>
+                                <Box sx={{ width: '100%' }}>
+                                    <Typography variant="overline" sx={{ color: topicColor, fontWeight: 700, letterSpacing: 1.5, textTransform: 'uppercase', fontSize: { xs: '0.7rem', md: '0.75rem' } }}>
                                         {category.group || 'CATEGORY'}
                                     </Typography>
-                                    <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, color: isDark ? '#fff' : '#1a1a1a', display: 'flex', alignItems: 'center', gap: 2 }}>
+                                    <Typography variant="h3" sx={{ fontWeight: 800, mb: 1, color: isDark ? '#fff' : '#1a1a1a', display: 'flex', alignItems: 'center', gap: 2, fontSize: { xs: '1.75rem', md: '3rem' }, flexWrap: 'wrap' }}>
                                         {category.name}
-                                        {allStudied && <EmojiEvents sx={{ color: '#FFD700', fontSize: 32 }} />}
+                                        {allStudied && <EmojiEvents sx={{ color: '#FFD700', fontSize: { xs: 24, md: 32 } }} />}
                                     </Typography>
-                                    <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: '800px', lineHeight: 1.7 }}>
+                                    <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: '800px', lineHeight: 1.7, fontSize: { xs: '0.9rem', md: '1rem' } }}>
                                         {category.description}
                                     </Typography>
                                 </Box>
@@ -279,14 +279,19 @@ const CategoryPage = () => {
                                         bgcolor: isBookmarked(category._id) ? `${topicColor}15` : 'transparent',
                                         border: '1px solid',
                                         borderColor: isBookmarked(category._id) ? `${topicColor}40` : 'rgba(128,128,128,0.2)',
-                                        '&:hover': { bgcolor: `${topicColor}15` }
+                                        '&:hover': { bgcolor: `${topicColor}15` },
+                                        alignSelf: { xs: 'flex-end', md: 'flex-start' }, // Align to right on mobile too
+                                        mt: { xs: -8, md: 0 }, // Pull up on mobile to sit next to title or over it if needed (optional styling choice, but safer to just stack or keep separate)
+                                        position: { xs: 'absolute', md: 'relative' },
+                                        top: { xs: 24, md: 'auto' },
+                                        right: { xs: 24, md: 'auto' }
                                     }}
                                 >
                                     {isBookmarked(category._id) ? <Bookmark /> : <BookmarkBorder />}
                                 </IconButton>
                             </Box>
 
-                            <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+                            <Box sx={{ mt: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                                 <Chip
                                     icon={<School sx={{ fontSize: 16 }} />}
                                     label={`${sections.length} Sections`}
@@ -353,13 +358,13 @@ const CategoryPage = () => {
 
                 {/* Sections List */}
                 <Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, px: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3, px: 1, flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { xs: 'flex-start', sm: 'center' } }}>
                         <Typography variant="h5" sx={{ fontWeight: 700 }}>
                             Sections
                         </Typography>
 
                         {/* Difficulty Filter */}
-                        <FormControl variant="outlined" size="small" sx={{ minWidth: 160 }}>
+                        <FormControl variant="outlined" size="small" sx={{ minWidth: 160, width: { xs: '100%', sm: 'auto' } }}>
                             <InputLabel>Filter Level</InputLabel>
                             <Select
                                 value={difficultyFilter}
@@ -387,37 +392,46 @@ const CategoryPage = () => {
                                         <Card
                                             onClick={() => navigate(`/topic/${topicSlug}/category/${categorySlug}/section/${section.slug}`)}
                                             sx={{
-                                                borderRadius: '20px',
-                                                background: isDark ? 'rgba(255,255,255,0.03)' : '#fff',
+                                                borderRadius: '24px',
+                                                background: isDark ? 'rgba(30, 30, 30, 0.4)' : 'rgba(255, 255, 255, 0.65)',
+                                                backdropFilter: 'blur(30px)',
                                                 border: '1px solid',
-                                                borderColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                                                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.5)',
+                                                boxShadow: isDark ? '0 10px 30px rgba(0, 0, 0, 0.2)' : '0 10px 30px rgba(31, 38, 135, 0.05)',
                                                 transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                                                 cursor: 'pointer',
                                                 '&:hover': {
-                                                    transform: 'translateY(-2px)',
-                                                    boxShadow: `0 8px 24px ${topicColor}15`,
-                                                    borderColor: `${topicColor}40`
+                                                    transform: 'translateY(-4px)',
+                                                    boxShadow: `0 20px 40px ${topicColor}20`,
+                                                    borderColor: `${topicColor}40`,
+                                                    background: isDark ? 'rgba(30,30,30,0.6)' : 'rgba(255,255,255,0.8)'
                                                 }
                                             }}
                                         >
-                                            <Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 3 }}>
-                                                {/* Index Number */}
-                                                <Typography variant="h4" sx={{
-                                                    fontWeight: 800,
-                                                    color: isCompleted ? '#30d158' : 'text.disabled',
-                                                    opacity: 0.3,
-                                                    minWidth: '40px'
-                                                }}>
-                                                    {String(index + 1).padStart(2, '0')}
-                                                </Typography>
+                                            <Box sx={{ p: { xs: 2, md: 3 }, display: 'flex', alignItems: { xs: 'flex-start', sm: 'center' }, gap: { xs: 2, md: 3 }, flexDirection: { xs: 'column', sm: 'row' } }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, width: { xs: '100%', sm: 'auto' }, mb: { xs: 1, sm: 0 } }}>
+                                                    {/* Index Number */}
+                                                    <Typography variant="h4" sx={{
+                                                        fontWeight: 800,
+                                                        color: isCompleted ? '#30d158' : 'text.disabled',
+                                                        opacity: 0.3,
+                                                        minWidth: '40px',
+                                                        fontSize: { xs: '1.5rem', md: '2.125rem' }
+                                                    }}>
+                                                        {String(index + 1).padStart(2, '0')}
+                                                    </Typography>
+
+                                                    {/* Content Mobile View - Merged here for simpler columnar layout if needed, but keeping separate for now */}
+                                                </Box>
 
                                                 {/* Content */}
-                                                <Box sx={{ flex: 1 }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                                                <Box sx={{ flex: 1, width: '100%' }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5, flexWrap: 'wrap' }}>
                                                         <Typography variant="h6" sx={{
                                                             fontWeight: 700,
                                                             textDecoration: isCompleted ? 'line-through' : 'none',
-                                                            opacity: isCompleted ? 0.6 : 1
+                                                            opacity: isCompleted ? 0.6 : 1,
+                                                            fontSize: { xs: '1rem', md: '1.25rem' }
                                                         }}>
                                                             {section.title}
                                                         </Typography>
@@ -444,13 +458,13 @@ const CategoryPage = () => {
                                                             }}
                                                         />
                                                     </Box>
-                                                    <Typography variant="body2" sx={{ color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                                    <Typography variant="body2" sx={{ color: 'text.secondary', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden', fontSize: { xs: '0.85rem', md: '0.875rem' } }}>
                                                         {section.description}
                                                     </Typography>
                                                 </Box>
 
                                                 {/* Actions */}
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'flex-end', sm: 'flex-start' }, mt: { xs: 1, sm: 0 } }}>
                                                     <IconButton
                                                         onClick={(e) => handleToggleProgress(e, section.slug)}
                                                         sx={{

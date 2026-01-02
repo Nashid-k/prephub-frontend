@@ -149,21 +149,21 @@ const Navbar = () => {
                                 justifyContent: 'space-between',
                                 background: (theme) =>
                                     theme.palette.mode === 'dark'
-                                        ? 'linear-gradient(135deg, rgba(30, 30, 30, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%)'
-                                        : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(250, 250, 250, 0.95) 100%)',
-                                backdropFilter: 'blur(20px) saturate(180%)',
+                                        ? 'rgba(30, 30, 30, 0.4)'
+                                        : 'rgba(255, 255, 255, 0.65)',
+                                backdropFilter: 'blur(30px) saturate(180%)',
                                 border: '1px solid',
                                 borderColor: (theme) =>
                                     theme.palette.mode === 'dark'
                                         ? 'rgba(255, 255, 255, 0.08)'
-                                        : 'rgba(0, 0, 0, 0.06)',
+                                        : 'rgba(255, 255, 255, 0.5)',
                                 borderRadius: '9999px',
                                 px: { xs: 2, md: 3 },
                                 py: 1.5,
                                 boxShadow: (theme) =>
                                     theme.palette.mode === 'dark'
-                                        ? '0 8px 32px rgba(0, 0, 0, 0.4)'
-                                        : '0 8px 32px rgba(0, 0, 0, 0.08)',
+                                        ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+                                        : '0 20px 40px rgba(0, 0, 0, 0.1)',
                                 transition: 'all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1)',
                             }}
                         >
@@ -213,8 +213,8 @@ const Navbar = () => {
                                         gap: 0.5,
                                         background: (theme) =>
                                             theme.palette.mode === 'dark'
-                                                ? 'rgba(255, 255, 255, 0.05)'
-                                                : 'rgba(0, 0, 0, 0.03)',
+                                                ? 'rgba(30, 30, 30, 0.4)'
+                                                : 'rgba(255, 255, 255, 0.5)',
                                         borderRadius: '9999px',
                                         p: 0.5,
                                         position: 'absolute',
@@ -374,13 +374,17 @@ const Navbar = () => {
                                                     minWidth: 200,
                                                     background: (theme) =>
                                                         theme.palette.mode === 'dark'
-                                                            ? 'rgba(30, 30, 30, 0.95)'
-                                                            : 'rgba(255, 255, 255, 0.95)',
-                                                    backdropFilter: 'blur(20px)',
+                                                            ? 'rgba(30, 30, 30, 0.4)'
+                                                            : 'rgba(255, 255, 255, 0.65)',
+                                                    backdropFilter: 'blur(30px)',
                                                     border: '1px solid',
+                                                    boxShadow: (theme) =>
+                                                        theme.palette.mode === 'dark'
+                                                            ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+                                                            : '0 20px 40px rgba(0, 0, 0, 0.1)',
                                                     borderColor: (theme) =>
                                                         theme.palette.mode === 'dark'
-                                                            ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+                                                            ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.5)',
                                                 },
                                             }}
                                         >

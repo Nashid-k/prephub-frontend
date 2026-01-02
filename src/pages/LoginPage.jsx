@@ -36,8 +36,8 @@ const LoginPage = () => {
                 justifyContent: 'center',
                 background: (theme) =>
                     theme.palette.mode === 'dark'
-                        ? 'radial-gradient(ellipse at center, rgba(10, 132, 255, 0.15) 0%, transparent 50%)'
-                        : 'radial-gradient(ellipse at center, rgba(10, 132, 255, 0.08) 0%, transparent 50%)',
+                        ? 'radial-gradient(circle at 50% 0%, rgba(10, 132, 255, 0.15) 0%, rgba(0, 0, 0, 0) 70%), radial-gradient(circle at 80% 10%, rgba(94, 92, 230, 0.1) 0%, rgba(0, 0, 0, 0) 50%)'
+                        : 'radial-gradient(circle at 50% 0%, rgba(10, 132, 255, 0.08) 0%, rgba(255, 255, 255, 0) 70%), radial-gradient(circle at 80% 10%, rgba(94, 92, 230, 0.05) 0%, rgba(255, 255, 255, 0) 50%)',
                 py: 6,
             }}
         >
@@ -46,6 +46,11 @@ const LoginPage = () => {
                     sx={{
                         borderRadius: '32px',
                         overflow: 'hidden',
+                        background: (theme) => theme.palette.mode === 'dark' ? 'rgba(30,30,30,0.4)' : 'rgba(255,255,255,0.65)',
+                        backdropFilter: 'blur(30px)',
+                        border: '1px solid',
+                        borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
+                        boxShadow: (theme) => theme.palette.mode === 'dark' ? '0 20px 40px rgba(0,0,0,0.3)' : '0 20px 40px rgba(10,132,255,0.1)',
                     }}
                 >
                     <CardContent sx={{ p: 6, textAlign: 'center' }}>

@@ -4,7 +4,7 @@ import { Container, Grid, Typography, Box, Button, Alert, useTheme as useMuiThem
 import { Refresh, Computer } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
 import TopicCard from '../components/features/dashboard/TopicCard';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import GlobalLoader from '../components/common/GlobalLoader';
 import { useNavigate } from 'react-router-dom';
 import { ArrowBack } from '@mui/icons-material';
 
@@ -43,7 +43,7 @@ const CSFundamentalsPage = () => {
 
     if (loading) {
         return (
-            <LoadingSpinner message="Initializing CS Fundamentals..." fullScreen />
+            <GlobalLoader fullScreen />
         );
     }
 
