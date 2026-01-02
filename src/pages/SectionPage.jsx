@@ -3,15 +3,15 @@ import { AnimatePresence } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, aiAPI, progressAPI, testCaseAPI } from '../services/api';
 import { useSectionAggregate } from '../hooks/useCurriculum';
-import AIChat from '../components/AIChat';
-import QuizModal from '../components/QuizModal';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { ContentSkeleton, EditorSkeleton } from '../components/SkeletonLoader';
+import AIChat from '../components/features/ai/AIChat';
+import QuizModal from '../components/features/quiz/QuizModal';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import { ContentSkeleton, EditorSkeleton } from '../components/common/SkeletonLoader';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Drawer } from '@mui/material';
-import Breadcrumb from '../components/Breadcrumb';
-import SafeImage from '../components/SafeImage';
-import AIOutputModal from '../components/AIOutputModal';
+import Breadcrumb from '../components/layout/Breadcrumb';
+import SafeImage from '../components/common/SafeImage';
+import AIOutputModal from '../components/features/ai/AIOutputModal';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 
 // Lazy load heavy components for better performance
@@ -21,7 +21,7 @@ const SyntaxHighlighter = React.lazy(() =>
         default: module.Prism
     }))
 );
-const CodeEditor = React.lazy(() => import('../components/CodeEditor'));
+const CodeEditor = React.lazy(() => import('../components/features/editor/CodeEditor'));
 import { useAuth } from '../context/AuthContext';
 import {
     Container,

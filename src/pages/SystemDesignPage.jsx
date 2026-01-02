@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 import { Container, Grid, Typography, Box, Button, Alert, useTheme as useMuiTheme } from '@mui/material';
 import { Refresh, Architecture } from '@mui/icons-material';
 import { curriculumAPI } from '../services/api';
-import TopicCard from '../components/TopicCard';
-import LoadingSpinner from '../components/LoadingSpinner';
+import TopicCard from '../components/features/dashboard/TopicCard';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import { useNavigate } from 'react-router-dom';
 import { ArrowBack } from '@mui/icons-material';
 

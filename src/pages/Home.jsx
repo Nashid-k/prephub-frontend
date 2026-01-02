@@ -38,7 +38,7 @@ import {
     Timeline,
     Architecture
 } from '@mui/icons-material';
-import OnboardingModal from '../components/OnboardingModal';
+import OnboardingModal from '../components/features/onboarding/OnboardingModal';
 import { progressAPI } from '../services/api';
 import { getBookmarks } from '../utils/bookmarks';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';

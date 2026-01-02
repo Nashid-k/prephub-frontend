@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import CategoryCard from '../components/CategoryCard';
+import CategoryCard from '../components/features/dashboard/CategoryCard';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -29,8 +29,8 @@ import { Collapse } from '@mui/material';
 import { curriculumAPI, categoryAPI, progressAPI } from '../services/api';
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks';
 import toast from 'react-hot-toast';
-import LoadingSpinner from '../components/LoadingSpinner';
-import SafeImage from '../components/SafeImage';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+import SafeImage from '../components/common/SafeImage';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 
 const TopicPage = () => {

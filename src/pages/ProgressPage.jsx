@@ -24,7 +24,7 @@ import {
     Timeline,
 } from '@mui/icons-material';
 import { progressAPI } from '../services/api';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import { getStreakData } from '../utils/streakTracker';
 import StudyHeatmap from '../components/analytics/StudyHeatmap';

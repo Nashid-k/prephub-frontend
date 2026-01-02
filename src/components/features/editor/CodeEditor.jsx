@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, Suspense, lazy } from 'react';
-import { compilerAPI } from '../services/api';
+import { compilerAPI } from '../../../services/api';
 import { Box, Button, Select, MenuItem, Typography, IconButton, Tooltip, CircularProgress, Chip, Stack } from '@mui/material';
 import { PlayArrow, CheckCircle, BugReport, Lightbulb, AutoFixHigh, ExpandMore, Code as CodeIcon } from '@mui/icons-material';
-import { trackCodeExecution } from '../services/analytics';
-import { useLanguage } from '../context/LanguageContext';
+import { trackCodeExecution } from '../../../services/analytics';
+import { useLanguage } from '../../../context/LanguageContext';
 import './CodeEditor.css';
 
 const Editor = lazy(() => import('@monaco-editor/react'));

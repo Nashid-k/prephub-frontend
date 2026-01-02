@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { aiAPI } from '../services/api';
+import { aiAPI } from '../../../services/api';
 import ReactMarkdown from 'react-markdown';
 import './AIChat.css';
 

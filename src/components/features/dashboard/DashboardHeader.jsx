@@ -4,8 +4,8 @@ import { PlayArrow, EmojiEvents, LocalFireDepartment, Psychology } from '@mui/ic
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { getStreakData } from '../utils/streakTracker';
-import { getTopicImage } from '../utils/topicMetadata';
+import { getStreakData } from '../../../utils/streakTracker';
+import { getTopicImage } from '../../../utils/topicMetadata';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 

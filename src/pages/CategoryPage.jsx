@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { curriculumAPI, progressAPI } from '../services/api';
 import { isBookmarked, toggleBookmark } from '../utils/bookmarks';
-import SafeImage from '../components/SafeImage';
+import SafeImage from '../components/common/SafeImage';
 import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import toast from 'react-hot-toast';
 import {
@@ -34,7 +34,7 @@ import {
     AccessTime,
     FilterList
 } from '@mui/icons-material';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 
 const CategoryPage = () => {
     const { topicSlug, categorySlug } = useParams();

@@ -20,7 +20,7 @@ import {
     TrendingUp,
 } from '@mui/icons-material';
 import { progressAPI } from '../services/api';
-import LoadingSpinner from '../components/LoadingSpinner';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import { getDueReviews, getDifficultyLabel, getDifficultyColor } from '../utils/spacedRepetition';
 
 const ReviewQueuePage = () => {

@@ -32,9 +32,9 @@ import {
     School,
     LocalCafe,
 } from '@mui/icons-material';
-import { useTheme } from '../context/ThemeContext';
-import { useAuth } from '../context/AuthContext';
-import SearchBar from './SearchBar';
+import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import SearchBar from '../features/search/SearchBar';
 import './Navbar.css';
 
 const Navbar = () => {

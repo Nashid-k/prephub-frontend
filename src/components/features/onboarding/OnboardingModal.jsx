@@ -36,7 +36,7 @@ import {
     ArrowBack
 } from '@mui/icons-material';
 import axios from 'axios';
-import { generateSmartPath } from '../utils/SmartCurriculum';
+import { generateSmartPath } from '../../../utils/SmartCurriculum';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 

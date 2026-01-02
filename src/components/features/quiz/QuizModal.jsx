@@ -7,7 +7,7 @@ import {
     Close, CheckCircle, Cancel, EmojiEvents, Psychology,
     Lightbulb, Refresh
 } from '@mui/icons-material';
-import { aiAPI } from '../services/api';
+import { aiAPI } from '../../../services/api';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;

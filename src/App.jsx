@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Navbar from './components/Navbar';
-import LoadingSpinner from './components/LoadingSpinner';
+import Navbar from './components/layout/Navbar';
+import LoadingSpinner from './components/common/LoadingSpinner';
 
 const Home = React.lazy(() => import('./pages/Home'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
@@ -22,7 +22,7 @@ const SystemDesignPage = React.lazy(() => import('./pages/SystemDesignPage'));
 const EngineeringPracticesPage = React.lazy(() => import('./pages/EngineeringPracticesPage'));
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { LanguageProvider } from './context/LanguageContext';
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import { Toaster } from 'react-hot-toast';
 import createAppTheme from './theme';
 import './App.css';
@@ -32,7 +32,7 @@ import { initAnalytics, trackPageView } from './services/analytics';
 import { useLocation } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
     return (

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent, Typography, Box, Chip, LinearProgress, IconButton, useTheme } from '@mui/material';
 import { TrendingUp, CheckCircle, PlayArrow, MenuBook, ArrowForward } from '@mui/icons-material';
-import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
+import { getTopicColor, getTopicImage } from '../../../utils/topicMetadata';
 import './TopicCard.css';
 
 const TopicCard = (props) => {
