@@ -100,6 +100,43 @@ const SectionPage = () => {
     // Always default to JavaScript (users can switch if needed)
     const defaultLanguage = 'javascript';
 
+    // Helper to generate boilerplate code based on problem title and language
+    const getBoilerplateCode = (title, lang) => {
+        const problemName = title.toLowerCase();
+        const funcName = title.replace(/\s+/g, '');
+        let args = ['nums'];
+        let log = 'console.log("Input:", nums);';
+
+        // Simple heuristic for common Blind 75 args
+        if (problemName.includes('two sum')) {
+            args = ['nums', 'target'];
+            log = 'console.log("nums:", nums, "target:", target);';
+        } else if (problemName.includes('stock')) {
+            args = ['prices'];
+            log = 'console.log("Prices:", prices);';
+        } else if (problemName.includes('tree') || problemName.includes('invert')) {
+            args = ['root'];
+            log = 'console.log("Root:", root);';
+        } else if (problemName.includes('string') || problemName.includes('anagram') || problemName.includes('message')) {
+            args = ['s'];
+            log = 'console.log("String:", s);';
+        }
+
+        switch (lang) {
+            case 'python':
+                return `# Practice ${title}\n\ndef ${title.toLowerCase().replace(/\s+/g, '_')}(${args.join(', ')}):\n    # Write your solution here\n    print("Input:", ${args[0]})\n    return None`;
+
+            case 'java':
+                return `// Practice ${title}\n\nclass Solution {\n    public void ${funcName}(${args.map(a => 'int[] ' + a).join(', ')}) {\n        // Write your solution here\n        System.out.println("Input: " + ${args[0]});\n    }\n}`;
+
+            case 'cpp':
+                return `// Practice ${title}\n\n#include <iostream>\n#include <vector>\nusing namespace std;\n\nclass Solution {\npublic:\n    void ${funcName}(${args.map(a => 'vector<int>& ' + a).join(', ')}) {\n        // Write your solution here\n        cout << "Input: " << ${args[0]}[0] << endl;\n    }\n};`;
+
+            default: // javascript, typescript, etc
+                return `// Practice ${title}\n\nfunction ${funcName}(${args.join(', ')}) {\n  // Write your solution here\n  ${log}\n  return null;\n}`;
+        }
+    };
+
     // Track activity automatically
     useActivityTracking(topicSlug, { categorySlug, sectionSlug });
 
@@ -168,27 +205,38 @@ const SectionPage = () => {
         return blocks;
     };
 
+
     const handleLanguageSelect = async (newLang) => {
         if (newLang === selectedLanguage) return;
-
         setLanguageMenuAnchor(null);
-        setTargetLanguage(newLang); // Set target language for loading message
+
+        // If in Practice Mode (Blind 75), just switch the editor boilerplate
+        if (activeTab === 'practice' && category?.group?.startsWith('Blind 75')) {
+            setSelectedLanguage(newLang);
+            if (section) {
+                // Check if user has modified code significantly? 
+                // For now, always offer to reset or just switch language and let them keep code if they want?
+                // The user request implies "switching" which usually means getting the snippet in that language.
+                // We'll replace with boilerplate for the new language.
+                const boilerplate = getBoilerplateCode(section.title, newLang);
+                setEditorCode(boilerplate);
+                toast.success(`Switched to ${newLang} boilerplate`);
+            }
+            return;
+        }
+
+        // Otherwise (Learn Mode), do the full AI translation of content
+        setTargetLanguage(newLang);
         setLanguageChangeLoading(true);
 
         try {
-            // Extract code blocks from current content
+            // ... existing translation logic ...
             const codeBlocks = extractCodeBlocks(aiContent);
-
             if (codeBlocks.length === 0) {
-                // No code blocks, just change language marker
                 setSelectedLanguage(newLang);
                 setLanguageChangeLoading(false);
                 return;
             }
-
-            console.log(`🔄 Translating ${codeBlocks.length} code blocks from ${selectedLanguage} to ${newLang}`);
-
-            // Translate only the code blocks via API
             const response = await aiAPI.translateCode(
                 codeBlocks.map(b => b.code),
                 selectedLanguage,
@@ -211,21 +259,13 @@ const SectionPage = () => {
 
             setAiContent(newContent);
             setSelectedLanguage(newLang);
-
-            console.log(`✅ Language switched: ${selectedLanguage} → ${newLang} (explanations preserved)`);
-
-        } catch (error) {
-            console.error('Code translation failed:', error);
-            console.log('⚠️ Falling back to full content regeneration');
-
-            // Fallback: regenerate full content if translation fails
-            if (section && category) {
-                await generateAIContent(section, category, newLang);
-                setSelectedLanguage(newLang);
-            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to translate content");
+            setSelectedLanguage(newLang); // Force switch anyway
         } finally {
             setLanguageChangeLoading(false);
-            setTargetLanguage(null); // Clear target language after translation
+            setTargetLanguage(null);
         }
     };
 
@@ -365,22 +405,7 @@ const SectionPage = () => {
         // Initialize Editor Code if not already set or if section changed
         if (sectionData) {
             if (isBlind75) {
-                const problemName = sectionData.title.toLowerCase();
-                let functionSignature = 'nums';
-                let exampleLog = 'console.log("Input array:", nums);';
-
-                if (problemName.includes('two sum')) {
-                    functionSignature = 'nums, target';
-                    exampleLog = 'console.log("nums:", nums, "target:", target);';
-                } else if (problemName.includes('three sum')) {
-                    functionSignature = 'nums';
-                } else if (problemName.includes('best time') || problemName.includes('stock')) {
-                    functionSignature = 'prices';
-                    exampleLog = 'console.log("Prices:", prices);';
-                }
-
-                const functionName = sectionData.title.replace(/\s+/g, '');
-                setEditorCode(`// Practice ${sectionData.title}\n\nfunction ${functionName}(${functionSignature}) {\n  // Write your solution here\n  ${exampleLog}\n  return null;\n}`);
+                setEditorCode(getBoilerplateCode(sectionData.title, selectedLanguage));
             } else {
                 setEditorCode(`// Practice ${sectionData.title}\n\n// Write your solution here...`);
             }
@@ -1116,7 +1141,7 @@ Write ONLY the problem description, like you're reading it on LeetCode before lo
                                                         </Box>
                                                         <Box sx={{ flex: 1, height: '100%', minWidth: 0, overflow: 'hidden' }}>
                                                             <CodeEditor
-                                                                defaultLanguage={topicSlug === 'typescript' ? 'typescript' : 'javascript'}
+                                                                defaultLanguage={selectedLanguage}
                                                                 code={editorCode}
                                                                 onCodeChange={setEditorCode}
                                                                 testCases={testCases}

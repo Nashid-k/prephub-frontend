@@ -451,7 +451,7 @@ const CodeEditor = ({
                     <Editor
                         height="100%"
                         language={language}
-                        defaultValue={code}
+                        value={code}
                         onChange={(value) => onCodeChange(value || '')}
                         theme="prephub-dark"
                         beforeMount={(monaco) => {
