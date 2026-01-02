@@ -71,8 +71,7 @@ export const aiAPI = {
   askQuestion: (question, context = {}, language = 'javascript', experienceLevel = 'advanced') => 
     api.post('/ai/ask', { question, context, language, experienceLevel }),
   
-  generateInterviewQuestions: (topic, type = 'both', difficulty = 'medium') => 
-    api.post('/ai/interview-questions', { topic, type, difficulty }),
+
   
   generateQuiz: (topic, section, regenerate = false, language = 'javascript', content = '', experienceLevel = 'advanced') => 
     api.post('/ai/quiz', { topic, section, regenerate, language, content, experienceLevel }),
