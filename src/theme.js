@@ -4,7 +4,7 @@ const getDesignTokens = (mode) => ({
     palette: {
         mode,
         primary: {
-            main: mode === 'dark' ? '#0a84ff' : '#007aff',
+            main: mode === 'dark' ? '#0a84ff' : '#0069d9', // Darker blue for light mode (4.5:1+)
             light: '#409cff',
             dark: '#0066cc',
         },
@@ -14,17 +14,17 @@ const getDesignTokens = (mode) => ({
             dark: '#4240b8',
         },
         success: {
-            main: '#30d158',
+            main: mode === 'dark' ? '#30d158' : '#1a7f37', // Darker green for light mode
             light: '#5de67c',
             dark: '#26a644',
         },
         warning: {
-            main: '#ff9f0a',
+            main: mode === 'dark' ? '#ff9f0a' : '#b07000', // Darker orange/brown for light mode
             light: '#ffb340',
             dark: '#cc7f08',
         },
         error: {
-            main: '#ff453a',
+            main: mode === 'dark' ? '#ff453a' : '#d32f2f', // Darker red for light mode
             light: '#ff6961',
             dark: '#cc372e',
         },
