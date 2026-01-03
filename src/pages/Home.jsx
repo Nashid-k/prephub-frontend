@@ -396,7 +396,7 @@ const Home = () => {
                                 return (
                                     <Grid item xs={12}>
                                         <CardContent sx={{
-                                            p: 4,
+                                            p: { xs: 2, md: 4 },
                                             bgcolor: isDark ? 'rgba(30, 30, 30, 0.4)' : 'rgba(255, 255, 255, 0.65)',
                                             borderRadius: '24px',
                                             border: '1px solid',
@@ -404,21 +404,31 @@ const Home = () => {
                                             backdropFilter: 'blur(30px)',
                                             boxShadow: isDark ? '0 20px 60px rgba(0,0,0,0.4)' : '0 20px 60px rgba(0,0,0,0.1)',
                                             display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 4
+                                            flexDirection: { xs: 'column', md: 'row' },
+                                            alignItems: { xs: 'stretch', md: 'center' },
+                                            gap: { xs: 2, md: 4 }
                                         }}>
-                                            <Box sx={{ width: 80, height: 80, borderRadius: '20px', bgcolor: `${topicColor}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <Box sx={{
+                                                width: { xs: 60, md: 80 },
+                                                height: { xs: 60, md: 80 },
+                                                borderRadius: '20px',
+                                                bgcolor: `${topicColor}20`,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                alignSelf: { xs: 'center', md: 'auto' }
+                                            }}>
                                                 <img
                                                     src={getTopicImage(progress.activeTopic.topicSlug)}
                                                     alt={progress.activeTopic.topicName}
                                                     style={{ width: '50%' }}
                                                 />
                                             </Box>
-                                            <Box sx={{ flex: 1 }}>
-                                                <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{progress.activeTopic.topicName}</Typography>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                                    <LinearProgress variant="determinate" value={progress.activeTopic.percentage} sx={{ width: 200, height: 8, borderRadius: 4, bgcolor: `${topicColor}20`, '& .MuiLinearProgress-bar': { bgcolor: topicColor } }} />
-                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: topicColor }}>{progress.activeTopic.percentage}% Complete</Typography>
+                                            <Box sx={{ flex: 1, textAlign: { xs: 'center', md: 'left' } }}>
+                                                <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, fontSize: { xs: '1.25rem', md: '1.5rem' } }}>{progress.activeTopic.topicName}</Typography>
+                                                <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: 'center', gap: 2, mb: 2 }}>
+                                                    <LinearProgress variant="determinate" value={progress.activeTopic.percentage} sx={{ width: { xs: '100%', md: 200 }, height: 8, borderRadius: 4, bgcolor: `${topicColor}20`, '& .MuiLinearProgress-bar': { bgcolor: topicColor } }} />
+                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: topicColor, whiteSpace: 'nowrap' }}>{progress.activeTopic.percentage}% Complete</Typography>
                                                 </Box>
                                             </Box>
                                             <Button
@@ -431,7 +441,9 @@ const Home = () => {
                                                     fontWeight: 700,
                                                     px: 4,
                                                     py: 1.5,
-                                                    boxShadow: `0 8px 20px ${topicColor}40`
+                                                    boxShadow: `0 8px 20px ${topicColor}40`,
+                                                    alignSelf: { xs: 'center', md: 'auto' },
+                                                    width: { xs: '100%', md: 'auto' }
                                                 }}
                                             >
                                                 Continue

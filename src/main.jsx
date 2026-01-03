@@ -3,9 +3,13 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import './App.css';
 import { registerSW } from 'virtual:pwa-register';
+import { initAnalytics } from './services/analytics';
 
 // Register Service Worker
 registerSW({ immediate: true });
+
+// Initialize Google Analytics
+initAnalytics();
 
 // Highlight.js logic removed in favor of component-based highlighting in pages
 
