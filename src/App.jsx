@@ -35,6 +35,7 @@ import { initAnalytics, trackPageView } from './services/analytics';
 // useLocation imported above
 
 import { AuthProvider } from './context/AuthContext';
+import { LoaderProvider } from './context/LoaderContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
 function App() {
@@ -68,108 +69,110 @@ function AppContent() {
         <MuiThemeProvider theme={muiTheme}>
             <CssBaseline />
             <ErrorBoundary>
-                <AuthProvider>
-                    <SocketProvider>
-                        <AnalyticsWrapper />
-                        <div className="App">
-                            <Navbar />
-                            <React.Suspense fallback={<GlobalLoader fullScreen />}>
-                                <AnimatePresence mode="wait">
-                                    <Routes location={location} key={location.pathname}>
-                                        <Route path="/" element={<PageTransition><Home /></PageTransition>} />
-                                        <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
-                                        <Route
-                                            path="/dashboard"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <PageTransition><Dashboard /></PageTransition>
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/dsa"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <PageTransition><DSAPage /></PageTransition>
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/cs-fundamentals"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <PageTransition><CSFundamentalsPage /></PageTransition>
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/system-design"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <PageTransition><SystemDesignPage /></PageTransition>
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route
-                                            path="/engineering-practices"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <PageTransition><EngineeringPracticesPage /></PageTransition>
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route path="/topic/:slug" element={<PageTransition><TopicPage /></PageTransition>} />
-                                        <Route path="/topic/:topicSlug/category/:categorySlug" element={<PageTransition><CategoryPage /></PageTransition>} />
-                                        <Route path="/topic/:topicSlug/category/:categorySlug/section/:sectionSlug" element={<PageTransition><SectionPage /></PageTransition>} />
-                                        <Route
-                                            path="/progress"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <PageTransition><ProgressPage /></PageTransition>
-                                                </ProtectedRoute>
-                                            }
-                                        />
+                <LoaderProvider>
+                    <AuthProvider>
+                        <SocketProvider>
+                            <AnalyticsWrapper />
+                            <div className="App">
+                                <Navbar />
+                                <React.Suspense fallback={<GlobalLoader fullScreen />}>
+                                    <AnimatePresence mode="wait">
+                                        <Routes location={location} key={location.pathname}>
+                                            <Route path="/" element={<PageTransition><Home /></PageTransition>} />
+                                            <Route path="/login" element={<PageTransition><LoginPage /></PageTransition>} />
+                                            <Route
+                                                path="/dashboard"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <PageTransition><Dashboard /></PageTransition>
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+                                            <Route
+                                                path="/dsa"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <PageTransition><DSAPage /></PageTransition>
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+                                            <Route
+                                                path="/cs-fundamentals"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <PageTransition><CSFundamentalsPage /></PageTransition>
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+                                            <Route
+                                                path="/system-design"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <PageTransition><SystemDesignPage /></PageTransition>
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+                                            <Route
+                                                path="/engineering-practices"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <PageTransition><EngineeringPracticesPage /></PageTransition>
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+                                            <Route path="/topic/:slug" element={<PageTransition><TopicPage /></PageTransition>} />
+                                            <Route path="/topic/:topicSlug/category/:categorySlug" element={<PageTransition><CategoryPage /></PageTransition>} />
+                                            <Route path="/topic/:topicSlug/category/:categorySlug/section/:sectionSlug" element={<PageTransition><SectionPage /></PageTransition>} />
+                                            <Route
+                                                path="/progress"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <PageTransition><ProgressPage /></PageTransition>
+                                                    </ProtectedRoute>
+                                                }
+                                            />
 
-                                        <Route
-                                            path="/bookmarks"
-                                            element={
-                                                <ProtectedRoute>
-                                                    <PageTransition><BookmarksPage /></PageTransition>
-                                                </ProtectedRoute>
-                                            }
-                                        />
-                                        <Route path="/share" element={<PageTransition><ShareCodePage /></PageTransition>} />
-                                        <Route path="/reviews" element={<PageTransition><ReviewQueuePage /></PageTransition>} />
-                                        <Route path="/collab" element={<PageTransition><YjsCollaborative /></PageTransition>} />
-                                    </Routes>
-                                </AnimatePresence>
-                            </React.Suspense>
-                            <Toaster
-                                position="top-right"
-                                toastOptions={{
-                                    duration: 4000,
-                                    style: {
-                                        background: '#363636',
-                                        color: '#fff',
-                                        borderRadius: '10px',
-                                    },
-                                    success: {
-                                        iconTheme: {
-                                            primary: '#10b981',
-                                            secondary: '#fff',
+                                            <Route
+                                                path="/bookmarks"
+                                                element={
+                                                    <ProtectedRoute>
+                                                        <PageTransition><BookmarksPage /></PageTransition>
+                                                    </ProtectedRoute>
+                                                }
+                                            />
+                                            <Route path="/share" element={<PageTransition><ShareCodePage /></PageTransition>} />
+                                            <Route path="/reviews" element={<PageTransition><ReviewQueuePage /></PageTransition>} />
+                                            <Route path="/collab" element={<PageTransition><YjsCollaborative /></PageTransition>} />
+                                        </Routes>
+                                    </AnimatePresence>
+                                </React.Suspense>
+                                <Toaster
+                                    position="top-right"
+                                    toastOptions={{
+                                        duration: 4000,
+                                        style: {
+                                            background: '#363636',
+                                            color: '#fff',
+                                            borderRadius: '10px',
                                         },
-                                    },
-                                    error: {
-                                        iconTheme: {
-                                            primary: '#ef4444',
-                                            secondary: '#fff',
+                                        success: {
+                                            iconTheme: {
+                                                primary: '#10b981',
+                                                secondary: '#fff',
+                                            },
                                         },
-                                    },
-                                }}
-                            />
-                        </div>
-                    </SocketProvider>
-                </AuthProvider>
+                                        error: {
+                                            iconTheme: {
+                                                primary: '#ef4444',
+                                                secondary: '#fff',
+                                            },
+                                        },
+                                    }}
+                                />
+                            </div>
+                        </SocketProvider>
+                    </AuthProvider>
+                </LoaderProvider>
             </ErrorBoundary>
         </MuiThemeProvider>
     );
