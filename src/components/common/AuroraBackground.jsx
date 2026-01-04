@@ -18,6 +18,7 @@ const AuroraBackground = ({
 }) => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
+    const deviceMemory = navigator.deviceMemory || 8; // use to tune visuals on low-end devices
 
     // Mouse tracking for subtle parallax
     const mouseX = useMotionValue(0);
@@ -28,13 +29,22 @@ const AuroraBackground = ({
     const springX = useSpring(mouseX, springConfig);
     const springY = useSpring(mouseY, springConfig);
 
+    // Throttle mouse move with requestAnimationFrame to avoid main-thread spikes
+    let raf = null;
     const handleMouseMove = ({ clientX, clientY }) => {
-        const { innerWidth, innerHeight } = window;
-        // Normalize to -0.5 to 0.5
-        const x = (clientX / innerWidth) - 0.5;
-        const y = (clientY / innerHeight) - 0.5;
-        mouseX.set(x * 20); // 20px max movement
-        mouseY.set(y * 20);
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // avoid if user prefers reduced motion
+        if (raf) return;
+        raf = requestAnimationFrame(() => {
+            const { innerWidth, innerHeight } = window;
+            const x = (clientX / innerWidth) - 0.5;
+            const y = (clientY / innerHeight) - 0.5;
+            // reduce intensity on low-memory devices
+            const deviceMemory = navigator.deviceMemory || 8;
+            const intensityFactor = deviceMemory < 4 ? 0.4 : 1;
+            mouseX.set(x * 20 * intensityFactor);
+            mouseY.set(y * 20 * intensityFactor);
+            raf = null;
+        });
     };
 
     // Dynamic gradient colors based on prop and theme
@@ -88,9 +98,10 @@ const AuroraBackground = ({
                         height: '60vw',
                         borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
                         background: `radial-gradient(circle at center, ${color}, transparent 70%)`,
-                        filter: 'blur(80px)',
-                        opacity: 0.6,
-                        mixBlendMode: isDark ? 'screen' : 'multiply'
+                        filter: deviceMemory < 4 ? 'blur(36px)' : 'blur(80px)',
+                        opacity: deviceMemory < 4 ? 0.45 : 0.6,
+                        mixBlendMode: isDark ? 'screen' : 'multiply',
+                        willChange: 'transform, opacity'
                     }} />
                 </motion.div>
 

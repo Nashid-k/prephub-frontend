@@ -24,6 +24,8 @@ const getSessionId = () => {
   return sessionId;
 };
 
+import requestTracker from '../utils/requestTracker';
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -32,9 +34,25 @@ api.interceptors.request.use(
     } else {
       config.headers['x-session-id'] = getSessionId();
     }
+    // Track request start
+    try {
+      config.__requestTrackerId = requestTracker.startRequest({ url: config.url || config.baseURL || '', method: config.method });
+    } catch (e) {}
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Track response end
+api.interceptors.response.use(
+  (response) => {
+    try { requestTracker.endRequest(response.config.__requestTrackerId); } catch (e) {}
+    return response;
+  },
+  (error) => {
+    try { requestTracker.endRequest(error?.config?.__requestTrackerId); } catch (e) {}
     return Promise.reject(error);
   }
 );

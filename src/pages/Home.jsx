@@ -46,6 +46,7 @@ import { getTopicColor, getTopicImage } from '../utils/topicMetadata';
 import { useAuth } from '../context/AuthContext';
 import useJourney from '../hooks/useJourney';
 import './Home.css';
+import usePerformanceProfile from '../hooks/usePerformanceProfile';
 
 import { styled } from '@mui/material/styles';
 
@@ -69,6 +70,9 @@ const Home = () => {
     const isDark = theme.palette.mode === 'dark';
     const navigate = useNavigate();
     const [progress, setProgress] = useState(null);
+
+    // Performance profile
+    const { lowPower, prefersReducedMotion } = require('../hooks/usePerformanceProfile')();
     const [recentBookmarks, setRecentBookmarks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState({ topics: 0, sections: 0, active: 0 });
@@ -313,8 +317,8 @@ const Home = () => {
                                 : 'rgba(255, 255, 255, 0.65)',
                             border: '1px solid',
                             borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
-                            backdropFilter: 'blur(30px)',
-                            boxShadow: isDark ? '0 20px 60px rgba(0,0,0,0.4)' : '0 20px 60px rgba(0,0,0,0.1)',
+                            backdropFilter: lowPower ? 'none' : 'blur(30px)',
+                            boxShadow: lowPower ? '0 6px 14px rgba(0,0,0,0.06)' : (isDark ? '0 20px 60px rgba(0,0,0,0.4)' : '0 20px 60px rgba(0,0,0,0.1)'),
                             position: 'relative',
                             overflow: 'hidden'
                         }}
@@ -362,8 +366,8 @@ const Home = () => {
                                                 bgcolor: isDark ? 'rgba(30, 30, 30, 0.4)' : 'rgba(255, 255, 255, 0.65)',
                                                 border: '1px solid',
                                                 borderColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.5)',
-                                                backdropFilter: 'blur(30px)',
-                                                boxShadow: isDark ? '0 10px 30px rgba(0,0,0,0.2)' : '0 10px 30px rgba(31, 38, 135, 0.05)',
+                                                backdropFilter: lowPower ? 'none' : 'blur(30px)',
+                                                boxShadow: lowPower ? '0 6px 14px rgba(0,0,0,0.06)' : (isDark ? '0 10px 30px rgba(0,0,0,0.2)' : '0 10px 30px rgba(31, 38, 135, 0.05)'),
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: { xs: 1.5, md: 2 },
