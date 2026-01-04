@@ -17,6 +17,7 @@ import axios from 'axios';
 import { getStreakData } from '../utils/streakTracker';
 import './Dashboard.css';
 import { generateSmartPath, getNextRecommendation } from '../utils/SmartCurriculum';
+import AuroraBackground from '../components/common/AuroraBackground';
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -769,7 +770,7 @@ const Dashboard = () => {
                     </Box>
                 </motion.div>
             </Container>
-        </Box>
+        </AuroraBackground>
     );
 };
 
