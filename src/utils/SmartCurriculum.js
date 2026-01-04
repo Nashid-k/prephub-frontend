@@ -20,6 +20,39 @@ const DEPENDENCY_GRAPH = {
     'algorithms': ['data-structures']
 };
 
+// Cache configuration for AI ordering
+const AI_ORDERING_CACHE_KEY = 'prephub_ai_ordering_cache';
+const AI_ORDERING_CACHE_TTL = 1000 * 60 * 60; // 1 hour
+
+// Helper to get cached AI ordering
+const getCachedAIOrdering = (pathId) => {
+    try {
+        const cached = localStorage.getItem(`${AI_ORDERING_CACHE_KEY}_${pathId}`);
+        if (cached) {
+            const { data, timestamp } = JSON.parse(cached);
+            if (Date.now() - timestamp < AI_ORDERING_CACHE_TTL) {
+                return data;
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to load cached AI ordering', e);
+    }
+    return null;
+};
+
+// Helper to cache AI ordering
+const cacheAIOrdering = (pathId, ordering) => {
+    try {
+        localStorage.setItem(`${AI_ORDERING_CACHE_KEY}_${pathId}`, JSON.stringify({
+            data: ordering,
+            timestamp: Date.now()
+        }));
+    } catch (e) {
+        console.warn('Failed to cache AI ordering', e);
+    }
+};
+
+
 const PATH_RULES = {
     'new-beginner': {
         experienceLevels: {
@@ -135,7 +168,19 @@ const PATH_RULES = {
     }
 };
 
+// Memoization cache for dependency sorting
+const sortCache = new Map();
+const getSortCacheKey = (topics) => {
+    return topics.map(t => t.slug).sort().join(',');
+};
+
 const sortTopicsByDependency = (topics) => {
+    // Check cache first
+    const cacheKey = getSortCacheKey(topics);
+    if (sortCache.has(cacheKey)) {
+        return sortCache.get(cacheKey);
+    }
+
     const topicMap = new Map(topics.map(t => [t.slug, t]));
     const visited = new Set();
     const result = [];
@@ -155,7 +200,7 @@ const sortTopicsByDependency = (topics) => {
 
         tempVisited.delete(slug);
         visited.add(slug);
-        
+
         const topic = topicMap.get(slug);
         if (topic) result.push(topic);
     };
@@ -165,12 +210,21 @@ const sortTopicsByDependency = (topics) => {
         visit(t.slug);
     });
 
+    // Cache the result
+    sortCache.set(cacheKey, result);
+
+    // Limit cache size to prevent memory leaks
+    if (sortCache.size > 50) {
+        const firstKey = sortCache.keys().next().value;
+        sortCache.delete(firstKey);
+    }
+
     return result;
 };
 
 export const generateSmartPath = (allTopics, pathId, experienceLevel = '0-1_year') => {
     if (!pathId || pathId === 'all' || !PATH_RULES[pathId]) {
-        return sortTopicsByDependency(allTopics); 
+        return sortTopicsByDependency(allTopics);
     }
 
     const rules = PATH_RULES[pathId];
@@ -180,15 +234,15 @@ export const generateSmartPath = (allTopics, pathId, experienceLevel = '0-1_year
     if (rules.experienceLevels) {
         // Add current level topics
         if (rules.experienceLevels[experienceLevel]) {
-             rules.experienceLevels[experienceLevel].forEach(slug => selectedSlugs.add(slug));
+            rules.experienceLevels[experienceLevel].forEach(slug => selectedSlugs.add(slug));
         }
-        
+
         // Add previous levels (cumulative learning)
         if (experienceLevel === '1-3_years') {
-             rules.experienceLevels['0-1_year']?.forEach(slug => selectedSlugs.add(slug));
+            rules.experienceLevels['0-1_year']?.forEach(slug => selectedSlugs.add(slug));
         } else if (experienceLevel === '3-5_years') {
-             rules.experienceLevels['0-1_year']?.forEach(slug => selectedSlugs.add(slug));
-             rules.experienceLevels['1-3_years']?.forEach(slug => selectedSlugs.add(slug));
+            rules.experienceLevels['0-1_year']?.forEach(slug => selectedSlugs.add(slug));
+            rules.experienceLevels['1-3_years']?.forEach(slug => selectedSlugs.add(slug));
         }
     }
 
@@ -205,7 +259,7 @@ export const generateSmartPath = (allTopics, pathId, experienceLevel = '0-1_year
 
     // 4. Fallback: If no experienceLevels defined (legacy), use old logic (keywords inclusion)
     if (!rules.experienceLevels && rules.keywords) {
-         filteredTopics = allTopics.filter(topic => {
+        filteredTopics = allTopics.filter(topic => {
             const slug = topic.slug.toLowerCase();
             if (rules.exclude && rules.exclude.some(ex => slug.includes(ex))) return false;
             if (rules.include && rules.include.includes(slug)) return true;
@@ -224,7 +278,7 @@ export const getPathMetadata = (pathId) => {
 
 export const getNextRecommendation = (topics) => {
     if (!topics || topics.length === 0) return null;
-    
+
     return topics.find(t => {
         const p = t.progress !== undefined ? t.progress : (t.completionPercentage || 0);
         return p < 100;

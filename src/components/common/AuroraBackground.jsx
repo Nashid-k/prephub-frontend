@@ -18,9 +18,13 @@ const AuroraBackground = ({
 }) => {
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
-    const deviceMemory = navigator.deviceMemory || 8; // use to tune visuals on low-end devices
+    const deviceMemory = navigator.deviceMemory || 8;
 
-    // Mouse tracking for subtle parallax
+    // Determine if we should render animations
+    const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const shouldAnimate = deviceMemory >= 4 && !prefersReducedMotion;
+
+    // Mouse tracking for subtle parallax (only if animating)
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
 
@@ -32,14 +36,13 @@ const AuroraBackground = ({
     // Throttle mouse move with requestAnimationFrame to avoid main-thread spikes
     let raf = null;
     const handleMouseMove = ({ clientX, clientY }) => {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // avoid if user prefers reduced motion
+        if (!shouldAnimate) return; // Skip on low-power devices
         if (raf) return;
         raf = requestAnimationFrame(() => {
             const { innerWidth, innerHeight } = window;
             const x = (clientX / innerWidth) - 0.5;
             const y = (clientY / innerHeight) - 0.5;
             // reduce intensity on low-memory devices
-            const deviceMemory = navigator.deviceMemory || 8;
             const intensityFactor = deviceMemory < 4 ? 0.4 : 1;
             mouseX.set(x * 20 * intensityFactor);
             mouseY.set(y * 20 * intensityFactor);
@@ -73,93 +76,107 @@ const AuroraBackground = ({
                 zIndex: 0,
                 overflow: 'hidden',
             }}>
-                {/* Main Topic Color Blob */}
-                <motion.div
-                    style={{
-                        x: springX,
-                        y: springY,
-                    }}
-                    animate={{
-                        scale: [1, 1.1, 1],
-                        rotate: [0, 5, -5, 0],
-                        opacity: [blobOpacity, blobOpacity * 0.8, blobOpacity]
-                    }}
-                    transition={{
-                        duration: 10,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                >
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '-10%',
-                        left: '-10%',
-                        width: '60vw',
-                        height: '60vw',
-                        borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
-                        background: `radial-gradient(circle at center, ${color}, transparent 70%)`,
-                        filter: deviceMemory < 4 ? 'blur(36px)' : 'blur(80px)',
-                        opacity: deviceMemory < 4 ? 0.45 : 0.6,
-                        mixBlendMode: isDark ? 'screen' : 'multiply',
-                        willChange: 'transform, opacity'
-                    }} />
-                </motion.div>
+                {shouldAnimate ? (
+                    <>
+                        {/* Main Topic Color Blob */}
+                        <motion.div
+                            style={{
+                                x: springX,
+                                y: springY,
+                            }}
+                            animate={{
+                                scale: [1, 1.1, 1],
+                                rotate: [0, 5, -5, 0],
+                                opacity: [blobOpacity, blobOpacity * 0.8, blobOpacity]
+                            }}
+                            transition={{
+                                duration: 10,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                        >
+                            <Box sx={{
+                                position: 'absolute',
+                                top: '-10%',
+                                left: '-10%',
+                                width: '60vw',
+                                height: '60vw',
+                                borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%',
+                                background: `radial-gradient(circle at center, ${color}, transparent 70%)`,
+                                filter: 'blur(80px)',
+                                opacity: 0.6,
+                                mixBlendMode: isDark ? 'screen' : 'multiply',
+                                willChange: 'transform, opacity'
+                            }} />
+                        </motion.div>
 
-                {/* Secondary Accent Blob (Cyan/Blue) */}
-                <motion.div
-                    animate={{
-                        scale: [1.2, 1, 1.2],
-                        x: [0, 50, 0],
-                        y: [0, -30, 0],
-                        rotate: [0, -10, 0]
-                    }}
-                    transition={{
-                        duration: 15,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                    }}
-                >
-                    <Box sx={{
-                        position: 'absolute',
-                        top: '20%',
-                        right: '-10%',
-                        width: '50vw',
-                        height: '50vw',
-                        borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
-                        background: `radial-gradient(circle at center, ${isDark ? '#4ade80' : '#818cf8'}, transparent 70%)`, // Green/Indigo ACCENT
-                        filter: 'blur(90px)',
-                        opacity: 0.4,
-                        mixBlendMode: isDark ? 'screen' : 'multiply'
-                    }} />
-                </motion.div>
+                        {/* Secondary Accent Blob (Cyan/Blue) */}
+                        <motion.div
+                            animate={{
+                                scale: [1.2, 1, 1.2],
+                                x: [0, 50, 0],
+                                y: [0, -30, 0],
+                                rotate: [0, -10, 0]
+                            }}
+                            transition={{
+                                duration: 15,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                        >
+                            <Box sx={{
+                                position: 'absolute',
+                                top: '20%',
+                                right: '-10%',
+                                width: '50vw',
+                                height: '50vw',
+                                borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+                                background: `radial-gradient(circle at center, ${isDark ? '#4ade80' : '#818cf8'}, transparent 70%)`,
+                                filter: 'blur(90px)',
+                                opacity: 0.4,
+                                mixBlendMode: isDark ? 'screen' : 'multiply'
+                            }} />
+                        </motion.div>
 
-                {/* Third "Depth" Blob (Purple/Rose) */}
-                <motion.div
-                    animate={{
-                        scale: [0.9, 1.1, 0.9],
-                        x: [0, -40, 0],
-                        rotate: [0, 15, 0]
-                    }}
-                    transition={{
-                        duration: 12,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: 2
-                    }}
-                >
+                        {/* Third "Depth" Blob (Purple/Rose) */}
+                        <motion.div
+                            animate={{
+                                scale: [0.9, 1.1, 0.9],
+                                x: [0, -40, 0],
+                                rotate: [0, 15, 0]
+                            }}
+                            transition={{
+                                duration: 12,
+                                repeat: Infinity,
+                                ease: "easeInOut",
+                                delay: 2
+                            }}
+                        >
+                            <Box sx={{
+                                position: 'absolute',
+                                bottom: '-10%',
+                                left: '20%',
+                                width: '50vw',
+                                height: '50vw',
+                                borderRadius: '50% 50% 30% 70% / 50% 50% 70% 60%',
+                                background: `radial-gradient(circle at center, ${isDark ? '#a78bfa' : '#fb7185'}, transparent 70%)`,
+                                filter: 'blur(100px)',
+                                opacity: 0.3,
+                                mixBlendMode: isDark ? 'screen' : 'multiply'
+                            }} />
+                        </motion.div>
+                    </>
+                ) : (
+                    // Static gradient fallback for low-power devices
                     <Box sx={{
                         position: 'absolute',
-                        bottom: '-10%',
-                        left: '20%',
-                        width: '50vw',
-                        height: '50vw',
-                        borderRadius: '50% 50% 30% 70% / 50% 50% 70% 60%',
-                        background: `radial-gradient(circle at center, ${isDark ? '#a78bfa' : '#fb7185'}, transparent 70%)`, // Purple/Rose ACCENT
-                        filter: 'blur(100px)',
-                        opacity: 0.3,
-                        mixBlendMode: isDark ? 'screen' : 'multiply'
+                        inset: 0,
+                        background: isDark
+                            ? `radial-gradient(circle at 20% 20%, ${color}15, transparent 50%), radial-gradient(circle at 80% 80%, #818cf815, transparent 50%)`
+                            : `radial-gradient(circle at 20% 20%, ${color}10, transparent 50%), radial-gradient(circle at 80% 80%, #818cf810, transparent 50%)`,
+                        opacity: 0.6
                     }} />
-                </motion.div>
+                )}
 
                 {/* Noise Texture Overlay for "Film Grain" Feel */}
                 <Box sx={{
