@@ -38,20 +38,9 @@ export const AuthProvider = ({ children }) => {
             console.warn('Failed to parse onboarding data', e);
         }
 
-        const isLocal = window.location.hostname === 'localhost' || '127.0.0.1';
-
         if (storedToken && storedUser) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
-        } else if (isLocal) {
-            const devUser = {
-                _id: 'dev-user-id',
-                name: 'Local Developer',
-                email: 'dev@prephub.local',
-                picture: 'https://ui-avatars.com/api/?name=Local+Developer',
-                isDev: true
-            };
-            setUser(devUser);
         }
         setLoading(false);
     }, []);
