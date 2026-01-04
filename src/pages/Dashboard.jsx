@@ -350,9 +350,10 @@ const Dashboard = () => {
     }
 
     return (
-        <Box sx={{ minHeight: 'calc(100vh - 100px)', py: 6 }}>
-            <Container maxWidth="xl">
-                <OnboardingModal
+        <AuroraBackground>
+            <Box sx={{ minHeight: 'calc(100vh - 100px)', py: 6 }}>
+                <Container maxWidth="xl">
+                    <OnboardingModal
                     open={showOnboarding}
                     onComplete={handleOnboardingComplete}
                     onSkip={handleOnboardingSkip}
@@ -770,6 +771,7 @@ const Dashboard = () => {
                     </Box>
                 </motion.div>
             </Container>
+            </Box>
         </AuroraBackground>
     );
 };
