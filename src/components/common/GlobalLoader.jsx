@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
+import { useLoader } from '../../context/LoaderContext';
+import LoaderInner from './LoaderInner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { getCategoryFromPath, processMessage } from '../../utils/loadingMessages';
@@ -100,6 +102,11 @@ const GlobalLoader = ({ isDark: propsIsDark, fullScreen = false }) => {
                     </Typography>
                 </motion.div>
             </AnimatePresence>
+
+            {/* Progress and AI hint (if available) */}
+            <Box sx={{ width: '60%', mt: 3 }}>
+                <LoaderInner />
+            </Box>
             <style>
                 {`
                     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
