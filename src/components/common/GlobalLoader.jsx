@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
-import { AutoAwesome } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { getCategoryFromPath, processMessage } from '../../utils/loadingMessages';
@@ -53,19 +52,30 @@ const GlobalLoader = ({ isDark: propsIsDark, fullScreen = false }) => {
             gap: 4
         }}>
             <Box sx={{ position: 'relative' }}>
+                {/* Animated rings using theme colors */}
                 <Box sx={{
                     position: 'absolute', inset: -20, borderRadius: '50%',
-                    border: '2px solid transparent', borderTopColor: '#0a84ff', borderRightColor: '#bf5af2',
-                    animation: 'spin 1.5s linear infinite'
+                    border: '3px solid transparent',
+                    borderTopColor: theme.palette.primary.main,
+                    borderRightColor: theme.palette.secondary.main,
+                    animation: 'spin 1.6s linear infinite'
                 }} />
                 <Box sx={{
                     position: 'absolute', inset: -10, borderRadius: '50%',
-                    border: '2px solid transparent', borderBottomColor: '#34c759', borderLeftColor: '#ff9f0a',
-                    animation: 'spin 2s linear infinite reverse'
+                    border: '3px solid transparent',
+                    borderBottomColor: theme.palette.success.main,
+                    borderLeftColor: theme.palette.warning.main,
+                    animation: 'spin 2.2s linear infinite reverse'
                 }} />
-                <AutoAwesome sx={{
-                    fontSize: 48,
-                    color: isDark ? 'white' : '#1a1a1a',
+
+                {/* Central brand blob - matches Aurora background styling */}
+                <Box sx={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: '50%',
+                    background: `radial-gradient(circle at 30% 30%, ${theme.palette.primary.main}, ${theme.palette.secondary.main} 60%)`,
+                    boxShadow: `0 6px 24px ${theme.palette.mode === 'dark' ? 'rgba(59,130,246,0.12)' : 'rgba(37,99,235,0.08)'}`,
+                    transform: 'translateZ(0)',
                     animation: 'pulse 2s infinite'
                 }} />
             </Box>
@@ -78,14 +88,13 @@ const GlobalLoader = ({ isDark: propsIsDark, fullScreen = false }) => {
                 >
                     <Typography variant="h5" sx={{
                         fontWeight: 600,
-                        background: isDark
-                            ? 'linear-gradient(45deg, #fff, #aaa)'
-                            : 'linear-gradient(45deg, #000, #555)',
+                        background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                         backgroundClip: 'text',
                         WebkitBackgroundClip: 'text',
                         color: 'transparent',
                         WebkitTextFillColor: 'transparent',
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        fontFamily: theme.typography.fontFamily
                     }}>
                         {processMessage(texts[textIndex], dynamicData)}
                     </Typography>
@@ -108,13 +117,16 @@ const GlobalLoader = ({ isDark: propsIsDark, fullScreen = false }) => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                zIndex: 9999,
-                bgcolor: isDark ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)',
-                backdropFilter: 'blur(10px)',
+                zIndex: 1400,
+                bgcolor: isDark ? 'rgba(9,10,12,0.85)' : 'rgba(255,255,255,0.92)',
+                backdropFilter: 'blur(6px)',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'background-color 0.2s ease'
             }}>
+                {/* Slight border to match app cards */}
+                <Box sx={{ position: 'absolute', inset: 0, border: `1px solid ${theme.palette.divider}`, pointerEvents: 'none' }} />
                 {content}
             </Box>
         );
