@@ -7,7 +7,7 @@ import { getTopicColor, getTopicImage } from '../../../utils/topicMetadata';
 import './TopicCard.css';
 
 const TopicCard = (props) => {
-    const { topic } = props;
+    const { topic, reduced = false } = props;
     const theme = useTheme();
     const isDark = theme.palette.mode === 'dark';
 
@@ -152,16 +152,19 @@ const TopicCard = (props) => {
                         theme.palette.mode === 'dark'
                             ? 'rgba(30, 30, 30, 0.4)' // More translucent
                             : 'rgba(255, 255, 255, 0.65)',
-                    backdropFilter: 'blur(30px)', // Deep blur
                     border: '1px solid',
                     borderColor: (theme) =>
                         theme.palette.mode === 'dark'
                             ? 'rgba(255, 255, 255, 0.08)'
                             : 'rgba(255, 255, 255, 0.5)',
                     boxShadow: (theme) =>
-                        theme.palette.mode === 'dark'
-                            ? '0 20px 40px rgba(0, 0, 0, 0.4)' // Stronger shadow for depth
-                            : '0 20px 40px rgba(31, 38, 135, 0.1)',
+                        reduced
+                            ? '0 6px 12px rgba(0,0,0,0.06)'
+                            : (theme.palette.mode === 'dark'
+                                ? '0 20px 40px rgba(0, 0, 0, 0.4)'
+                                : '0 20px 40px rgba(31, 38, 135, 0.1)'),
+                    // Only apply heavy blur on capable devices
+                    backdropFilter: reduced ? 'none' : 'blur(30px)',
                     transition: 'all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
                     '&:hover': {
                         transform: 'translateY(-8px)',

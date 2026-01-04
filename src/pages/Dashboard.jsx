@@ -18,6 +18,7 @@ import { getStreakData } from '../utils/streakTracker';
 import './Dashboard.css';
 import { generateSmartPath, getNextRecommendation } from '../utils/SmartCurriculum';
 import AuroraBackground from '../components/common/AuroraBackground';
+import usePerformanceProfile from '../hooks/usePerformanceProfile';
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -34,6 +35,10 @@ const Dashboard = () => {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [aiStrategy, setAiStrategy] = useState(null);
     const [onboardingStep, setOnboardingStep] = useState(1);
+
+    // Performance profile
+    const { lowPower, prefersReducedMotion } = usePerformanceProfile();
+    const [visibleCount, setVisibleCount] = React.useState(12);
 
     // React Query for Topics
     const {
@@ -734,38 +739,56 @@ const Dashboard = () => {
                                     </Box>
                                 </>
                             )}
-                            {filteredTopics.filter(t => {
-                                if (t.isGroup) return true;
-                                const HIDDEN_CHILDREN = [
-                                    'algorithms', 'data-structures', 'blind-75', 'dsa',
-                                    'operating-systems', 'networking',
-                                    'system-design', 'api-design', 'security-engineering', 'reliability-observability', 'caching-performance', 'concurrency', 'concurrency-async',
-                                    'testing-strategy', 'devops-basics', 'code-quality', 'product-thinking'
-                                ];
-                                const CORE_GROUPS = ['algorithms-data-structures', 'cs-fundamentals', 'system-design-architecture', 'engineering-practices'];
-                                return !HIDDEN_CHILDREN.includes(t.slug) && !CORE_GROUPS.includes(t.slug);
-                            }).map((topic, index) => (
-                                <Box key={topic._id} sx={{ display: 'flex', height: 'auto' }}>
-                                    <motion.div
-                                        initial={{ opacity: 0, scale: 0.9 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        transition={{
-                                            duration: 0.3,
-                                            delay: index * 0.05 + 0.4,
-                                            ease: [0.25, 0.1, 0.25, 1],
-                                        }}
-                                        style={{ width: '100%', height: '100%' }}
-                                    >
-                                        <TopicCard topic={topic} />
-                                    </motion.div>
-                                </Box>
-                            ))}
+                            {(() => {
+                                const visible = filteredTopics.filter(t => {
+                                    if (t.isGroup) return true;
+                                    const HIDDEN_CHILDREN = [
+                                        'algorithms', 'data-structures', 'blind-75', 'dsa',
+                                        'operating-systems', 'networking',
+                                        'system-design', 'api-design', 'security-engineering', 'reliability-observability', 'caching-performance', 'concurrency', 'concurrency-async',
+                                        'testing-strategy', 'devops-basics', 'code-quality', 'product-thinking'
+                                    ];
+                                    const CORE_GROUPS = ['algorithms-data-structures', 'cs-fundamentals', 'system-design-architecture', 'engineering-practices'];
+                                    return !HIDDEN_CHILDREN.includes(t.slug) && !CORE_GROUPS.includes(t.slug);
+                                }).slice(0, visibleCount);
+
+                                return visible.map((topic, index) => (
+                                    <Box key={topic._id} sx={{ display: 'flex', height: 'auto' }}>
+                                        {(!lowPower && !prefersReducedMotion) ? (
+                                            <motion.div
+                                                initial={{ opacity: 0, scale: 0.9 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                transition={{
+                                                    duration: 0.3,
+                                                    delay: index * 0.03 + 0.15,
+                                                    ease: [0.25, 0.1, 0.25, 1],
+                                                }}
+                                                style={{ width: '100%', height: '100%' }}
+                                            >
+                                                <TopicCard topic={topic} reduced={lowPower} />
+                                            </motion.div>
+                                        ) : (
+                                            <div style={{ width: '100%', height: '100%' }}>
+                                                <TopicCard topic={topic} reduced={lowPower} />
+                                            </div>
+                                        )}
+                                    </Box>
+                                ));
+                            })()}
                         </Box>
                         {topics.length === 0 && !loading && !error && (
                             <Box sx={{ textAlign: 'center', py: 8 }}>
                                 <Typography variant="h5" color="text.secondary">
                                     No topics available yet
                                 </Typography>
+                            </Box>
+                        )}
+
+                        {filteredTopics.length > visibleCount && (
+                            <Box sx={{ textAlign: 'center', mt: 4 }}>
+                                <Button variant="outlined" onClick={() => setVisibleCount(v => v + 12)}>
+                                    Show more topics
+                                </Button>
                             </Box>
                         )}
                     </Box>

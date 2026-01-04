@@ -4,16 +4,22 @@ let nextId = 1;
 const inflight = new Map();
 const ewma = new Map(); // key -> { avg, alpha }
 
-function emit() {
-  const snapshot = {
+function buildSnapshot() {
+  return {
     inflight: Array.from(inflight.values()).map(r => ({ id: r.id, url: r.url, method: r.method, startTime: r.startTime })),
     ewma: Object.fromEntries(Array.from(ewma.entries()).map(([k, v]) => [k, v.avg]))
   };
+}
+
+function emit() {
+  const snapshot = buildSnapshot();
   listeners.forEach(cb => cb(snapshot));
 }
 
 export function onChange(cb) {
   listeners.add(cb);
+  // call immediately with current snapshot so late subscribers get current state
+  try { cb(buildSnapshot()); } catch (e) { /* swallow listener errors */ }
   return () => listeners.delete(cb);
 }
 
