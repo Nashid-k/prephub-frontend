@@ -1,0 +1,48 @@
+{
+    "name": "prephub-frontend",
+    "version": "1.0.0",
+    "description": "Frontend for PrepHub - MERN Preparation Platform",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.1",
+        "@monaco-editor/react": "^4.6.0",
+        "@mui/icons-material": "^7.3.6",
+        "@mui/material": "^7.3.6",
+        "@react-oauth/google": "^0.13.4",
+        "@tanstack/react-query": "^5.90.16",
+        "@vercel/analytics": "^1.6.1",
+        "@vercel/speed-insights": "^1.3.1",
+        "axios": "^1.7.9",
+        "canvas-confetti": "^1.9.4",
+        "chart.js": "^4.5.1",
+        "dexie": "^4.2.1",
+        "dexie-react-hooks": "^4.2.0",
+        "driver.js": "^1.4.0",
+        "framer-motion": "^12.23.26",
+        "jwt-decode": "^4.0.0",
+        "lz-string": "^1.5.0",
+        "react": "^18.3.1",
+        "react-chartjs-2": "^5.3.1",
+        "react-dom": "^18.3.1",
+        "react-ga4": "^2.1.0",
+        "react-hot-toast": "^2.6.0",
+        "react-icons": "^5.4.0",
+        "react-markdown": "^9.0.1",
+        "react-router-dom": "^7.1.1",
+        "react-syntax-highlighter": "^15.6.1",
+        "zustand": "^5.0.9"
+    },
+    "devDependencies": {
+        "@types/react": "^18.3.18",
+        "@types/react-dom": "^18.3.5",
+        "@vitejs/plugin-react": "^4.3.4",
+        "vite": "^6.0.5",
+        "vite-plugin-pwa": "^1.2.0"
+    }
+}

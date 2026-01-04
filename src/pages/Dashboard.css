@@ -1,0 +1,115 @@
+.dashboard {
+    min-height: 100vh;
+    padding: 120px 0 4rem;
+    background: radial-gradient(circle at top center, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    padding: 0 var(--spacing-md);
+}
+
+.dashboard-title {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    margin-bottom: var(--spacing-lg);
+    letter-spacing: -0.04em;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--text-primary) 30%, var(--text-secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.1;
+}
+
+.dashboard-subtitle {
+    font-size: clamp(1.125rem, 2vw, 1.25rem);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 0 auto;
+    font-weight: 400;
+}
+
+.topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    padding: 0 var(--spacing-md);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    min-height: 60vh;
+}
+
+.loading {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-container p {
+    margin-top: var(--spacing-lg);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    min-height: 50vh;
+    text-align: center;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--border-color);
+    max-width: 500px;
+    margin: 4rem auto;
+}
+
+.error-message {
+    color: #ff453a;
+    margin-bottom: var(--spacing-lg);
+    font-size: 1.125rem;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 100px 0 2rem;
+    }
+
+    .topics-grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+    }
+
+    .dashboard-header {
+        margin-bottom: 3rem;
+    }
+}
